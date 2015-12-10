@@ -1,0 +1,5 @@
+module_version = "0.0.1"
+block_a_module_version = "0.0.1"
+block_b_module_version = "0.5.1"
+block_a_version = "0.0.1"
+block_b_version = "0.2.1"
