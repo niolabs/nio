@@ -6,8 +6,7 @@ from nio.metadata.properties import PropertyHolder, StringProperty, \
 from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
-from nio.common.block.attribute.input_output \
-    import get_class_attributes, Input, Output
+from nio.block.terminals import Terminal, TerminalType, Input, Output
 
 
 @Input("default")
@@ -129,11 +128,9 @@ class Block(PropertyHolder, CommandHolder):
     def get_description(cls):
         properties = super().get_description()
         commands = cls.get_command_description()
-        attributes = get_class_attributes(cls)
 
         return {'properties': properties,
-                'commands': commands,
-                'attributes': attributes}
+                'commands': commands}
 
     def properties(self):
         """ Returns block runtime properties
@@ -142,11 +139,13 @@ class Block(PropertyHolder, CommandHolder):
 
     @property
     def inputs(self):
-        return Input.get_class_attribute(self.__class__)
+        return list(Terminal.get_terminals_on_class(
+            self.__class__, TerminalType.input))
 
     @property
     def outputs(self):
-        return Output.get_class_attribute(self.__class__)
+        return list(Terminal.get_terminals_on_class(
+            self.__class__, TerminalType.output))
 
     def is_input_valid(self, input_id):
         """ Find out if input is valid
