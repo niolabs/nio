@@ -95,7 +95,7 @@ class Terminal(object):
         return terminals
 
     @classmethod
-    def _get_terminals_entry(cls, class_to_inspect, terminal_type):
+    def _get_terminals_entry(cls, _class, terminal_type):
         """ Get the string for the attribute we should save to.
 
         This method will return a string indicating where subsequent attribute
@@ -105,7 +105,7 @@ class Terminal(object):
         collide with subclasses or parent classes.
 
         Args:
-            class_to_inspect (cls): The class we will save the attribute on
+            _class (cls): The class we will save the attribute on
             terminal_type (TerminalType): What type of terminal type we will
                 be saving
 
@@ -113,8 +113,7 @@ class Terminal(object):
             str: A string indicating where the attribute shoudl reside on the
                 class
         """
-        return "_{}_{}_attributes".format(
-            class_to_inspect.__name__, terminal_type.value)
+        return "_{}_{}_attributes".format(_class.__name__, terminal_type.value)
 
 
 class Input(Terminal):

@@ -1,5 +1,5 @@
 from unittest.mock import MagicMock
-from nio.common.block.base import Block
+from nio.block.base import Block
 from nio.common.command import command
 from nio.common.command.params.string import StringParameter
 from nio.common.command.params.int import IntParameter

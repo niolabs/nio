@@ -1,12 +1,12 @@
 import unittest
-from nio.common.block.base import Block
-from nio.common.block.context import BlockContext
+from nio.block.base import Block
+from nio.block.context import BlockContext
 from nio.common.block.router.base import BaseBlockRouter, InvalidBlockOutput, \
     InvalidBlockInput
 from nio.common.block.controller import BlockController
 from nio.common.block.router.context import RouterContext
 from nio.util.support.test_case import NIOTestCaseNoModules
-from nio.common.block.attribute import Attribute
+from nio.block.terminals import Input, Output
 
 
 class OutputBlock(Block):
@@ -16,12 +16,12 @@ class OutputBlock(Block):
         self.name = self.__class__.__name__.lower()
 
 
-@Attribute("output", "first")
+@Output("first")
 class FirstOutputBlock(OutputBlock):
     pass
 
 
-@Attribute("output", "second")
+@Output("second")
 class SecondOutputBlock(Block):
     pass
 
@@ -37,12 +37,12 @@ class InputBlock(Block):
         self.signal_cache.append(signals)
 
 
-@Attribute("input", "first")
+@Input("first")
 class FirstInputBlock(InputBlock):
     pass
 
 
-@Attribute("input", "second")
+@Input("second")
 class SecondInputBlock(InputBlock):
     pass
 

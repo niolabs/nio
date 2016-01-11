@@ -1,5 +1,5 @@
 from unittest.mock import MagicMock
-from nio.common.block.base import Block
+from nio.block.base import Block
 from nio.common.command.base import MissingCommandArg, InvalidCommandArg
 from nio.common.signal.base import Signal
 from nio.common.command import command

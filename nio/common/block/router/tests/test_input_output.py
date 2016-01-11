@@ -1,7 +1,7 @@
 import unittest
-from nio.common.block.attribute import Input, Output
-from nio.common.block.base import Block
-from nio.common.block.context import BlockContext
+from nio.block.terminals import Input, Output
+from nio.block.base import Block
+from nio.block.context import BlockContext
 from nio.common.block.router.base import BaseBlockRouter
 from nio.common.block.controller import BlockController
 from nio.common.block.router.context import RouterContext

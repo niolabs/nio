@@ -1,6 +1,6 @@
 from nio.common.block.router.base import InvalidBlockOutput
 from nio.util.support.block_test_case import NIOBlockTestCase
-from nio.common.block.base import Block
+from nio.block.base import Block
 from nio.common.signal.base import Signal
 from nio.common.signal.status import BlockStatusSignal
 from nio.common.block.controller import BlockStatus

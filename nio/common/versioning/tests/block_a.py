@@ -1,6 +1,6 @@
 from nio.common.versioning.tests import block_a_version, block_a_module_version
 from nio.common.versioning.dependency import DependsOn
-from nio.common.block.base import Block
+from nio.block.base import Block
 
 __version__ = block_a_version
 

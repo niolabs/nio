@@ -1,7 +1,7 @@
 from threading import Event
-from nio.common.block import MissingBlock
-from nio.common.block.base import Block
-from nio.common.block.context import BlockContext
+from nio.common.block.router.base import MissingBlock
+from nio.block.base import Block
+from nio.block.context import BlockContext
 from nio.common.block.router.base import BaseBlockRouter, \
     BlockRouterNotStarted, RouterStatus
 from nio.common.block.router.threaded import ThreadedBaseBlockRouter

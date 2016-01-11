@@ -1,3 +1,8 @@
+""" The base class for creating nio Blocks.
+
+A block contains modular functionality to be used inside of Services. To create
+a custom block, extend this Block class and override the appropriate methods.
+"""
 from nio.common.command import command
 from nio.common.command.holder import CommandHolder
 from nio.common.block.router import BlockRouter
@@ -6,6 +11,7 @@ from nio.metadata.properties import PropertyHolder, StringProperty, \
 from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
+from nio.block.context import BlockContext
 from nio.block.terminals import Terminal, TerminalType, Input, Output
 
 
@@ -27,45 +33,28 @@ class Block(PropertyHolder, CommandHolder):
     log_level = SelectProperty(LogLevel, title="Log Level", default="NOTSET")
 
     def __init__(self):
-        """ Initializes block variables.
+        """ Create a new block instance.
 
-        Args:
-            None
+        Take care of setting up instance variables in your block's constructor.
+        Note that the properties of the block are not available when the block
+        is created. Those will be available when the block is configured.
 
-        Returns:
-            None
-
+        It is normally meaningless to pass variables to the constructor of the
+        block. Any data the block requires will be passed through the
+        BlockContext when the block is configured.
         """
-
+        super().__init__()
         # store block type so that it gets serialized
         self.type = self.__class__.__name__
 
         self._block_router = None
+        # We will replace the block's logger with its own name once we learn
+        # what that name is during configure()
         self._logger = get_nio_logger('default')
         self.persistence = None
 
-    def start(self):
-        """The overrideable method to be called when the block's parent
-        controller is started.
-
-        The block creator can assume at this point that the block's
-        initialization is complete and that the service or parent controller
-        is in "starting" state.
-        """
-        pass
-
-    def stop(self):
-        """The overrideable method to be called when the block's parent
-        controller is stopped.
-
-        The block creator can assume at this point that the service or
-        parent controller is in "stopping" state. All functional modules are
-        still available for use in the service process.
-        """
-        pass
-
     def configure(self, context):
-        """Configure method to override when subclassing block
+        """Overrideable method to be called when the block configures.
 
         The block creator should call the configure method on the parent,
         after which it can assume that any parent configuration options present
@@ -74,12 +63,13 @@ class Block(PropertyHolder, CommandHolder):
         started.
 
         Args:
-            context (ServiceContext (block): The context to use to configure
-            the block.
+            context (BlockContext): The context to use to configure the block.
 
         Raises:
             TypeError: If the specified router is not a BlockRouter
         """
+        if not isinstance(context, BlockContext):
+            raise TypeError("Block must be configured with a BlockContext")
         # Ensure it is a BlockRouter so we can safely notify
         if not isinstance(context.block_router, BlockRouter):
             raise TypeError("Block's router must be instance of BlockRouter")
@@ -94,6 +84,24 @@ class Block(PropertyHolder, CommandHolder):
 
         self.persistence = Persistence(self.name)
 
+    def start(self):
+        """Overrideable method to be called when the block starts.
+
+        The block creator can assume at this point that the block's
+        initialization is complete and that the service and block router
+        are in "starting" state.
+        """
+        pass  # pragma: no cover
+
+    def stop(self):
+        """Overrideable method to be called when the block stops.
+
+        The block creator can assume at this point that the service and block
+        router are in "stopping" state. All modules are still available for use
+        in the service process.
+        """
+        pass  # pragma: no cover
+
     def notify_signals(self, signals, output_id='default'):
         """Notify signals to router.
 
@@ -102,30 +110,44 @@ class Block(PropertyHolder, CommandHolder):
 
         Args:
             signals (list): A list of signals to notify to the router
-            output_id: output identifier
+            output_id: The identifier of the output terminal to notify the
+                signals on
         """
         self._block_router.notify_signals(self, signals, output_id)
 
     def notify_management_signal(self, signal):
+        """Notify a management signal to router.
+
+        This is a special type of signal notification that does not actually
+        propogate signals in the service. Instead, it is used to communicate
+        some information to the block router about the block. For example,
+        the block can report itself in an error state and thus prevent other
+        signals from being delivered to it.
+        """
         self._block_router.notify_management_signal(self, signal)
 
     def process_signals(self, signals, input_id='default'):
-        """The overrideable method to be called when signals are sent to the
-        block from the block's router.
+        """Overrideable method to be called when signals are delivered.
 
-        This method will be called by the parent context whenever signals
+        This method will be called by the block router whenever signals
         are sent to the block. The method should not return the modified
         signals, but rather call `notify_signals` so that the router
         can route them properly.
 
         Args:
             signals (list): A list of signals to be processed by the block
-            input_id: input identifier
+            input_id: The identifier of the input terminal the signals are
+                being delivered to
         """
         pass  # pragma: no cover
 
     @classmethod
     def get_description(cls):
+        """ Get a dictionary description of this block.
+
+        Returns:
+            dict: A dictionary containing the blocks properties and commands
+        """
         properties = super().get_description()
         commands = cls.get_command_description()
 
@@ -133,17 +155,18 @@ class Block(PropertyHolder, CommandHolder):
                 'commands': commands}
 
     def properties(self):
-        """ Returns block runtime properties
-        """
+        """ Returns block runtime properties """
         return self.to_dict()
 
     @property
     def inputs(self):
+        """ A list of the block's input terminals """
         return list(Terminal.get_terminals_on_class(
             self.__class__, TerminalType.input))
 
     @property
     def outputs(self):
+        """ A list of the block's output terminals """
         return list(Terminal.get_terminals_on_class(
             self.__class__, TerminalType.output))
 
@@ -152,6 +175,9 @@ class Block(PropertyHolder, CommandHolder):
 
         Args:
             input_id: input identifier
+
+        Returns:
+            bool: True if the input ID exists on this block
         """
         return input_id in self.inputs
 
@@ -159,6 +185,9 @@ class Block(PropertyHolder, CommandHolder):
         """ Find out if output is valid
 
         Args:
-            output_id: input identifier
+            output_id: output identifier
+
+        Returns:
+            bool: True if the output ID exists on this block
         """
         return output_id in self.outputs

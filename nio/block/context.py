@@ -1,8 +1,4 @@
-"""
-
-  Block Context
-
-"""
+""" The data that a block will be configured with """
 
 
 class BlockContext(object):

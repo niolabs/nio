@@ -76,3 +76,10 @@ class TestInputOutput(NIOTestCaseNoModules):
         # Try to fetch a bad terminal
         with self.assertRaises(TypeError):
             Terminal.get_terminals_on_class(Block, "not a real terminal type")
+
+    def test_import_locations(self):
+        """Make sure the Input and Output can be imported from nio.block"""
+        from nio.block import Input as blockInput
+        from nio.block import Output as blockOutput
+        self.assertEqual(blockInput, Input)
+        self.assertEqual(blockOutput, Output)
