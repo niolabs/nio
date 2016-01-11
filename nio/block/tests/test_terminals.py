@@ -1,24 +1,24 @@
 from nio.block.base import Block
 from nio.util.support.test_case import NIOTestCaseNoModules
-from nio.block.terminals import Input, Output, Terminal, TerminalType
+from nio.block.terminals import input, output, Terminal, TerminalType
 
 
-@Input("i1")
-@Input("i2")
-@Output("o1")
-@Output("o2")
+@input("i1")
+@input("i2")
+@output("o1")
+@output("o2")
 class Parent(Block):
     pass
 
 
-@Input("ParentSubClass_input")
-@Output("ParentSubClass_output")
+@input("ParentSubClass_input")
+@output("ParentSubClass_output")
 class ParentSubClass(Parent):
     pass
 
 
-@Input("i1")
-@Output("o2")
+@input("i1")
+@output("o2")
 class Duplicates(Parent):
     pass
 
@@ -78,8 +78,8 @@ class TestInputOutput(NIOTestCaseNoModules):
             Terminal.get_terminals_on_class(Block, "not a real terminal type")
 
     def test_import_locations(self):
-        """Make sure the Input and Output can be imported from nio.block"""
-        from nio.block import Input as blockInput
-        from nio.block import Output as blockOutput
-        self.assertEqual(blockInput, Input)
-        self.assertEqual(blockOutput, Output)
+        """Make sure the input and output can be imported from nio.block"""
+        from nio.block import input as blockInput
+        from nio.block import output as blockOutput
+        self.assertEqual(blockInput, input)
+        self.assertEqual(blockOutput, output)

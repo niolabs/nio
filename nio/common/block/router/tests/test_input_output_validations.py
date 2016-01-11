@@ -6,7 +6,7 @@ from nio.common.block.router.base import BaseBlockRouter, InvalidBlockOutput, \
 from nio.common.block.controller import BlockController
 from nio.common.block.router.context import RouterContext
 from nio.util.support.test_case import NIOTestCaseNoModules
-from nio.block.terminals import Input, Output
+from nio.block.terminals import input, output
 
 
 class OutputBlock(Block):
@@ -16,12 +16,12 @@ class OutputBlock(Block):
         self.name = self.__class__.__name__.lower()
 
 
-@Output("first")
+@output("first")
 class FirstOutputBlock(OutputBlock):
     pass
 
 
-@Output("second")
+@output("second")
 class SecondOutputBlock(Block):
     pass
 
@@ -37,12 +37,12 @@ class InputBlock(Block):
         self.signal_cache.append(signals)
 
 
-@Input("first")
+@input("first")
 class FirstInputBlock(InputBlock):
     pass
 
 
-@Input("second")
+@input("second")
 class SecondInputBlock(InputBlock):
     pass
 

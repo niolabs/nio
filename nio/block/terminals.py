@@ -116,7 +116,7 @@ class Terminal(object):
         return "_{}_{}_attributes".format(_class.__name__, terminal_type.value)
 
 
-class Input(Terminal):
+class input(Terminal):
 
     """A decorator for an input terminal on a block"""
 
@@ -125,7 +125,7 @@ class Input(Terminal):
         super().__init__(TerminalType.input, input_name)
 
 
-class Output(Terminal):
+class output(Terminal):
 
     """A decorator for an output terminal on a block"""
 

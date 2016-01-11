@@ -1,1 +1,1 @@
-from nio.block.terminals import Input, Output
+from nio.block.terminals import input, output

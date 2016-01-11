@@ -12,20 +12,15 @@ from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
 from nio.block.context import BlockContext
-from nio.block.terminals import Terminal, TerminalType, Input, Output
+from nio.block.terminals import Terminal, TerminalType, input, output
 
 
-@Input("default")
-@Output("default")
+@input("default")
+@output("default")
 @command('properties')
 class Block(PropertyHolder, CommandHolder):
 
-    """The base class for blocks to inherit from.
-
-    Once a block is created, at some point before starting the block
-    the `configure` method should be called, indicating who the block's
-    parent is and what configuration it has.
-    """
+    """The base class for blocks to inherit from."""
 
     version = VersionProperty(version='0.0.0')
     type = StringProperty(visible=False, readonly=True)
@@ -160,13 +155,19 @@ class Block(PropertyHolder, CommandHolder):
 
     @property
     def inputs(self):
-        """ A list of the block's input terminals """
+        """ A list of the block's input terminals
+
+        This is a read-only property
+        """
         return list(Terminal.get_terminals_on_class(
             self.__class__, TerminalType.input))
 
     @property
     def outputs(self):
-        """ A list of the block's output terminals """
+        """ A list of the block's output terminals
+
+        This is a read-only property
+        """
         return list(Terminal.get_terminals_on_class(
             self.__class__, TerminalType.output))
 

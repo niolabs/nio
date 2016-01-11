@@ -1,5 +1,5 @@
 import unittest
-from nio.block.terminals import Input, Output
+from nio.block.terminals import input, output
 from nio.block.base import Block
 from nio.block.context import BlockContext
 from nio.common.block.router.base import BaseBlockRouter
@@ -119,8 +119,8 @@ class Log2(Block):
         self.signal_cache.append(signals)
 
 
-@Output(0)
-@Output(1)
+@output(0)
+@output(1)
 class Two_Outputs(Block):
 
     def __init__(self):
@@ -128,9 +128,9 @@ class Two_Outputs(Block):
         self.name = self.__class__.__name__.lower()
 
 
-@Output(0)
-@Output(1)
-@Output(2)
+@output(0)
+@output(1)
+@output(2)
 class Three_Outputs(Block):
 
     def __init__(self):
@@ -138,8 +138,8 @@ class Three_Outputs(Block):
         self.name = self.__class__.__name__.lower()
 
 
-@Input(0)
-@Input(1)
+@input(0)
+@input(1)
 class State(Block):
 
     def __init__(self):
