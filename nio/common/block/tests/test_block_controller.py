@@ -1,9 +1,9 @@
-from nio.common.block.base import Block
+from nio.block.base import Block
 from nio.common.block.controller import BlockController, BlockState,\
     BlockStatus
 from nio.common.signal.management import ManagementSignal
 from nio.util.support.test_case import NIOTestCase
-from nio.common.block.context import BlockContext
+from nio.block.context import BlockContext
 
 
 class SampleBlock(Block):

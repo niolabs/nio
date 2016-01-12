@@ -1,5 +1,5 @@
-from nio.common.block.context import BlockContext
-from nio.common.block.base import Block
+from nio.block.context import BlockContext
+from nio.block.base import Block
 from nio.common.block.router import BlockRouter
 from nio.metadata.properties.string import StringProperty
 from nio.util.support.test_case import NIOTestCase

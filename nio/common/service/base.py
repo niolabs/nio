@@ -239,7 +239,7 @@ class Service(PropertyHolder, CommandHolder):
         # TODO: Do we need to merge in individual block data here? Why were
         # we doing that before?
 
-        from nio.common.block.context import BlockContext
+        from nio.block.context import BlockContext
 
         return BlockContext(
             self._block_router,

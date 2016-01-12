@@ -1,4 +1,4 @@
-from nio.common.block.base import Block
+from nio.block.base import Block
 from nio.common.versioning.dependency import DependsOn, get_class_dependencies
 from nio.util.support.test_case import NIOTestCase
 

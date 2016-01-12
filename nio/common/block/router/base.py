@@ -1,6 +1,5 @@
 from copy import deepcopy
 from enum import Enum
-from nio.common.block import MissingBlock
 from nio.common.block.controller import BlockStatus
 from nio.common.block.router import BlockRouter
 from nio.util.logging import get_nio_logger
@@ -24,6 +23,10 @@ class InvalidBlockInput(Exception):
 
 
 class InvalidBlockOutput(Exception):
+    pass
+
+
+class MissingBlock(Exception):
     pass
 
 

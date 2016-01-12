@@ -1,7 +1,7 @@
 from nio.util.support.test_case import NIOTestCase
 from nio.common.discovery import DiscoverableType, Discoverable, \
     class_has_discoverable_type
-from nio.common.block.base import Block
+from nio.block.base import Block
 
 
 @Discoverable(DiscoverableType.block)

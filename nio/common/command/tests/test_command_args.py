@@ -1,4 +1,4 @@
-from nio.common.block.base import Block
+from nio.block.base import Block
 from nio.common.command import command
 from nio.common.command.base import InvalidCommandArg
 from nio.common.command.params.int import IntParameter
