@@ -1,4 +1,5 @@
-from nio.common.signal.status import ServiceStatusSignal, SignalStatus, \
+from nio.common import ComponentStatus
+from nio.common.signal.status import ServiceStatusSignal, \
     BlockStatusSignal, StatusSignal
 from nio.util.support.test_case import NIOTestCase
 
@@ -8,13 +9,13 @@ class TestStatusSignal(NIOTestCase):
     """
 
     def test_service_status_signal(self):
-        signal = ServiceStatusSignal(SignalStatus.warning, "from unit test")
+        signal = ServiceStatusSignal(ComponentStatus.warning, "from unit test")
         self.assertEqual(signal.source, "service")
 
     def test_block_status_signal(self):
-        signal = BlockStatusSignal(SignalStatus.warning, "from unit test")
+        signal = BlockStatusSignal(ComponentStatus.warning, "from unit test")
         self.assertEqual(signal.source, "block")
 
     def test_unknown_source_status_signal(self):
-        signal = StatusSignal(SignalStatus.warning, "from unit test")
+        signal = StatusSignal(ComponentStatus.warning, "from unit test")
         self.assertEqual(signal.source, "unknown")

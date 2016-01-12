@@ -13,6 +13,10 @@ from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
 from nio.block.context import BlockContext
 from nio.block.terminals import Terminal, TerminalType, input, output
+from nio.util.flags_enum import FlagsEnum
+from nio.common import ComponentStatus
+from nio.common.signal.management import ManagementSignal
+from nio.common.signal.status import BlockStatusSignal
 
 
 @input("default")
@@ -39,6 +43,9 @@ class Block(PropertyHolder, CommandHolder):
         BlockContext when the block is configured.
         """
         super().__init__()
+
+        self._status = FlagsEnum(ComponentStatus)
+
         # store block type so that it gets serialized
         self.type = self.__class__.__name__
 
@@ -47,6 +54,7 @@ class Block(PropertyHolder, CommandHolder):
         # what that name is during configure()
         self._logger = get_nio_logger('default')
         self.persistence = None
+        self._service_name = None
 
     def configure(self, context):
         """Overrideable method to be called when the block configures.
@@ -78,6 +86,7 @@ class Block(PropertyHolder, CommandHolder):
         self._logger.setLevel(self.log_level)
 
         self.persistence = Persistence(self.name)
+        self._service_name = context.service_name
 
     def start(self):
         """Overrideable method to be called when the block starts.
@@ -119,6 +128,12 @@ class Block(PropertyHolder, CommandHolder):
         the block can report itself in an error state and thus prevent other
         signals from being delivered to it.
         """
+        if isinstance(signal, ManagementSignal):
+            if isinstance(signal, BlockStatusSignal):
+                # set service block is part of
+                signal.service_name = self._service_name
+                signal.name = self.name
+                self.status.add(signal.status)
         self._block_router.notify_management_signal(self, signal)
 
     def process_signals(self, signals, input_id='default'):
@@ -192,3 +207,18 @@ class Block(PropertyHolder, CommandHolder):
             bool: True if the output ID exists on this block
         """
         return output_id in self.outputs
+
+    @property
+    def status(self):
+        return self._status
+
+    @status.setter
+    def status(self, status):
+        """ Block Status
+
+        Possible values are based on ComponentStatus
+
+        """
+        self._logger.info("Block: {} (type: {}) status is {}".format(
+            self.name, self.__class__.__name__, status.name))
+        self._status.set(status)

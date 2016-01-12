@@ -19,7 +19,8 @@ class ComponentStatus(Enum):
     stopped = 5
     starting = 6
     started = 7
-    error = 8
+    warning = 8
+    error = 9
 
 
 def get_class(cls):

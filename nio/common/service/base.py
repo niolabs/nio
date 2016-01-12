@@ -1,5 +1,4 @@
 from nio.common import ComponentStatus
-from nio.common.block.controller import BlockController
 from nio.common.block.router.base import RouterStatus
 from nio.common.block.router.context import RouterContext
 from nio.common.command import command
@@ -166,7 +165,9 @@ class Service(PropertyHolder, CommandHolder):
 
         for block in self._blocks.values():
             try:
+                block.status.set(ComponentStatus.starting)
                 block.start()
+                block.status.set(ComponentStatus.started)
             except Exception:
                 self._logger.exception(
                     "Block: {0} failed to start".format(block.name))
@@ -179,7 +180,9 @@ class Service(PropertyHolder, CommandHolder):
             self._block_router.status.set(RouterStatus.stopping)
 
         for block in self._blocks.values():
+            block.status.set(ComponentStatus.stopping)
             block.stop()
+            block.status.set(ComponentStatus.stopped)
 
         if self._block_router:
             self._block_router.stop()
@@ -247,10 +250,7 @@ class Service(PropertyHolder, CommandHolder):
             component_data,
             service_context.properties.get('name', ''),
             self._create_commandable_url(service_context,
-                                         properties.get('name', '')),
-            # TODO Remove this handler from block context
-            # self._publish_mgmt_signals
-            lambda x: x  # dummy mgmt signal handler for now
+                                         properties.get('name', ''))
         )
 
     def _create_commandable_url(self, service_context, block_alias):
@@ -260,9 +260,11 @@ class Service(PropertyHolder, CommandHolder):
             service_context.properties.get('name', ''), block_alias)
 
     def _create_and_configure_block(self, block_type, block_context):
-        block = BlockController(block_type)
+        block = block_type()
         try:
+            block.status.set(ComponentStatus.configuring)
             block.configure(block_context)
+            block.status.set(ComponentStatus.configured)
         except Exception:
             self._logger.exception(
                 "Block: {0} failed to configure".format(block.name))

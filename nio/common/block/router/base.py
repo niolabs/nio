@@ -1,6 +1,6 @@
 from copy import deepcopy
 from enum import Enum
-from nio.common.block.controller import BlockStatus
+from nio.common import ComponentStatus
 from nio.common.block.router import BlockRouter
 from nio.util.logging import get_nio_logger
 from nio.util.flags_enum import FlagsEnum
@@ -63,6 +63,8 @@ class BaseBlockRouter(BlockRouter):
     """
 
     def __init__(self):
+        super().__init__()
+
         self._receivers = None
         self._logger = get_nio_logger('BlockRouter')
         self._clone_signals = False
@@ -227,13 +229,13 @@ class BaseBlockRouter(BlockRouter):
                 self._clone_signals and len(self._receivers[block.name]) > 1
 
             for receiver_data in self._receivers[block.name]:
-                if receiver_data.block.status == BlockStatus.error:
+                if receiver_data.block.status.is_set(ComponentStatus.error):
                     self._logger.debug(
                         "Block '{0}' has status 'error'. Not delivering "
                         "signals from '{1}'...".format(
                             receiver_data.block.name, block.name))
                     continue
-                elif receiver_data.block.status == BlockStatus.warning:
+                elif receiver_data.block.status.is_set(ComponentStatus.warning):
                     self._logger.debug(
                         "Block '{0}' has status 'warning'. Delivering signals"
                         " anyway from '{1}...".format(receiver_data.block.name,

@@ -3,7 +3,6 @@ from nio.block.base import Block
 from nio.block.context import BlockContext
 from nio.common.block.router.base import BaseBlockRouter, InvalidBlockOutput, \
     InvalidBlockInput
-from nio.common.block.controller import BlockController
 from nio.common.block.router.context import RouterContext
 from nio.util.support.test_case import NIOTestCaseNoModules
 from nio.block.terminals import input, output
@@ -58,12 +57,12 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
 
     def test_valid_input_output(self):
         block_router = BaseBlockRouter()
-        context = BlockContext(block_router, dict(), dict(), None)
+        context = BlockContext(block_router, dict(), dict())
 
         # create blocks
-        sender_block = BlockController(FirstOutputBlock)
+        sender_block = FirstOutputBlock()
         sender_block.configure(context)
-        receiver_block = BlockController(FirstInputBlock)
+        receiver_block = FirstInputBlock()
         receiver_block.configure(context)
 
         # create context initialization data
@@ -86,25 +85,25 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
         signals = [1, 2, 3, 4]
 
         # make sure nothing has been delivered
-        self.assertEqual(len(receiver_block.block.signal_cache), 0)
+        self.assertEqual(len(receiver_block.signal_cache), 0)
 
-        sender_block.block.notify_signals(signals, input_id1)
+        sender_block.notify_signals(signals, input_id1)
 
         # checking results
-        self.assertIn(signals, receiver_block.block.signal_cache)
+        self.assertIn(signals, receiver_block.signal_cache)
         # clean up
-        receiver_block.block.signal_cache.remove(signals)
+        receiver_block.signal_cache.remove(signals)
 
         block_router.stop()
 
     def test_valid_input_invalid_output(self):
         block_router = BaseBlockRouter()
-        context = BlockContext(block_router, dict(), dict(), None)
+        context = BlockContext(block_router, dict(), dict())
 
         # create blocks
-        sender_block = BlockController(FirstOutputBlock)
+        sender_block = FirstOutputBlock()
         sender_block.configure(context)
-        receiver_block = BlockController(FirstInputBlock)
+        receiver_block = FirstInputBlock()
         receiver_block.configure(context)
 
         # create context initialization data
@@ -125,12 +124,12 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
     @unittest.skip('old constraint no longer enforceable, 03172015 changes')
     def test_invalid_input_valid_output1(self):
         block_router = BaseBlockRouter()
-        context = BlockContext(block_router, dict(), dict(), None)
+        context = BlockContext(block_router, dict(), dict())
 
         # create blocks
-        sender_block = BlockController(FirstOutputBlock)
+        sender_block = FirstOutputBlock()
         sender_block.configure(context)
-        receiver_block = BlockController(SecondInputBlock)
+        receiver_block = SecondInputBlock()
         receiver_block.configure(context)
 
         # create context initialization data
@@ -150,12 +149,12 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
 
     def test_invalid_input_valid_output2(self):
         block_router = BaseBlockRouter()
-        context = BlockContext(block_router, dict(), dict(), None)
+        context = BlockContext(block_router, dict(), dict())
 
         # create blocks
-        sender_block = BlockController(FirstOutputBlock)
+        sender_block = FirstOutputBlock()
         sender_block.configure(context)
-        receiver_block = BlockController(SecondInputBlock)
+        receiver_block = SecondInputBlock()
         receiver_block.configure(context)
 
         # create context initialization data
@@ -184,12 +183,12 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
         """
 
         block_router = BaseBlockRouter()
-        context = BlockContext(block_router, dict(), dict(), None)
+        context = BlockContext(block_router, dict(), dict())
 
         # create blocks
-        sender_block = BlockController(OutputBlock)
+        sender_block = OutputBlock()
         sender_block.configure(context)
-        receiver_block = BlockController(FirstInputBlock)
+        receiver_block = FirstInputBlock()
         receiver_block.configure(context)
 
         # create context initialization data
@@ -206,12 +205,12 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
         signals = [1, 2, 3, 4]
 
         # make sure nothing has been delivered
-        self.assertEqual(len(receiver_block.block.signal_cache), 0)
+        self.assertEqual(len(receiver_block.signal_cache), 0)
 
-        sender_block.block.notify_signals(signals, 'default')
+        sender_block.notify_signals(signals, 'default')
         # checking results
-        self.assertIn(signals, receiver_block.block.signal_cache)
+        self.assertIn(signals, receiver_block.signal_cache)
         # clean up
-        receiver_block.block.signal_cache.remove(signals)
+        receiver_block.signal_cache.remove(signals)
 
         block_router.stop()
