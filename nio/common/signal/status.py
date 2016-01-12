@@ -6,17 +6,11 @@ from enum import Enum
 from nio.common.signal.management import ManagementSignal
 
 
-class SignalStatus(Enum):
-    ok = 1
-    warning = 2
-    error = 3
-
-
 class StatusSignal(ManagementSignal):
     """ An internal signal to encapsulate status management signals.
 
     Args:
-        status (str): The signal status (ok, warning, or error).
+        status (ComponentStatus): The signal status.
         msg (str): A message/explanation to go with the status change.
 
     """

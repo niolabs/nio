@@ -1,9 +1,7 @@
-import unittest
 from nio.block.terminals import input, output
 from nio.block.base import Block
 from nio.block.context import BlockContext
 from nio.common.block.router.base import BaseBlockRouter
-from nio.common.block.controller import BlockController
 from nio.common.block.router.context import RouterContext
 from nio.util.support.test_case import NIOTestCaseNoModules
 
@@ -93,7 +91,7 @@ class Sim(Block):
         super().__init__()
         self.name = self.__class__.__name__.lower()
 
-    def process_signals(self, signals):
+    def process_signals(self, signals, input_id='default'):
         self.notify_signals(signals)
 
 
@@ -104,7 +102,7 @@ class Log1(Block):
         self.name = self.__class__.__name__.lower()
         self.signal_cache = []
 
-    def process_signals(self, signals):
+    def process_signals(self, signals, input_id='default'):
         self.signal_cache.append(signals)
 
 
@@ -115,7 +113,7 @@ class Log2(Block):
         self.name = self.__class__.__name__.lower()
         self.signal_cache = []
 
-    def process_signals(self, signals):
+    def process_signals(self, signals, input_id='default'):
         self.signal_cache.append(signals)
 
 
@@ -164,72 +162,16 @@ class TestBlockExecution(object):
 
 class TestInputOutput(NIOTestCaseNoModules):
 
-    @unittest.skip('use to satisfy behavior before 03172015 changes')
-    def test_default_output_two_inputs(self):
-        block_router = BaseBlockRouter()
-        context = BlockContext(block_router, dict(), dict(), None)
-
-        # create blocks
-        sim = BlockController(Sim)
-        sim.configure(context)
-        state = BlockController(State)
-        state.configure(context)
-
-        # create context initialization data
-        blocks = dict(state=state, sim=sim)
-
-        input_id0 = 0
-        input_id1 = 1
-        execution = [
-            TestBlockExecution(name="sim",
-                               receivers=[
-                                   {"name": "state",
-                                    "input": input_id0},
-                                   {"name": "state",
-                                    "input": input_id1}])]
-
-        router_context = RouterContext(execution, blocks)
-
-        block_router.configure(router_context)
-        block_router.start()
-
-        signals = [1, 2, 3, 4]
-
-        # make sure nothing has been delivered
-        self.assertEqual(len(state.block.signal_cache_input0), 0)
-        self.assertEqual(len(state.block.signal_cache_input1), 0)
-
-        # when sending using input_id1, only input1 should receive
-        sim.block.notify_signals(signals, input_id0)
-
-        # checking results
-        self.assertIsNotNone(state.block.signal_cache_input0)
-        self.assertIn(signals, state.block.signal_cache_input0)
-        self.assertEqual(len(state.block.signal_cache_input1), 0)
-        # clean up
-        state.block.signal_cache_input0.remove(signals)
-        # assert that it is clean again
-        self.assertEqual(len(state.block.signal_cache_input0), 0)
-        self.assertEqual(len(state.block.signal_cache_input1), 0)
-
-        # when sending using input_id2, only input2 should receive
-        sim.block.notify_signals(signals, input_id1)
-        # checking results
-        self.assertEqual(len(state.block.signal_cache_input0), 0)
-        self.assertIn(signals, state.block.signal_cache_input1)
-
-        block_router.stop()
-
     def test_two_outputs_default_input(self):
         block_router = BaseBlockRouter()
-        context = BlockContext(block_router, dict(), dict(), None)
+        context = BlockContext(block_router, dict(), dict())
 
         # create blocks
-        two_outputs = BlockController(Two_Outputs)
+        two_outputs = Two_Outputs()
         two_outputs.configure(context)
-        log1 = BlockController(Log1)
+        log1 = Log1()
         log1.configure(context)
-        log2 = BlockController(Log2)
+        log2 = Log2()
         log2.configure(context)
 
         # create context initialization data
@@ -252,41 +194,41 @@ class TestInputOutput(NIOTestCaseNoModules):
         signals = [1, 2, 3, 4]
 
         # make sure nothing has been delivered
-        self.assertEqual(len(log1.block.signal_cache), 0)
-        self.assertEqual(len(log2.block.signal_cache), 0)
+        self.assertEqual(len(log1.signal_cache), 0)
+        self.assertEqual(len(log2.signal_cache), 0)
 
         # when sending using input_id1, only block1 should receive
-        two_outputs.block.notify_signals(signals, input_id1)
+        two_outputs.notify_signals(signals, input_id1)
         # checking results
-        self.assertEqual(len(log1.block.signal_cache), 1)
-        self.assertIn(signals, log1.block.signal_cache)
-        self.assertEqual(len(log2.block.signal_cache), 0)
+        self.assertEqual(len(log1.signal_cache), 1)
+        self.assertIn(signals, log1.signal_cache)
+        self.assertEqual(len(log2.signal_cache), 0)
         # clean up
-        log1.block.signal_cache.remove(signals)
+        log1.signal_cache.remove(signals)
 
         # when sending using input_id2, only block2 should receive
-        two_outputs.block.notify_signals(signals, input_id2)
+        two_outputs.notify_signals(signals, input_id2)
         # checking results
-        self.assertEqual(len(log1.block.signal_cache), 0)
-        self.assertEqual(len(log2.block.signal_cache), 1)
-        self.assertIn(signals, log2.block.signal_cache)
+        self.assertEqual(len(log1.signal_cache), 0)
+        self.assertEqual(len(log2.signal_cache), 1)
+        self.assertIn(signals, log2.signal_cache)
         # clean up
-        log2.block.signal_cache.remove(signals)
+        log2.signal_cache.remove(signals)
 
         block_router.stop()
 
     def test_three_outputs_mix_inputs(self):
         block_router = BaseBlockRouter()
-        context = BlockContext(block_router, dict(), dict(), None)
+        context = BlockContext(block_router, dict(), dict())
 
         # create blocks
-        three_outputs = BlockController(Three_Outputs)
+        three_outputs = Three_Outputs()
         three_outputs.configure(context)
-        state = BlockController(State)
+        state = State()
         state.configure(context)
-        log1 = BlockController(Log1)
+        log1 = Log1()
         log1.configure(context)
-        log2 = BlockController(Log2)
+        log2 = Log2()
         log2.configure(context)
 
         # create context initialization data
@@ -312,40 +254,40 @@ class TestInputOutput(NIOTestCaseNoModules):
         signals = [1, 2, 3, 4]
 
         # make sure nothing has been delivered
-        self.assertEqual(len(state.block.signal_cache_input0), 0)
-        self.assertEqual(len(state.block.signal_cache_input1), 0)
-        self.assertEqual(len(log1.block.signal_cache), 0)
-        self.assertEqual(len(log2.block.signal_cache), 0)
+        self.assertEqual(len(state.signal_cache_input0), 0)
+        self.assertEqual(len(state.signal_cache_input1), 0)
+        self.assertEqual(len(log1.signal_cache), 0)
+        self.assertEqual(len(log2.signal_cache), 0)
 
         # when sending using input_id0, only input0 and log1 receive
-        three_outputs.block.notify_signals(signals, input_id0)
+        three_outputs.notify_signals(signals, input_id0)
         # checking results
-        self.assertEqual(len(state.block.signal_cache_input0), 1)
-        self.assertIn(signals, state.block.signal_cache_input0)
-        self.assertEqual(len(state.block.signal_cache_input1), 0)
-        self.assertEqual(len(log1.block.signal_cache), 1)
-        self.assertIn(signals, log1.block.signal_cache)
-        self.assertEqual(len(log2.block.signal_cache), 0)
+        self.assertEqual(len(state.signal_cache_input0), 1)
+        self.assertIn(signals, state.signal_cache_input0)
+        self.assertEqual(len(state.signal_cache_input1), 0)
+        self.assertEqual(len(log1.signal_cache), 1)
+        self.assertIn(signals, log1.signal_cache)
+        self.assertEqual(len(log2.signal_cache), 0)
         # clean up
-        state.block.signal_cache_input0.remove(signals)
-        log1.block.signal_cache.remove(signals)
+        state.signal_cache_input0.remove(signals)
+        log1.signal_cache.remove(signals)
 
         # when sending using input_id1, only input1 receives
-        three_outputs.block.notify_signals(signals, input_id1)
+        three_outputs.notify_signals(signals, input_id1)
         # checking results
-        self.assertEqual(len(state.block.signal_cache_input0), 0)
-        self.assertEqual(len(state.block.signal_cache_input1), 1)
-        self.assertEqual(len(log1.block.signal_cache), 0)
-        self.assertEqual(len(log2.block.signal_cache), 0)
+        self.assertEqual(len(state.signal_cache_input0), 0)
+        self.assertEqual(len(state.signal_cache_input1), 1)
+        self.assertEqual(len(log1.signal_cache), 0)
+        self.assertEqual(len(log2.signal_cache), 0)
         # clean up
-        state.block.signal_cache_input1.remove(signals)
+        state.signal_cache_input1.remove(signals)
 
         # when sending using input_id2, only log2 receives
-        three_outputs.block.notify_signals(signals, input_id2)
+        three_outputs.notify_signals(signals, input_id2)
         # checking results
-        self.assertEqual(len(state.block.signal_cache_input0), 0)
-        self.assertEqual(len(state.block.signal_cache_input1), 0)
-        self.assertEqual(len(log1.block.signal_cache), 0)
-        self.assertEqual(len(log2.block.signal_cache), 1)
+        self.assertEqual(len(state.signal_cache_input0), 0)
+        self.assertEqual(len(state.signal_cache_input1), 0)
+        self.assertEqual(len(log1.signal_cache), 0)
+        self.assertEqual(len(log2.signal_cache), 1)
 
         block_router.stop()

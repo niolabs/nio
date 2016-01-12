@@ -4,8 +4,7 @@
 class BlockContext(object):
 
     def __init__(self, block_router, properties, component_data,
-                 service_name='', command_url='',
-                 mgmt_signal_handler=None):
+                 service_name='', command_url=''):
         """ Initializes information needed for a Block
 
         This BlockContext will be passed to the `configure` method on each
@@ -34,4 +33,3 @@ class BlockContext(object):
         self.component_data = component_data
         self.service_name = service_name
         self.command_url = command_url
-        self.mgmt_signal_handler = mgmt_signal_handler
