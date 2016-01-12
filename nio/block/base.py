@@ -15,7 +15,6 @@ from nio.block.context import BlockContext
 from nio.block.terminals import Terminal, TerminalType, input, output
 from nio.util.flags_enum import FlagsEnum
 from nio.common import ComponentStatus
-from nio.common.signal.management import ManagementSignal
 from nio.common.signal.status import BlockStatusSignal
 
 
@@ -128,12 +127,11 @@ class Block(PropertyHolder, CommandHolder):
         the block can report itself in an error state and thus prevent other
         signals from being delivered to it.
         """
-        if isinstance(signal, ManagementSignal):
-            if isinstance(signal, BlockStatusSignal):
-                # set service block is part of
-                signal.service_name = self._service_name
-                signal.name = self.name
-                self.status.add(signal.status)
+        if isinstance(signal, BlockStatusSignal):
+            # set service block is part of
+            signal.service_name = self._service_name
+            signal.name = self.name
+            self.status.add(signal.status)
         self._block_router.notify_management_signal(self, signal)
 
     def process_signals(self, signals, input_id='default'):
