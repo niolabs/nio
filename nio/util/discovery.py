@@ -1,77 +1,60 @@
-""" Discoverable type
+""" Discoverable decorator
 
-Classes marked as Discoverable for a given type allow the system to
-identify them as belonging to a specific group be registered and
-treated accordingly
+Classes marked as Discoverable allow the system to identify them and register
+them. While any class can technically be marked discoverable, n.io will tend
+to only care about blocks, services, or components that are discoverable.
 
-Some examples are: block, service, etc
+Note: A class being marked discoverable will not mark its subclasses as
+discoverable. Each subclass must be explicitly marked with the discoverable
+decorator.
+
+To mark a class as discoverable, use the parameter-less decorator
+`discoverable`::
+
+    from nio import discoverable, Block
+
+    @discoverable
+    class MyBlock(Block):
+        pass
 
 """
-from enum import Enum
 
 
-class DiscoverableType(Enum):
+def discoverable(_class):
+    """The decorator method to be called on the class object.
 
-    """Enum specifying the different discoverable types that are possible"""
-
-    block = 1
-    service = 2
-    module = 3
-    component = 4
-
-
-class Discoverable(object):
-
-    """Decorator for declaring a class as Discoverable"""
-
-    def __init__(self, discoverable_type, **kwargs):
-        """ Create a Discoverable with a given type
-
-        Args:
-            discoverable_type (DiscoverableType): What type of discoverable
-                should this be
-        """
-        self._disc_type = discoverable_type
-
-    def __call__(self, cls):
-        """The decorator method to be called on the class object.
-
-        This method will set the proper discoverable type to the class. It
-        should return the class passed in, according to the decorator spec.
-        """
-
-        # Set the attribute to the class name, to prevent subclasses from also
-        # being discoverable.
-        setattr(cls, _discoverable_type_to_attr(self._disc_type), cls.__name__)
-        return cls
-
-
-def _discoverable_type_to_attr(discoverable_type):
-    """ Mangles the discoverable type to avoid collisions with other potential
-    attributes of the class
-
-    Args:
-        discoverable_type (DiscoverableType): Discoverable type to mangle
-
-    Returns:
-        Mangled discoverable type
+    This method will set the proper discoverable type to the class. It
+    should return the class passed in, according to the decorator spec.
     """
-    return "_%{0}%".format(discoverable_type.name)
+
+    # Set the attribute to the class name, to prevent subclasses from also
+    # being discoverable.
+    _make_class_discoverable(_class)
+    return _class
 
 
-def class_has_discoverable_type(_class, disc_type):
-    """ Returns true if the class has the specified discoverable type
+def _make_class_discoverable(_class):
+    """ Mark a given class to be discoverable """
+    # Set the attribute to the class name, to prevent subclasses from also
+    # being discoverable.
+    setattr(_class, _get_discoverable_attribute(_class), True)
+
+
+def _get_discoverable_attribute(_class):
+    """ Get an attribute to set on a class to consider it discoverable """
+    return "__{}_is_discoverable".format(_class.__name__)
+
+
+def _class_is_discoverable(_class):
+    """ Returns true if the class is marked discoverable
+
+    Note: discoverability does not extend to subclasses. Each subclass must
+    explicitly be marked as discoverable
 
     Args:
         _class (class): The class in question, should be a class object
-        disc_type (DiscoverableType): The discoverable type enum to check.
-            Should be something like `DiscoverableType.block`
 
     Returns:
-        discoverable (bool): True if the class has the discoverable type
+        bool: True if the class is discoverable
     """
-    disc_val = getattr(_class, _discoverable_type_to_attr(disc_type), None)
-
-    # We need the value to not only be set, but to also be set to the right
-    # class name. This prevents subclasses from also being discoverable
-    return disc_val == _class.__name__
+    return bool(getattr(_class, _get_discoverable_attribute(_class), False))
