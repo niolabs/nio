@@ -4,7 +4,7 @@ from nio.common.block.router.context import RouterContext
 from nio.common.command import command
 from nio.common.command.security import command_security
 from nio.common.command.holder import CommandHolder
-from nio.common.discovery import Discoverable, DiscoverableType
+from nio import Discoverable, DiscoverableType
 from nio.common.versioning.dependency import DependsOn
 from nio.metadata.properties import PropertyHolder, VersionProperty, \
     BoolProperty, ListProperty, StringProperty, VarProperty, SelectProperty
