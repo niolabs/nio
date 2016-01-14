@@ -29,23 +29,11 @@ def discoverable(_class):
 
     # Set the attribute to the class name, to prevent subclasses from also
     # being discoverable.
-    _make_class_discoverable(_class)
+    setattr(_class, _get_discoverable_attribute(_class), True)
     return _class
 
 
-def _make_class_discoverable(_class):
-    """ Mark a given class to be discoverable """
-    # Set the attribute to the class name, to prevent subclasses from also
-    # being discoverable.
-    setattr(_class, _get_discoverable_attribute(_class), True)
-
-
-def _get_discoverable_attribute(_class):
-    """ Get an attribute to set on a class to consider it discoverable """
-    return "__{}_is_discoverable".format(_class.__name__)
-
-
-def _class_is_discoverable(_class):
+def is_class_discoverable(_class):
     """ Returns true if the class is marked discoverable
 
     Note: discoverability does not extend to subclasses. Each subclass must
@@ -58,3 +46,8 @@ def _class_is_discoverable(_class):
         bool: True if the class is discoverable
     """
     return bool(getattr(_class, _get_discoverable_attribute(_class), False))
+
+
+def _get_discoverable_attribute(_class):
+    """ Get an attribute to set on a class to consider it discoverable """
+    return "__{}_is_discoverable".format(_class.__name__)
