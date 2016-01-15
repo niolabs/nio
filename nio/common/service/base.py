@@ -4,7 +4,7 @@ from nio.common.block.router.context import RouterContext
 from nio.common.command import command
 from nio.common.command.security import command_security
 from nio.common.command.holder import CommandHolder
-from nio import Discoverable, DiscoverableType
+from nio import discoverable
 from nio.common.versioning.dependency import DependsOn
 from nio.metadata.properties import PropertyHolder, VersionProperty, \
     BoolProperty, ListProperty, StringProperty, VarProperty, SelectProperty
@@ -33,7 +33,7 @@ class BlockMapping(PropertyHolder):
 @command_security('stop', True, has_permission('services.stop'))
 @command('heartbeat')
 @command('runproperties')
-@Discoverable(DiscoverableType.service)
+@discoverable
 class Service(PropertyHolder, CommandHolder):
 
     """The base class for services.

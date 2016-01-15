@@ -1,32 +1,26 @@
-from nio.util.support.test_case import NIOTestCase
-from nio.util.discovery import DiscoverableType, Discoverable, \
-    class_has_discoverable_type
+from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.util.discovery import discoverable, is_class_discoverable
 from nio.block.base import Block
 
 
-@Discoverable(DiscoverableType.block)
+@discoverable
 class DiscoverableBlock(Block):
     pass
 
 
-class DiscoverableSubBlock(DiscoverableBlock):
+class NonDiscoverableSubBlock(DiscoverableBlock):
     pass
 
 
-class TestTypesManager(NIOTestCase):
+@discoverable
+class DiscoverableSubBlock(NonDiscoverableSubBlock):
+    pass
+
+
+class TestDiscoverable(NIOTestCaseNoModules):
 
     def test_subclass(self):
         """Tests that subclasses are not discoverable"""
-        self.assertTrue(class_has_discoverable_type(
-            DiscoverableBlock, DiscoverableType.block))
-
-        self.assertFalse(class_has_discoverable_type(
-            DiscoverableSubBlock, DiscoverableType.block))
-
-    def test_discoverable_type(self):
-        """Tests that the discoverable type is checked properly"""
-        self.assertTrue(class_has_discoverable_type(
-            DiscoverableBlock, DiscoverableType.block))
-
-        self.assertFalse(class_has_discoverable_type(
-            DiscoverableBlock, DiscoverableType.service))
+        self.assertTrue(is_class_discoverable(DiscoverableBlock))
+        self.assertFalse(is_class_discoverable(NonDiscoverableSubBlock))
+        self.assertTrue(is_class_discoverable(DiscoverableSubBlock))
