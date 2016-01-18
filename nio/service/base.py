@@ -16,11 +16,21 @@ from nio.util.flags_enum import FlagsEnum
 
 
 class BlockExecution(PropertyHolder):
+    """ Defines a single block execution within a potential execution graph
+    A block execution is defined by a block name (name) and a set of block
+    receivers where each receiver is identified by a block name.
+
+    This information is parsed/used by the Router which is able then, based on
+    the sending block, to forward signals to its receivers
+    """
     name = StringProperty()
     receivers = VarProperty()
 
 
 class BlockMapping(PropertyHolder):
+    """ Allows a mapping of a given block based on another block
+    This information is parsed/used internally by the core system
+    """
     name = StringProperty()
     mapping = StringProperty()
 
@@ -29,44 +39,41 @@ class BlockMapping(PropertyHolder):
 @DependsOn("nio.modules.scheduler", "1.0.0")
 @DependsOn("nio.modules.security", "1.0.0")
 @command('status', method="full_status")
-@command_security('start', True, has_permission('services.start'))
-@command_security('stop', True, has_permission('services.stop'))
 @command('heartbeat')
 @command('runproperties')
+@command_security('start', True, has_permission('services.start'))
+@command_security('stop', True, has_permission('services.stop'))
 @discoverable
 class Service(PropertyHolder, CommandHolder):
 
     """The base class for services.
 
     Once a service is created, the service is correctly executed
-    by calling:
-        `configure` indicating it's configuration.
-        `start`
-        `block` this blocking call will be reimplemented by an inheriting
-           class when a different blocking method is needed.
+    by calling 'configure' and 'start'
     """
 
     version = VersionProperty(version='1.0.0')
     type = StringProperty(visible=False, readonly=True)
     name = StringProperty()
+
+    # indicates whether service is to be started when nio starts
     auto_start = BoolProperty(default=False)
+    # indicates the logging level
     log_level = SelectProperty(LogLevel, default="NOTSET")
 
+    # properties defining the service execution
     execution = ListProperty(BlockExecution)
     mappings = ListProperty(BlockMapping)
 
-    # System Metadata that can be used by API clients
+    # System Metadata that can be used by API clients, which is serialized
+    # along with any other service properties
     sys_metadata = StringProperty(visible=True, default="")
 
     def __init__(self):
-        """ Initializes the service logger and its variables.
+        """ Create a new service instance.
 
-        Args:
-            None
-
-        Returns:
-            None
-
+        Take care of setting up instance variables in your service's
+        constructor.
         """
 
         super().__init__()
@@ -88,14 +95,7 @@ class Service(PropertyHolder, CommandHolder):
             Starting the block router
             Starting each service block
 
-        Args:
-            None
-
-        Returns:
-            None
-
         """
-
         self.status.set(ComponentStatus.starting)
         try:
             self.on_start()
@@ -111,12 +111,6 @@ class Service(PropertyHolder, CommandHolder):
         Stopping a service comprises tasks such as:
             Stopping each service block
             Stopping the block router
-
-        Args:
-            None
-
-        Returns:
-            None
 
         """
         self.status.set(ComponentStatus.stopping)
@@ -140,12 +134,7 @@ class Service(PropertyHolder, CommandHolder):
                 used to configure the service including service
                 properties, block classes and properties for each
                 block included in the service execution.
-
-        Returns:
-            None
-
         """
-
         self.status.set(ComponentStatus.configuring)
         try:
             self.on_configure(context)
@@ -155,11 +144,16 @@ class Service(PropertyHolder, CommandHolder):
             self.status.add(ComponentStatus.error)
             raise
 
-    @property
-    def status(self):
-        return self._status
-
     def on_start(self):
+        """Overrideable method to be called when the service starts.
+
+        The service creator can assume at this point that the service's
+        configuration is complete.
+
+        If overriding, The service creator should call the on_start method
+        on the parent, after which it can assume that block router and blocks
+        are started
+        """
         if self._block_router:
             self._block_router.start()
 
@@ -174,8 +168,14 @@ class Service(PropertyHolder, CommandHolder):
                 raise
 
     def on_stop(self):
+        """Overrideable method to be called when the service stops.
+
+        If overriding, The service creator should call the on_stop method
+        on the parent, after which it can assume that block router and blocks
+        are stopped
+        """
         if self._block_router:
-            # 'alert' block controller that whole thing will be
+            # 'alert' block controller that service will be
             # 'stopped' shortly
             self._block_router.status.set(RouterStatus.stopping)
 
@@ -191,10 +191,12 @@ class Service(PropertyHolder, CommandHolder):
         """Configure the service based on the context
 
         Args:
-            context (ServiceContext): the context in which to configure
-                the service
+            context (ServiceContext): Specifies the information
+                used to configure the service including service
+                properties, block classes and properties for each
+                block included in the service execution.
         """
-        # configuring service itself
+        # populate service properties
         self.from_dict(context.properties, self._logger)
 
         # reset logger after modules initialization
@@ -205,7 +207,7 @@ class Service(PropertyHolder, CommandHolder):
         # configure the Persistence module with the service name
         Persistence.configure(self.name)
 
-        # create block router and pass it to blocks
+        # instantiate block router
         self._logger.debug("Instantiating block router: {0}.{1}".
                            format(context.block_router_type.__module__,
                                   context.block_router_type.__name__))
@@ -223,18 +225,23 @@ class Service(PropertyHolder, CommandHolder):
 
             self._blocks[block.name] = block
 
-        # configure block router
+        # populate router context and configure block router
         router_context = RouterContext(self.execution,
                                        self._blocks,
                                        context.router_settings)
-
         self._block_router.configure(router_context)
 
-    def notify_management_signal(self, signal):
-        # TODO: Remove once block router/controller is removed from SDK
-        pass
+    @property
+    def status(self):
+        """ Provides service status
+        """
+        return self._status
 
-    def _create_block_context(self, block_type, properties, service_context):
+    def _create_block_context(self, block_type, block_properties,
+                              service_context):
+        """ Populates block context, which will serve as a basis
+         for a future block configuration
+        """
 
         # populate component data member for given block by getting
         # data for all blocks and merging it with specific block data
@@ -246,20 +253,21 @@ class Service(PropertyHolder, CommandHolder):
 
         return BlockContext(
             self._block_router,
-            properties,
+            block_properties,
             component_data,
             service_context.properties.get('name', ''),
-            self._create_commandable_url(service_context,
-                                         properties.get('name', ''))
+            self._create_commandable_url(service_context.properties,
+                                         block_properties.get('name', ''))
         )
 
-    def _create_commandable_url(self, service_context, block_alias):
+    def _create_commandable_url(self, service_properties, block_alias):
         """ Get the commandable url of a block given its alias """
 
         return '/services/{0}/{1}/'.format(
-            service_context.properties.get('name', ''), block_alias)
+            service_properties.get('name', ''), block_alias)
 
     def _create_and_configure_block(self, block_type, block_context):
+        """ Instantiates and configures given block """
         block = block_type()
         try:
             block.status.set(ComponentStatus.configuring)
@@ -273,6 +281,12 @@ class Service(PropertyHolder, CommandHolder):
 
     @classmethod
     def get_description(cls):
+        """ Retrieves a service description based on properties and commands
+        it exposes
+
+        Returns:
+            Service description
+        """
         properties = super().get_description()
         commands = cls.get_command_description()
         return {'properties': properties,
@@ -280,7 +294,7 @@ class Service(PropertyHolder, CommandHolder):
 
     @property
     def blocks(self):
-        """ Allow aggregated instances access to service blocks.  """
+        """ Allow access to service blocks """
         return self._blocks
 
     def heartbeat(self):
@@ -297,7 +311,7 @@ class Service(PropertyHolder, CommandHolder):
         return self.to_dict()
 
     def full_status(self):
-        """ Returns service plus blocks status
+        """ Returns service plus block statuses for each block in the service
         """
         status = {"service": self.status.name}
         for name in self._blocks:
