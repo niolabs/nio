@@ -2,7 +2,7 @@ from enum import Enum
 import json
 from datetime import timedelta
 from nio.block.base import Block
-from nio.common.service.base import Service
+from nio.service.base import Service
 from nio.metadata.properties import FloatProperty, BoolProperty, \
     ExpressionProperty, SelectProperty
 from nio.metadata.properties.int import IntProperty

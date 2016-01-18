@@ -68,7 +68,7 @@ class CoreComponent(object):
         """ Method executed when preparing an init context
 
         Components can override this method to provide specific information
-        trough the service init context
+        through the service init context
 
         Args:
             context (ServiceContext): service initialization context
