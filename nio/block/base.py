@@ -54,6 +54,7 @@ class Block(PropertyHolder, CommandHolder):
         self._logger = get_nio_logger('default')
         self.persistence = None
         self._service_name = None
+        self.mgmt_signal_handler = None
 
     def configure(self, context):
         """Overrideable method to be called when the block configures.
@@ -86,6 +87,7 @@ class Block(PropertyHolder, CommandHolder):
 
         self.persistence = Persistence(self.name)
         self._service_name = context.service_name
+        self.mgmt_signal_handler = context.mgmt_signal_handler
 
     def start(self):
         """Overrideable method to be called when the block starts.
@@ -133,6 +135,8 @@ class Block(PropertyHolder, CommandHolder):
             signal.name = self.name
             self.status.add(signal.status)
         self._block_router.notify_management_signal(self, signal)
+        if self.mgmt_signal_handler:
+            self.mgmt_signal_handler(signal)
 
     def process_signals(self, signals, input_id='default'):
         """Overrideable method to be called when signals are delivered.

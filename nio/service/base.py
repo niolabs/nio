@@ -83,6 +83,7 @@ class Service(PropertyHolder, CommandHolder):
 
         self._logger = get_nio_logger('service')
         self._block_router = None
+        self.mgmt_signal_handler = None
         self._blocks = {}
         self.mappings = []
         self._status = FlagsEnum(ComponentStatus)
@@ -230,6 +231,7 @@ class Service(PropertyHolder, CommandHolder):
                                        self._blocks,
                                        context.router_settings)
         self._block_router.configure(router_context)
+        self.mgmt_signal_handler = context.mgmt_signal_handler
 
     @property
     def status(self):
@@ -257,7 +259,8 @@ class Service(PropertyHolder, CommandHolder):
             component_data,
             service_context.properties.get('name', ''),
             self._create_commandable_url(service_context.properties,
-                                         block_properties.get('name', ''))
+                                         block_properties.get('name', '')),
+            service_context.mgmt_signal_handler
         )
 
     def _create_commandable_url(self, service_properties, block_alias):
