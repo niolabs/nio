@@ -1,9 +1,9 @@
 import unittest
 from nio.block.base import Block
 from nio.block.context import BlockContext
-from nio.common.block.router.base import BaseBlockRouter, InvalidBlockOutput, \
+from nio.router.base import BlockRouter, InvalidBlockOutput, \
     InvalidBlockInput
-from nio.common.block.router.context import RouterContext
+from nio.router.context import RouterContext
 from nio.util.support.test_case import NIOTestCaseNoModules
 from nio.block.terminals import input, output
 
@@ -56,7 +56,7 @@ class TestBlockExecution(object):
 class TestInputOutputValidations(NIOTestCaseNoModules):
 
     def test_valid_input_output(self):
-        block_router = BaseBlockRouter()
+        block_router = BlockRouter()
         context = BlockContext(block_router, dict(), dict())
 
         # create blocks
@@ -97,7 +97,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
         block_router.stop()
 
     def test_valid_input_invalid_output(self):
-        block_router = BaseBlockRouter()
+        block_router = BlockRouter()
         context = BlockContext(block_router, dict(), dict())
 
         # create blocks
@@ -123,7 +123,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
 
     @unittest.skip('old constraint no longer enforceable, 03172015 changes')
     def test_invalid_input_valid_output1(self):
-        block_router = BaseBlockRouter()
+        block_router = BlockRouter()
         context = BlockContext(block_router, dict(), dict())
 
         # create blocks
@@ -148,7 +148,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
                           router_context)
 
     def test_invalid_input_valid_output2(self):
-        block_router = BaseBlockRouter()
+        block_router = BlockRouter()
         context = BlockContext(block_router, dict(), dict())
 
         # create blocks
@@ -182,7 +182,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
         FirstInputBlock only input is 'first' yet it receives from 'default'
         """
 
-        block_router = BaseBlockRouter()
+        block_router = BlockRouter()
         context = BlockContext(block_router, dict(), dict())
 
         # create blocks

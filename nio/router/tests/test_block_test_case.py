@@ -1,4 +1,4 @@
-from nio.common.block.router.base import InvalidBlockOutput
+from nio.router.base import InvalidBlockOutput
 from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.block.base import Block
 from nio.common.signal.base import Signal

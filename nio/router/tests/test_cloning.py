@@ -2,8 +2,8 @@ from unittest.mock import patch
 
 from nio.block.base import Block
 from nio.block.context import BlockContext
-from nio.common.block.router.base import BaseBlockRouter
-from nio.common.block.router.context import RouterContext
+from nio.router.base import BlockRouter
+from nio.router.context import RouterContext
 from nio.common.signal.base import Signal
 from nio.util.support.test_case import NIOTestCase
 
@@ -66,7 +66,7 @@ class TestCloningSignals(NIOTestCase):
         delivers signals as intended
         """
 
-        block_router = BaseBlockRouter()
+        block_router = BlockRouter()
         context = BlockContext(block_router, dict(), dict())
 
         # create blocks
@@ -130,7 +130,7 @@ class TestCloningSignals(NIOTestCase):
         only they are not copied, and instead original signals are delivered
         """
 
-        block_router = BaseBlockRouter()
+        block_router = BlockRouter()
         context = BlockContext(block_router, dict(), dict())
 
         # create blocks
@@ -163,7 +163,7 @@ class TestCloningSignals(NIOTestCase):
         self.assertIsNone(receiver_block2.signal_cache)
 
         # patching deepcopy, making it fail
-        with patch('nio.common.block.router.base.deepcopy',
+        with patch('nio.router.base.deepcopy',
                    side_effect=Exception("causing deepcopy failure")):
             sender_block.process_signals(signals)
 

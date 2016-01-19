@@ -1,6 +1,6 @@
 from nio.block.base import Block
 from nio.block.context import BlockContext
-from nio.common.block.router.context import RouterContext
+from nio.router.context import RouterContext
 from nio.util.support.test_case import NIOTestCase
 
 
@@ -43,8 +43,7 @@ class TestBlockRouter(NIOTestCase):
         delivers signals as intended
         """
 
-        from nio.common.block.router.thread_pool_executor \
-            import ThreadedPoolExecutorRouter
+        from nio.router.thread_pool_executor import ThreadedPoolExecutorRouter
 
         block_router = ThreadedPoolExecutorRouter()
         context = BlockContext(block_router, dict(), dict())
