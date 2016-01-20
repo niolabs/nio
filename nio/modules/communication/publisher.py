@@ -1,5 +1,5 @@
 
-from nio.modules.proxy import ModuleProxy, proxied
+from nio.modules.proxy import ModuleProxy
 
 
 class PublisherError(Exception):
@@ -11,6 +11,7 @@ class Publisher(ModuleProxy):
     """ This class encapsulates the user-facing interface to NIO's
     publisher.
     """
+
     def __init__(self, context=None, **topics):
         """ Publisher constructor
         Kwargs:
@@ -18,7 +19,6 @@ class Publisher(ModuleProxy):
         """
         super().__init__(context, **topics)
 
-    @proxied
     def open(self):
         """ Opens publishing channel
 
@@ -28,7 +28,6 @@ class Publisher(ModuleProxy):
         """
         raise NotImplementedError()
 
-    @proxied
     def send(self, signals):
         """ Sends signals
 
@@ -38,7 +37,6 @@ class Publisher(ModuleProxy):
 
         raise NotImplementedError()
 
-    @proxied
     def close(self):
         """ Closes publisher.
 
@@ -48,8 +46,6 @@ class Publisher(ModuleProxy):
         """
         raise NotImplementedError()
 
-    @proxied
     def is_closed(self):
-        """ Finds out if publisher has been closed
-        """
+        """ Finds out if publisher has been closed """
         raise NotImplementedError()

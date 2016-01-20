@@ -1,4 +1,4 @@
-from nio.modules.proxy import ModuleProxy, proxied
+from nio.modules.proxy import ModuleProxy
 
 
 class Persistence(ModuleProxy):
@@ -27,7 +27,6 @@ class Persistence(ModuleProxy):
         """ Create a Persistence object for a given name """
         super().__init__(name)
 
-    @proxied
     def store(self, key, value):
         """ Store a key/value datum in memory.
 
@@ -37,7 +36,6 @@ class Persistence(ModuleProxy):
         """
         raise NotImplementedError()
 
-    @proxied
     def load(self, key, default=None):
         """ Load a value from the k/v store *currently in memory*.
 
@@ -64,7 +62,6 @@ class Persistence(ModuleProxy):
         """
         raise NotImplementedError()
 
-    @proxied
     def clear(self, key):
         """ Remove the given key and associated value from the in-mem
         k/v store. As above, this will not be reflected permanently
@@ -72,7 +69,6 @@ class Persistence(ModuleProxy):
         """
         raise NotImplementedError()
 
-    @proxied
     def save(self):
         """ Save the in-memory store permanently. This allows the data therein
         to persist between instance/service restarts.
@@ -80,7 +76,6 @@ class Persistence(ModuleProxy):
         raise NotImplementedError()
 
     @classmethod
-    @proxied
     def setup(cls, configuration):
         """ Class method to initialize the Persistence class with a config.
 
@@ -96,7 +91,6 @@ class Persistence(ModuleProxy):
         raise NotImplementedError()
 
     @classmethod
-    @proxied
     def configure(cls, service_name):
         """ Class method to configure the Persistence class with a service
         name. This allows us to have a service-by-service namespace for

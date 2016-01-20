@@ -33,45 +33,59 @@ class NIOTestCase(TestCase):
         self.module_proxies = []
 
     def get_scheduler_module_implementation(self):
-        return 'nio.util.support.modules.scheduler'
+        from nio.util.support.modules.scheduler import Scheduler
+        return Scheduler
 
-    def get_security_module_implementation(self):
-        return 'nio.util.support.modules.security'
+    def get_security_roles_implementation(self):
+        from nio.util.support.modules.security.roles import RolesProvider
+        return RolesProvider
 
-    def get_communication_module_implementation(self):
-        return 'nio.util.support.modules.communication'
+    def get_security_permissions_implementation(self):
+        from nio.util.support.modules.security.permissions \
+            import PermissionsProvider
+        return PermissionsProvider
+
+    def get_security_auth_implementation(self):
+        from nio.util.support.modules.security.auth import Authenticator
+        return Authenticator
+
+    def get_communication_publisher_implementation(self):
+        from nio.util.support.modules.communication.publisher import Publisher
+        return Publisher
+
+    def get_communication_subscriber_implementation(self):
+        from nio.util.support.modules.communication.subscriber \
+            import Subscriber
+        return Subscriber
 
     def setupModules(self):
         if 'scheduler' in self.get_test_modules():
             self.module_proxies.append((
                 SchedulerModuleJob,
-                self.get_scheduler_module_implementation()))
+                self.get_scheduler_implementation()))
 
         if 'security' in self.get_test_modules():
             self.module_proxies.append((
                 SecurityModuleRoles,
-                "{}.roles".format(self.get_security_module_implementation())))
+                self.get_security_roles_implementation()))
             self.module_proxies.append(
                 (SecurityModulePermissions,
-                 "{}.permissions".format(
-                     self.get_security_module_implementation())))
+                 self.get_security_permissions_implementation()))
             self.module_proxies.append((
                 SecurityModuleAuthenticator,
-                "{}.auth".format(self.get_security_module_implementation())))
+                self.get_security_auth_implementation()))
 
         if 'communication' in self.get_test_modules():
             self.module_proxies.append((
                 Publisher,
-                "{}.publisher".format(
-                    self.get_communication_module_implementation())))
+                self.get_communication_publisher_implementation()))
 
             self.module_proxies.append((
                 Subscriber,
-                "{}.subscriber".format(
-                    self.get_communication_module_implementation())))
+                self.get_communication_subscriber_implementation()))
 
         for module_proxy, module_implementation in self.module_proxies:
-            module_proxy.initialize_from_package(module_implementation)
+            module_proxy.proxy(module_implementation)
 
         if 'security' in self.get_test_modules():
             # TODO: Remove once security module is refactored
@@ -80,7 +94,7 @@ class NIOTestCase(TestCase):
 
     def tearDownModules(self):
         for module_proxy, _ in reversed(self.module_proxies):
-            module_proxy.finalize()
+            module_proxy.unproxy()
 
     def get_test_modules(self):
         """ Returns set of modules to load during test
