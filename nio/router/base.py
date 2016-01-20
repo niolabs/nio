@@ -81,6 +81,7 @@ class BlockRouter(object):
         self._status = \
             FlagsEnum(RouterStatus,
                       status_change_callback=self._on_status_change_callback)
+        self._mgmt_signal_handler = None
         self.status.set(RouterStatus.created)
 
     def configure(self, context):
@@ -94,6 +95,7 @@ class BlockRouter(object):
             context (RouterContext): Context where settings are stored
         """
 
+        self._mgmt_signal_handler = context.mgmt_signal_handler
         self._clone_signals = \
             context.settings.get("clone_signals", False)
         if self._clone_signals:
@@ -240,7 +242,8 @@ class BlockRouter(object):
             None
 
         """
-        pass  # pragma: no cover
+        if self._mgmt_signal_handler:
+            self._mgmt_signal_handler(signal)
 
     def notify_signals(self, block, signals, output_id):
         """This method is called when a block is notifying signals.

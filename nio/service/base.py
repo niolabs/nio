@@ -229,7 +229,8 @@ class Service(PropertyHolder, CommandHolder):
         # populate router context and configure block router
         router_context = RouterContext(self.execution,
                                        self._blocks,
-                                       context.router_settings)
+                                       context.router_settings,
+                                       context.mgmt_signal_handler)
         self._block_router.configure(router_context)
         self.mgmt_signal_handler = context.mgmt_signal_handler
 
@@ -259,8 +260,7 @@ class Service(PropertyHolder, CommandHolder):
             component_data,
             service_context.properties.get('name', ''),
             self._create_commandable_url(service_context.properties,
-                                         block_properties.get('name', '')),
-            service_context.mgmt_signal_handler
+                                         block_properties.get('name', ''))
         )
 
     def _create_commandable_url(self, service_properties, block_alias):
