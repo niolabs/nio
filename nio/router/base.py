@@ -1,12 +1,14 @@
 from copy import deepcopy
 from enum import Enum
 from nio.common import ComponentStatus
-from nio.common.block.router import BlockRouter
 from nio.util.logging import get_nio_logger
 from nio.util.flags_enum import FlagsEnum
 
 
 class RouterStatus(Enum):
+
+    """Enum specifying the different types of router status that are possible"""
+
     created = 1
     stopped = 2
     started = 3
@@ -38,6 +40,10 @@ class BlockReceiverData(object):
     """
 
     def __init__(self, block, input_id, output_id):
+        """ Create a new block receiver data.
+
+        Take care of setting up instance variables.
+        """
         self._block = block
         self._input_id = input_id
         self._output_id = output_id
@@ -55,18 +61,22 @@ class BlockReceiverData(object):
         return self._output_id
 
 
-class BaseBlockRouter(BlockRouter):
+class BlockRouter(object):
 
-    """An object that contains blocks and can handle when blocks notify
-    signals.
+    """A Block Router receives service block execution information, processes
+    it and becomes ready to receive signals from any participating block in
+    the service execution.
 
+    When receiving signals, the block router would be in the position of
+    a speedy delivery to receiving blocks.
     """
 
     def __init__(self):
-        super().__init__()
+        """ Create a new block router instance """
+
+        self._logger = get_nio_logger('BlockRouter')
 
         self._receivers = None
-        self._logger = get_nio_logger('BlockRouter')
         self._clone_signals = False
         self._status = \
             FlagsEnum(RouterStatus,
@@ -201,9 +211,11 @@ class BaseBlockRouter(BlockRouter):
         return receiver_data
 
     def start(self):
+        """ Marks block router status as started """
         self.status.set(RouterStatus.started)
 
     def stop(self):
+        """ Marks block router status as stopped """
         self.status.set(RouterStatus.stopped)
 
     @property
@@ -213,6 +225,22 @@ class BaseBlockRouter(BlockRouter):
     def _on_status_change_callback(self, old_status, new_status):
         self._logger.info("Block Router status changed from: {0} to: {1}".
                           format(old_status.name, new_status.name))
+
+    def notify_management_signal(self, block, signal):
+        """The method to be called when notifying management signals
+
+        This is called, most likely, when a block wants to notify its
+        own error state.
+
+        Args:
+            block (Block): The block that is notifying.
+            signal (ManagementSignal): The management signal to notify
+
+        Return:
+            None
+
+        """
+        pass  # pragma: no cover
 
     def notify_signals(self, block, signals, output_id):
         """This method is called when a block is notifying signals.

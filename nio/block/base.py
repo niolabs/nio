@@ -5,7 +5,7 @@ a custom block, extend this Block class and override the appropriate methods.
 """
 from nio.common.command import command
 from nio.common.command.holder import CommandHolder
-from nio.common.block.router import BlockRouter
+from nio.router.base import BlockRouter
 from nio.metadata.properties import PropertyHolder, StringProperty, \
     VersionProperty, SelectProperty
 from nio.util.logging import get_nio_logger

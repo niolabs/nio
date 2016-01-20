@@ -1,8 +1,8 @@
 from nio.block.terminals import input, output
 from nio.block.base import Block
 from nio.block.context import BlockContext
-from nio.common.block.router.base import BaseBlockRouter
-from nio.common.block.router.context import RouterContext
+from nio.router.base import BlockRouter
+from nio.router.context import RouterContext
 from nio.util.support.test_case import NIOTestCaseNoModules
 
 # CONFIGURATION to follow for unittests understanding
@@ -163,7 +163,7 @@ class TestBlockExecution(object):
 class TestInputOutput(NIOTestCaseNoModules):
 
     def test_two_outputs_default_input(self):
-        block_router = BaseBlockRouter()
+        block_router = BlockRouter()
         context = BlockContext(block_router, dict(), dict())
 
         # create blocks
@@ -218,7 +218,7 @@ class TestInputOutput(NIOTestCaseNoModules):
         block_router.stop()
 
     def test_three_outputs_mix_inputs(self):
-        block_router = BaseBlockRouter()
+        block_router = BlockRouter()
         context = BlockContext(block_router, dict(), dict())
 
         # create blocks

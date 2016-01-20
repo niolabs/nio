@@ -1,8 +1,6 @@
 class RouterContext(object):
 
-    """ Maintains information needed to configure a block router.
-
-    """
+    """ Maintains information needed to configure a block router """
 
     def __init__(self, execution, blocks, settings=None):
         """Initializes a router context.
@@ -12,19 +10,9 @@ class RouterContext(object):
                 execution property
             blocks (dict):  dictionary of blocks that looks like this:
                 block_name: block instance format
-            settings (dict): router settings, , these can include
+            settings (dict): router settings, these can include
                 "clone_signals" and/or any other settings depending on router
                 being used
-
-        Keyword Args:
-            None
-
-        Returns:
-            None
-
-        Raises:
-            None
-
         """
         self.execution = execution
         self.blocks = blocks
