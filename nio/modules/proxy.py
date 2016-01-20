@@ -1,6 +1,6 @@
 """
 
-  Proxy classes and decorator for Modules
+  A base class and exceptions for proxies.
 
 """
 from collections import defaultdict
@@ -9,14 +9,58 @@ from nio.util.logging import get_nio_logger
 
 
 class ProxyNotProxied(Exception):
+
+    """ Exception raised when an operation takes place on an unproxied proxy.
+
+    This can occur when trying to unproxy a proxy that hasn't been proxied yet.
+    """
     pass
 
 
 class ProxyAlreadyProxied(Exception):
+
+    """ Exception raised when an operation takes place on a proxied proxy.
+
+    This can occur when trying to proxy a proxy that has already been proxied
+    """
     pass
 
 
 class ModuleProxy(object):
+
+    """ A base class for creating a ModuleProxy interface
+
+  A ModuleProxy is similar to an interface - it allows for separating the
+  interface for accessing a class and the implementation controlling how it
+  works.
+
+  To create a ModuleProxy interface, create a class that inherits from the
+  ModuleProxy class. Define methods and class variables in your interface with
+  the method signatures you want people to use when calling them. These
+  functions can have as much or as little functionality as you want. Once the
+  proxy is "proxied" with an implementation class, any methods defined on the
+  implementation class will be proxied and overridden on to the interface.
+
+  After the interface is proxied, people can create an object as if they are
+  creating the interface - the caller does not need to know the type or
+  location of the implementation class.
+
+  To create an implementation for a ModuleProxy, create a class that does NOT
+  inherit from ModuleProxy. Define functionality for whatever methods on the
+  interface you want. You can define additional methods in your class that can
+  be accessed by the other methods in your implementation. Be aware though that
+  since these methods are not on the interface, it should not be assumed that
+  the caller can call them or even knows they exist.
+
+  Once the implementation class is complete, call the proxy method on the
+  interface passing in the reference to the implementation class.
+
+  Example - this will proxy the members of the ImplementationClass on to the
+  InterfaceProxyClass:
+
+      >>> InterfaceProxyClass.proxy(ImplementationClass)
+
+    """
 
     # Whether or not this class has already been proxied
     proxied = False

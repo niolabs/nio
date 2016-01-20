@@ -12,9 +12,11 @@ class ProxyInterface(ModuleProxy):
         super().__init__(my_arg)
 
     def method_a(self):
+        """ A public method that can be overridden by the implementation """
         raise NotImplementedError
 
     def _protected_proxy_method(self):
+        """ A protected method that can be overridden by the implementation """
         raise NotImplementedError
 
     def _method_with_body(self):
@@ -34,10 +36,12 @@ class ProxyInterface(ModuleProxy):
 
     @classmethod
     def my_overridden_classmethod(cls):
+        """ A classmethod that can be overridden by the implementation """
         raise NotImplementedError
 
     @classmethod
     def my_non_overridden_classmethod(cls):
+        """ A classmethod that will not be overridden by the implementation """
         return "INTERFACE"
 
 
@@ -54,10 +58,17 @@ class ProxyImplementation(object):
         pass
 
     def own_method(self):
-        """ This will return my reference to my private method """
+        """ A method that did not exist on the interface
+
+        This will return my reference to my private method """
         return self.__private_proxy_method()
 
     def __private_proxy_method(self):
+        """ Creating a private method with the same name as the one in iface
+
+        Methods in the implementation will access this private method, but
+        methods in the interface will access the interface's private method.
+        """
         return "IMPLEMENTATION"
 
     @classmethod
