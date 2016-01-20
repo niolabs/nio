@@ -1,8 +1,9 @@
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 from nio.block.base import Block
 from nio.block.context import BlockContext
 from nio.common.signal.base import Signal
 from nio.router.base import BlockRouter
+from nio.router.context import RouterContext
 from nio.util.support.test_case import NIOTestCaseNoModules
 
 
@@ -30,13 +31,37 @@ class TestBaseBlock(NIOTestCaseNoModules):
             Block().configure(BlockContext(JustAnObject, {}, {}, None))
 
     def test_notify_management_signal(self):
-        """Test the block can notify management signals properly"""
+        """Test the block can notify management signals properly to
+        block router"""
         blk = Block()
+        service_mgmt_signal_handler = Mock()
+        blk.configure(BlockContext(
+            BlockRouter(),
+            {"name": "BlockName", "log_level": "WARNING"},
+            {}))
         my_sig = Signal({"key": "val"})
         with patch.object(blk, '_block_router') as router_patch:
             blk.notify_management_signal(my_sig)
             router_patch.notify_management_signal.assert_called_once_with(
                 blk, my_sig)
+
+    def test_service_notify_management_signal(self):
+        """ Test the block can notify management signals properly by making it
+        all the way to service mgmt handler """
+        blk = Block()
+        service_mgmt_signal_handler = Mock()
+        block_router = BlockRouter()
+        router_context = \
+            RouterContext([], {},
+                          mgmt_signal_handler=service_mgmt_signal_handler)
+        block_router.configure(router_context)
+        blk.configure(BlockContext(
+            block_router,
+            {"name": "BlockName", "log_level": "WARNING"},
+            {}))
+        my_sig = Signal({"key": "val"})
+        blk.notify_management_signal(my_sig)
+        service_mgmt_signal_handler.assert_called_once_with(my_sig)
 
     def test_notify_signals(self):
         """Test the block can notify signals properly"""

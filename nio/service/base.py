@@ -83,6 +83,7 @@ class Service(PropertyHolder, CommandHolder):
 
         self._logger = get_nio_logger('service')
         self._block_router = None
+        self.mgmt_signal_handler = None
         self._blocks = {}
         self.mappings = []
         self._status = FlagsEnum(ComponentStatus)
@@ -228,8 +229,10 @@ class Service(PropertyHolder, CommandHolder):
         # populate router context and configure block router
         router_context = RouterContext(self.execution,
                                        self._blocks,
-                                       context.router_settings)
+                                       context.router_settings,
+                                       context.mgmt_signal_handler)
         self._block_router.configure(router_context)
+        self.mgmt_signal_handler = context.mgmt_signal_handler
 
     @property
     def status(self):

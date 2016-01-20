@@ -22,8 +22,6 @@ class BlockContext(object):
                 This URL will not have host or port information, as that may
                 be different based on public/private IP. It will look like
                 "/services/ServiceName/BlockAlias/"
-            mgmt_signal_handler (method): method to use to publish
-                management signals
 
         """
 
