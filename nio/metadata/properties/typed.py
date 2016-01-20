@@ -61,9 +61,7 @@ class TypedProperty(Property):
         return self._values.get(instance, self._default)
 
     def __set__(self, instance, value):
-
         self._check_allow_none(value)
-
         if value is not None and not isinstance(value, self._type):
             raise TypeError("Must be a {0}".format(self._type))
         self._values[instance] = value

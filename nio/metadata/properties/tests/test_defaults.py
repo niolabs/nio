@@ -3,8 +3,7 @@ import json
 from datetime import timedelta
 from nio.block.base import Block
 from nio.common.service.base import Service
-from nio.metadata.properties import FloatProperty, BoolProperty, \
-    ExpressionProperty, SelectProperty
+from nio.metadata.properties import FloatProperty, BoolProperty, SelectProperty
 from nio.metadata.properties.int import IntProperty
 from nio.metadata.properties.list import ListProperty
 from nio.metadata.properties.object import ObjectProperty
@@ -30,10 +29,10 @@ class ContainerClass(PropertyHolder):
     string_property_default_env_variable = \
         StringProperty(default='[[ENV_VARIABLE]]')
 
-    expression_property = ExpressionProperty(attr_default='Whoops',
+    expression_property = StringProperty(attr_default='Whoops',
                                              default='Default to {{$v1}}')
     expression_property_default_env_variable = \
-        ExpressionProperty(default='[[ENV_VARIABLE]]')
+        StringProperty(default='[[ENV_VARIABLE]]')
 
     bool_property = BoolProperty(default=False)
     bool_property_default_env_variable = \

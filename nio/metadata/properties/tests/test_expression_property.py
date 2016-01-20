@@ -2,7 +2,7 @@ from inspect import isclass
 from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.block.base import Block
 from nio.common.signal.base import Signal
-from nio.metadata.properties.expression import ExpressionProperty
+from nio.metadata.properties.string import StringProperty
 
 
 class ValueSignal(Signal):
@@ -21,17 +21,17 @@ class ValueSignal(Signal):
 
 
 class EvaluatorBlock(Block):
-    expression = ExpressionProperty(
+    expression = StringProperty(
         attr_default='Whoops',
         default='Default to {{$v1}}')
 
 
 class ExprDefaultBlock(Block):
-    expression = ExpressionProperty()
+    expression = StringProperty()
 
 
 class ExprExceptionBlock(Block):
-    expression = ExpressionProperty(attr_default=AttributeError)
+    expression = StringProperty(attr_default=AttributeError)
 
 
 class MyCustomException(Exception):
@@ -39,21 +39,21 @@ class MyCustomException(Exception):
 
 
 class CustomExceptionBlock(Block):
-    expression = ExpressionProperty(attr_default=MyCustomException)
+    expression = StringProperty(attr_default=MyCustomException)
 
 
 class ExprEmptyStr(Block):
-    expression = ExpressionProperty(default='')
+    expression = StringProperty(default='')
 
 
 class ExprEmptyStrExcept(Block):
-    expression = ExpressionProperty(default='', attr_default=AttributeError)
+    expression = StringProperty(default='', attr_default=AttributeError)
 
 
 class MultiExpression(Block):
-    e1 = ExpressionProperty(default='', attr_default=AttributeError)
-    e2 = ExpressionProperty(default='', attr_default=None)
-    e3 = ExpressionProperty(defulat='', attr_default='Fandango')
+    e1 = StringProperty(default='', attr_default=AttributeError)
+    e2 = StringProperty(default='', attr_default=None)
+    e3 = StringProperty(defulat='', attr_default='Fandango')
 
 
 class EvalSignalTestCase(NIOBlockTestCase):
