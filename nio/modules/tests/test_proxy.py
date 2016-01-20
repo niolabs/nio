@@ -7,6 +7,10 @@ class ProxyInterface(ModuleProxy):
 
     interface_class_variable = 5
 
+    def __init__(self, my_arg=None):
+        """ Follow the practice of only calling super in __init__"""
+        super().__init__(my_arg)
+
     def method_a(self):
         raise NotImplementedError
 
@@ -42,7 +46,7 @@ class ProxyImplementation(object):
     interface_class_variable = 10
     implementation_class_variable = 20
 
-    def __init__(self):
+    def __init__(self, my_arg=None):
         pass
 
     def method_a(self):
@@ -144,10 +148,13 @@ class TestNoProxy(NIOTestCaseNoModules):
     def tearDown(self):
         if ProxyInterface.proxied:
             ProxyInterface.unproxy()
+        ProxyInterface._impl_class = None
         super().tearDown()
 
     def test_no_proxy(self):
         """Nothing gets called without proxying"""
+        # Manually set the implementation class so we can call the constructor
+        ProxyInterface._impl_class = ProxyImplementation
         not_proxied = ProxyInterface()
         with self.assertRaises(NotImplementedError):
             not_proxied.method_a()
@@ -162,8 +169,8 @@ class TestNoProxy(NIOTestCaseNoModules):
             self.__class__.__module__, "ProxyImplementation")
         with patch(proxy_impl_constructor_loc, return_value=None) as init:
             ProxyInterface.proxy(ProxyImplementation)
-            ProxyImplementation()
-            init.assert_called_once_with()
+            instance = ProxyInterface("test")
+            init.assert_called_once_with(instance, "test")
 
     def test_unproxy(self):
         """Make sure unproxying cleans everything up"""

@@ -4,7 +4,7 @@
 
 """
 from collections import defaultdict
-from inspect import getmembers, isfunction, ismethod, isroutine
+from inspect import getmembers, isclass, isfunction, ismethod, isroutine
 from nio.util.logging import get_nio_logger
 
 
@@ -20,8 +20,25 @@ class ModuleProxy(object):
 
     # Whether or not this class has already been proxied
     proxied = False
+    _impl_class = None
     _unproxied_methods = defaultdict(dict)
     _logger = get_nio_logger('ModuleProxy')
+
+    def __init__(self, *args, **kwargs):
+        """ Handling the instantiation of a ModuleProxy
+
+        Instantiating a ModuleProxy probably means they want to instantiate
+        the module implementation class instead. We still call the ModuleProxy
+        constructor so that the interface can define an explicit signature
+        for its constructor.
+
+        Therefore, a proxy interface should define its __init__ method with
+        the desired signature, and call super with the same arguments. The
+        __init__ method of the proxy implementation will NOT be proxied to the
+        interface.
+        """
+        if isclass(self._impl_class):
+            self._impl_class.__init__(self, *args, **kwargs)
 
     @classmethod
     def proxy(cls, class_to_proxy):
@@ -54,8 +71,9 @@ class ModuleProxy(object):
             cls._unproxied_methods[cls.__name__][name] = interface_member
             setattr(cls, name, impl_member)
 
-        # Mark the class as proxied
+        # Mark the class as proxied and save the implementation class
         cls.proxied = True
+        cls._impl_class = class_to_proxy
 
     @classmethod
     def unproxy(cls):
@@ -77,6 +95,7 @@ class ModuleProxy(object):
 
         # Reset all of our cached proxy class information
         cls._unproxied_methods[cls.__name__] = {}
+        cls._impl_class = None
         cls.proxied = False
 
     @classmethod
@@ -84,10 +103,9 @@ class ModuleProxy(object):
         """Returns True if a member is proxy-able.
 
         Here is what we want to proxy:
-            * The __init__ constructor
             * Any non-private instance functions
             * Any non-private class methods
             * Any non-private class variables
         """
-        return (name == '__init__' or not name.startswith('__')) and \
+        return not name.startswith('__') and \
             (isfunction(member) or ismethod(member) or not isroutine(member))

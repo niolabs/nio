@@ -6,6 +6,7 @@ import logging.config
 import multiprocessing
 from unittest import TestCase
 
+from nio.modules.persistence import Persistence as PersistenceModulePersistence
 from nio.modules.scheduler import Job as SchedulerModuleJob
 from nio.modules.security.auth \
     import Authenticator as SecurityModuleAuthenticator
@@ -32,9 +33,13 @@ class NIOTestCase(TestCase):
         logging.config.dictConfig(self.get_logging_config())
         self.module_proxies = []
 
-    def get_scheduler_module_implementation(self):
-        from nio.util.support.modules.scheduler import Scheduler
-        return Scheduler
+    def get_persistence_implementation(self):
+        from nio.util.support.modules.persistence import Persistence
+        return Persistence
+
+    def get_scheduler_implementation(self):
+        from nio.util.support.modules.scheduler import Job
+        return Job
 
     def get_security_roles_implementation(self):
         from nio.util.support.modules.security.roles import RolesProvider
@@ -63,6 +68,11 @@ class NIOTestCase(TestCase):
             self.module_proxies.append((
                 SchedulerModuleJob,
                 self.get_scheduler_implementation()))
+
+        if 'persistence' in self.get_test_modules():
+            self.module_proxies.append((
+                PersistenceModulePersistence,
+                self.get_persistence_implementation()))
 
         if 'security' in self.get_test_modules():
             self.module_proxies.append((
@@ -101,7 +111,7 @@ class NIOTestCase(TestCase):
         Override this method to customize which modules you want to load
         during a test
         """
-        return {'scheduler', 'security'}
+        return {'scheduler', 'security', 'persistence'}
 
     def setUpSettings(self):
         """ Sets Settings before running a unit test """
