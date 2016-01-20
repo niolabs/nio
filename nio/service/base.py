@@ -243,18 +243,11 @@ class Service(PropertyHolder, CommandHolder):
          for a future block configuration
         """
 
-        # populate component data member for given block by getting
-        # data for all blocks and merging it with specific block data
-        component_data = service_context.get_block_data()
-        # TODO: Do we need to merge in individual block data here? Why were
-        # we doing that before?
-
         from nio.block.context import BlockContext
 
         return BlockContext(
             self._block_router,
             block_properties,
-            component_data,
             service_context.properties.get('name', ''),
             self._create_commandable_url(service_context.properties,
                                          block_properties.get('name', ''))

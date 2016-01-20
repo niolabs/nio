@@ -92,7 +92,6 @@ class NIOBlockTestCase(NIOTestCase):
         block.configure(BlockContext(
             self._router,
             block_properties,
-            dict(),
             'TestSuite',
             ''))
 
