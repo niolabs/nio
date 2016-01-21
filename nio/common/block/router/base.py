@@ -226,9 +226,9 @@ class BaseBlockRouter(BlockRouter):
 
             # determine if signals are to be cloned.
             clone_signals = \
-                self._clone_signals and len(self._receivers[block.name]) > 1
+                self._clone_signals and len(self._receivers[block.name()]) > 1
 
-            for receiver_data in self._receivers[block.name]:
+            for receiver_data in self._receivers[block.name()]:
                 if receiver_data.block.status.is_set(ComponentStatus.error):
                     self._logger.debug(
                         "Block '{0}' has status 'error'. Not delivering "

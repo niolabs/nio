@@ -115,7 +115,7 @@ class TestProperties(NIOTestCase):
         container.list_property = contained_list
 
         # assert that the values matched when reading them
-        self.assertEqual(container.string_property, "String_Property_Value")
+        self.assertEqual(container.string_property(), "String_Property_Value")
         self.assertEqual(container.int_property, 1)
         self.assertEqual(container.float_property, 1.23)
         self.assertEqual(container.object_property, contained)

@@ -1,5 +1,29 @@
 from weakref import WeakKeyDictionary
 from nio.metadata.properties.base import Property, AllowNoneViolation
+from nio.common.signal.base import Signal
+from nio.metadata.properties.expression_util import Evaluator
+
+
+class ExprFunc(object):
+
+    def __init__(self, value, attr_default=''):
+        self._object = value
+        self._attr_default = attr_default
+        self.evaluator = Evaluator(self._object, attr_default)
+        self.default = attr_default
+
+    def __call__(self, signal=None):
+        return self.evaluator.evaluate(signal or Signal())
+
+    def is_expression(self):
+        return "{{" in self.evaluator.expression and \
+                "}}" in self.evaluator.expression
+
+    def depends_on_signal(self):
+        return "$" in self.evaluator.expression and self.is_expression()
+
+    def get_expression(self):
+        return self.evaluator.expression
 
 
 class TypedProperty(Property):
@@ -79,7 +103,11 @@ class TypedProperty(Property):
         # TODO: Return None or default when not set
         # Returning None wouldn't "save" a value that was just set
         # by default, get would still return the default value each time
-        return self._values.get(instance, self.default)
+        value = self._values.get(instance, self.default)
+        if isinstance(value, ExprFunc):
+            # New style expression properties need to be evaluated first
+            value = value()
+        return value
 
     def deserialize(self, value):
         """Return the deserialized value of the specified serialized value"""
