@@ -65,7 +65,8 @@ class NIOTestCase(TestCase):
                 module_name,
                 getattr(self, 'get_{}_implementation'.format(module_name))())
 
-        self._module_initializer.initialize()
+        # Perform a safe initialization in case a proxy never got cleaned up
+        self._module_initializer.initialize(safe=True)
 
         if 'security' in self.get_test_modules():
             # TODO: Remove once security module is refactored
@@ -73,7 +74,9 @@ class NIOTestCase(TestCase):
             SecurityModule._reset({})
 
     def tearDownModules(self):
-        self._module_initializer.finalize()
+        # Perform a safe finalization in case anything wasn't proxied
+        # originally
+        self._module_initializer.finalize(safe=True)
 
     def get_test_modules(self):
         """ Returns set of modules to load during test
