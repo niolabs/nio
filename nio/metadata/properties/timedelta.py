@@ -14,7 +14,7 @@ class TimeDeltaProperty(TypedProperty):
             self._default = self.deserialize(kwargs["default"])
 
     def serialize(self, instance):
-        value = self.__get__(instance, self.__class__)
+        value = self.__get__(instance, self.__class__)()
         if isinstance(value, timedelta):
             return self._timedelta_to_dict(value)
         else:

@@ -6,14 +6,38 @@ from nio.metadata.properties.expression_util import Evaluator
 
 class ExprFunc(object):
 
-    def __init__(self, value, attr_default=''):
+    def __init__(self, value, type=str, attr_default=''):
         self._object = value
+        self._type = type
         self._attr_default = attr_default
-        self.evaluator = Evaluator(self._object, attr_default)
+        self.evaluator = Evaluator(str(self._object), attr_default)
         self.default = attr_default
 
     def __call__(self, signal=None):
-        return self.evaluator.evaluate(signal or Signal())
+        """ Evaluate and type cast the value """
+        value = self._object
+        from nio.metadata.properties.holder import PropertyHolder
+        from nio.metadata.properties.list import ListProperty
+        import datetime
+        import enum
+        # TODO: these types should support expressions too
+        if not issubclass(self._type, PropertyHolder) and \
+                not issubclass(self._type, ListProperty) and \
+                not issubclass(self._type, list) and \
+                not issubclass(self._type, datetime.timedelta) and \
+                not issubclass(self._type, enum.Enum) and \
+                not self._type is object:
+            value = self.evaluator.evaluate(signal or Signal())
+            if self._type != str:
+                # TODO: this really should be calling deserialize because it's
+                # not always this simple.
+                value = self._type(value)
+            else:
+                # nio 1.x ExpressionProperty does not needs to evaluate to a
+                # string. To keep that feature alive, StringProperty does not
+                # get type casted here.
+                pass
+        return value
 
     def is_expression(self):
         return "{{" in self.evaluator.expression and \
@@ -82,13 +106,25 @@ class TypedProperty(Property):
     # BEGIN MANDATORY DEFINITIONS (Property as Python descriptors)
 
     def __get__(self, instance, cls):
-        return self._values.get(instance, self._default)
+        # In case we use the default, it also needs to be an ExprFunc
+        default = ExprFunc(self._default,
+                           type=self._type,
+                           attr_default=self._kwargs.get('attr_default', ''))
+        return self._values.get(instance, default)
 
     def __set__(self, instance, value):
         self._check_allow_none(value)
         if value is not None and not isinstance(value, self._type):
             raise TypeError("Must be a {0}".format(self._type))
-        self._values[instance] = value
+        # Save an ExprFunc instead of just the regular str
+        self._values[instance] = ExprFunc(
+            value,
+            type=self._type,
+            attr_default=self._kwargs.get('attr_default', ''))
+        # TODO: why does the second one of these fail?
+        #import pdb; pdb.set_trace()
+        #print('set a new value: {}'.format(self._values[instance]()))
+        #print('set a new value: {}'.format(self._values[instance]()))
 
     def __delete__(self, instance):
         raise AttributeError("Can't delete a property")

@@ -116,10 +116,10 @@ class TestProperties(NIOTestCase):
 
         # assert that the values matched when reading them
         self.assertEqual(container.string_property(), "String_Property_Value")
-        self.assertEqual(container.int_property, 1)
-        self.assertEqual(container.float_property, 1.23)
-        self.assertEqual(container.object_property, contained)
-        self.assertEqual(container.list_property, contained_list)
+        self.assertEqual(container.int_property(), 1)
+        self.assertEqual(container.float_property(), 1.23)
+        self.assertEqual(container.object_property(), contained)
+        self.assertEqual(container.list_property(), contained_list)
 
     def test_declines_wrong_types(self):
         container = ContainerClass()
@@ -211,6 +211,8 @@ class TestProperties(NIOTestCase):
 
         # the serialized container should match properties_to_set
         container1_serialized = container1.to_dict()
+        self.assertEqual(container1_serialized['int_property'],
+                         properties_to_set['int_property'])
         self.assertEqual(container1_serialized, properties_to_set)
 
         container2 = ContainerClass()

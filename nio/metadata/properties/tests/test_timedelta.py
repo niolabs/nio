@@ -23,21 +23,21 @@ class TestTimeDeltaProp(NIOTestCase):
                 default=timedelta(weeks=1))
 
         inst = DefaultSampleClass()
-        self.assertNotEqual(inst.timedelta_dict_property, timedelta(days=6))
-        self.assertEqual(inst.timedelta_dict_property, timedelta(days=7))
-        self.assertNotEqual(inst.timedelta_dict_property, timedelta(days=8))
+        self.assertNotEqual(inst.timedelta_dict_property(), timedelta(days=6))
+        self.assertEqual(inst.timedelta_dict_property(), timedelta(days=7))
+        self.assertNotEqual(inst.timedelta_dict_property(), timedelta(days=8))
 
-        self.assertNotEqual(inst.timedelta_td_property, timedelta(days=6))
-        self.assertEqual(inst.timedelta_td_property, timedelta(days=7))
-        self.assertNotEqual(inst.timedelta_td_property, timedelta(days=8))
+        self.assertNotEqual(inst.timedelta_td_property(), timedelta(days=6))
+        self.assertEqual(inst.timedelta_td_property(), timedelta(days=7))
+        self.assertNotEqual(inst.timedelta_td_property(), timedelta(days=8))
 
     def test_accept_values(self):
         instance = SampleClass()
 
         instance.timedelta_property = timedelta(seconds=3)
-        self.assertEqual(instance.timedelta_property.total_seconds(), 3)
+        self.assertEqual(instance.timedelta_property().total_seconds(), 3)
 
-        self.assertEqual(instance.timedelta_property, timedelta(seconds=3))
+        self.assertEqual(instance.timedelta_property(), timedelta(seconds=3))
 
     def test_serialize_deserialize_matching(self):
         instance1 = SampleClass()
@@ -56,8 +56,8 @@ class TestTimeDeltaProp(NIOTestCase):
         instance2_serialized = instance2.to_dict()
 
         self.assertEqual(instance1_serialized, instance2_serialized)
-        self.assertEqual(instance1.timedelta_property,
-                         instance2.timedelta_property)
+        self.assertEqual(instance1.timedelta_property(),
+                         instance2.timedelta_property())
 
     def test_json_serializable(self):
         instance1 = SampleClass()
@@ -77,8 +77,8 @@ class TestTimeDeltaProp(NIOTestCase):
         instance2 = SampleClass()
         instance2.from_dict(instance1_from_str)
 
-        self.assertEqual(instance1.timedelta_property,
-                         instance2.timedelta_property)
+        self.assertEqual(instance1.timedelta_property(),
+                         instance2.timedelta_property())
 
     def test_description(self):
         description = SampleClass.get_description()

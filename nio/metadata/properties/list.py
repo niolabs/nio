@@ -38,7 +38,7 @@ class ListProperty(TypedProperty):
         values = self.__get__(instance, self.__class__)
         out_list = []
 
-        for el in values:
+        for el in values():
             # Figure out what form of serialization will happen for this type
             if issubclass(self._list_obj_type, Property):
                 # the items are properties, we will call serialize

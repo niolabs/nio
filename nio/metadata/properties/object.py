@@ -32,7 +32,7 @@ class ObjectProperty(TypedProperty):
     def serialize(self, instance):
         value = self.__get__(instance, self.__class__)
         if value is not None:
-            return value.to_dict()
+            return value().to_dict()
 
     def deserialize(self, value):
         sub_instance = self._type()
