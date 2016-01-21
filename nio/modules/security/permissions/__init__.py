@@ -3,7 +3,7 @@
   Permission Provider Interface
 
 """
-from nio.modules.proxy import ModuleProxy, proxied
+from nio.modules.proxy import ModuleProxy
 
 
 class PermissionsProvider(ModuleProxy):
@@ -15,6 +15,5 @@ class PermissionsProvider(ModuleProxy):
         """ Create a Permissions Provider """
         super().__init__(data)
 
-    @proxied
     def get_permissions(self):
         raise NotImplementedError()

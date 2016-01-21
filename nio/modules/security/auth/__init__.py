@@ -3,7 +3,7 @@
   Authenticator Interface
 
 """
-from nio.modules.proxy import ModuleProxy, proxied
+from nio.modules.proxy import ModuleProxy
 
 
 class Authenticator(ModuleProxy):
@@ -16,6 +16,5 @@ class Authenticator(ModuleProxy):
         """ Create an Authenticator based on a configuration  """
         super().__init__(configuration)
 
-    @proxied
     def authenticate(self, **kwargs):
         raise NotImplementedError()

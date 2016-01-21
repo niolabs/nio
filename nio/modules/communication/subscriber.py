@@ -1,4 +1,4 @@
-from nio.modules.proxy import ModuleProxy, proxied
+from nio.modules.proxy import ModuleProxy
 
 
 class Subscriber(ModuleProxy):
@@ -14,14 +14,12 @@ class Subscriber(ModuleProxy):
         """
         super().__init__(handler, matching_provider, **topics)
 
-    @proxied
     def open(self):
         """ Subscribes handler to matching publishers
 
         """
         raise NotImplementedError()
 
-    @proxied
     def close(self):
         """ Closes publisher.
 

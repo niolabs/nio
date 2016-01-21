@@ -1,4 +1,4 @@
-from nio.modules.proxy import ModuleProxy, proxied
+from nio.modules.proxy import ModuleProxy
 
 
 class Job(ModuleProxy):
@@ -28,7 +28,6 @@ class Job(ModuleProxy):
         """
         super().__init__(target, delta, repeatable, *args, **kwargs)
 
-    @proxied
     def cancel(self):
         """ Unschedule this task.
 

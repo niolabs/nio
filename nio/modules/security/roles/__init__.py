@@ -3,7 +3,7 @@
   Roles Provider Interface
 
 """
-from nio.modules.proxy import ModuleProxy, proxied
+from nio.modules.proxy import ModuleProxy
 
 
 class RolesProvider(ModuleProxy):
@@ -16,6 +16,5 @@ class RolesProvider(ModuleProxy):
         """ Create a Roles Provider """
         super().__init__(data)
 
-    @proxied
     def get_user_roles(self, user):
         raise NotImplementedError()
