@@ -6,16 +6,7 @@ import logging.config
 import multiprocessing
 from unittest import TestCase
 
-from nio.modules.persistence import Persistence as PersistenceModulePersistence
-from nio.modules.scheduler import Job as SchedulerModuleJob
-from nio.modules.security.auth \
-    import Authenticator as SecurityModuleAuthenticator
-from nio.modules.security.roles import RolesProvider as SecurityModuleRoles
-from nio.modules.security.permissions \
-    import PermissionsProvider as SecurityModulePermissions
-
-from nio.modules.communication.publisher import Publisher
-from nio.modules.communication.subscriber import Subscriber
+from nio.modules.initializer import ModuleInitializer
 
 
 class NIOTestCase(TestCase):
@@ -41,61 +32,40 @@ class NIOTestCase(TestCase):
         from nio.util.support.modules.scheduler import Job
         return Job
 
-    def get_security_roles_implementation(self):
+    def get_roles_implementation(self):
         from nio.util.support.modules.security.roles import RolesProvider
         return RolesProvider
 
-    def get_security_permissions_implementation(self):
+    def get_permissions_implementation(self):
         from nio.util.support.modules.security.permissions \
             import PermissionsProvider
         return PermissionsProvider
 
-    def get_security_auth_implementation(self):
+    def get_authenticator_implementation(self):
         from nio.util.support.modules.security.auth import Authenticator
         return Authenticator
 
-    def get_communication_publisher_implementation(self):
+    def get_publisher_implementation(self):
         from nio.util.support.modules.communication.publisher import Publisher
         return Publisher
 
-    def get_communication_subscriber_implementation(self):
+    def get_subscriber_implementation(self):
         from nio.util.support.modules.communication.subscriber \
             import Subscriber
         return Subscriber
 
+    def get_web_engine_implementation(self):
+        from nio.util.support.modules.web import WebEngine
+        return WebEngine
+
     def setupModules(self):
-        if 'scheduler' in self.get_test_modules():
-            self.module_proxies.append((
-                SchedulerModuleJob,
-                self.get_scheduler_implementation()))
+        self._module_initializer = ModuleInitializer()
+        for module_name in self.get_test_modules():
+            self._module_initializer.register_implementation(
+                module_name,
+                getattr(self, 'get_{}_implementation'.format(module_name))())
 
-        if 'persistence' in self.get_test_modules():
-            self.module_proxies.append((
-                PersistenceModulePersistence,
-                self.get_persistence_implementation()))
-
-        if 'security' in self.get_test_modules():
-            self.module_proxies.append((
-                SecurityModuleRoles,
-                self.get_security_roles_implementation()))
-            self.module_proxies.append(
-                (SecurityModulePermissions,
-                 self.get_security_permissions_implementation()))
-            self.module_proxies.append((
-                SecurityModuleAuthenticator,
-                self.get_security_auth_implementation()))
-
-        if 'communication' in self.get_test_modules():
-            self.module_proxies.append((
-                Publisher,
-                self.get_communication_publisher_implementation()))
-
-            self.module_proxies.append((
-                Subscriber,
-                self.get_communication_subscriber_implementation()))
-
-        for module_proxy, module_implementation in self.module_proxies:
-            module_proxy.proxy(module_implementation)
+        self._module_initializer.initialize()
 
         if 'security' in self.get_test_modules():
             # TODO: Remove once security module is refactored
@@ -103,15 +73,14 @@ class NIOTestCase(TestCase):
             SecurityModule._reset({})
 
     def tearDownModules(self):
-        for module_proxy, _ in reversed(self.module_proxies):
-            module_proxy.unproxy()
+        self._module_initializer.finalize()
 
     def get_test_modules(self):
         """ Returns set of modules to load during test
         Override this method to customize which modules you want to load
         during a test
         """
-        return {'scheduler', 'security', 'persistence'}
+        return {'scheduler', 'persistence'}
 
     def setUpSettings(self):
         """ Sets Settings before running a unit test """
