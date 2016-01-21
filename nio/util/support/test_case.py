@@ -68,7 +68,7 @@ class NIOTestCase(TestCase):
         # Perform a safe initialization in case a proxy never got cleaned up
         self._module_initializer.initialize(safe=True)
 
-        if 'security' in self.get_test_modules():
+        if 'permissions' in self.get_test_modules():
             # TODO: Remove once security module is refactored
             from niocore.modules.security import SecurityModule
             SecurityModule._reset({})
