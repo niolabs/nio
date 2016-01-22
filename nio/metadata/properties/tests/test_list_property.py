@@ -53,7 +53,7 @@ class TestListProperties(NIOTestCase):
         container.native_list = self.native_list_to_use
 
         # Now make sure getting the list gets the same one
-        self.assertEqual(self.native_list_to_use, container.native_list)
+        self.assertEqual(self.native_list_to_use, container.native_list())
 
     def test_holder_type(self):
         """Test when a list has a native python type"""
@@ -64,7 +64,7 @@ class TestListProperties(NIOTestCase):
         container.holder_list = self.holder_list_to_use
 
         # Now make sure getting the list gets the same one
-        self.assertEqual(self.holder_list_to_use, container.holder_list)
+        self.assertEqual(self.holder_list_to_use, container.holder_list())
 
     def test_property_type(self):
         """Test when a list has a native python type"""
@@ -75,7 +75,7 @@ class TestListProperties(NIOTestCase):
         container.property_list = self.prop_list_to_use
 
         # Now make sure getting the list gets the same one
-        self.assertEqual(self.prop_list_to_use, container.property_list)
+        self.assertEqual(self.prop_list_to_use, container.property_list())
 
     def test_to_from_dict(self):
         """Make sure the serialize/deserialze hold"""

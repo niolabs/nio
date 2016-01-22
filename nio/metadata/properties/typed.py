@@ -1,5 +1,53 @@
 from weakref import WeakKeyDictionary
 from nio.metadata.properties.base import Property, AllowNoneViolation
+from nio.common.signal.base import Signal
+from nio.metadata.properties.expression_util import Evaluator
+
+
+class ExprFunc(object):
+
+    def __init__(self, value, type=str, attr_default=''):
+        self._object = value
+        self._type = type
+        self._attr_default = attr_default
+        self.evaluator = Evaluator(str(self._object), attr_default)
+        self.default = attr_default
+
+    def __call__(self, signal=None):
+        """ Evaluate and type cast the value """
+        value = self._object
+        from nio.metadata.properties.holder import PropertyHolder
+        from nio.metadata.properties.list import ListProperty
+        import datetime
+        import enum
+        # TODO: these types should support expressions too
+        if not issubclass(self._type, PropertyHolder) and \
+                not issubclass(self._type, ListProperty) and \
+                not issubclass(self._type, list) and \
+                not issubclass(self._type, datetime.timedelta) and \
+                not issubclass(self._type, enum.Enum) and \
+                not self._type is object:
+            value = self.evaluator.evaluate(signal or Signal())
+            if self._type != str:
+                # TODO: this really should be calling deserialize because it's
+                # not always this simple.
+                value = self._type(value)
+            else:
+                # nio 1.x ExpressionProperty does not needs to evaluate to a
+                # string. To keep that feature alive, StringProperty does not
+                # get type casted here.
+                pass
+        return value
+
+    def is_expression(self):
+        return "{{" in self.evaluator.expression and \
+                "}}" in self.evaluator.expression
+
+    def depends_on_signal(self):
+        return "$" in self.evaluator.expression and self.is_expression()
+
+    def get_expression(self):
+        return self.evaluator.expression
 
 
 class TypedProperty(Property):
@@ -58,15 +106,25 @@ class TypedProperty(Property):
     # BEGIN MANDATORY DEFINITIONS (Property as Python descriptors)
 
     def __get__(self, instance, cls):
-        return self._values.get(instance, self._default)
+        # In case we use the default, it also needs to be an ExprFunc
+        default = ExprFunc(self._default,
+                           type=self._type,
+                           attr_default=self._kwargs.get('attr_default', ''))
+        return self._values.get(instance, default)
 
     def __set__(self, instance, value):
-
         self._check_allow_none(value)
-
         if value is not None and not isinstance(value, self._type):
             raise TypeError("Must be a {0}".format(self._type))
-        self._values[instance] = value
+        # Save an ExprFunc instead of just the regular str
+        self._values[instance] = ExprFunc(
+            value,
+            type=self._type,
+            attr_default=self._kwargs.get('attr_default', ''))
+        # TODO: why does the second one of these fail?
+        #import pdb; pdb.set_trace()
+        #print('set a new value: {}'.format(self._values[instance]()))
+        #print('set a new value: {}'.format(self._values[instance]()))
 
     def __delete__(self, instance):
         raise AttributeError("Can't delete a property")
@@ -81,7 +139,11 @@ class TypedProperty(Property):
         # TODO: Return None or default when not set
         # Returning None wouldn't "save" a value that was just set
         # by default, get would still return the default value each time
-        return self._values.get(instance, self.default)
+        value = self._values.get(instance, self.default)
+        if isinstance(value, ExprFunc):
+            # New style expression properties need to be evaluated first
+            value = value()
+        return value
 
     def deserialize(self, value):
         """Return the deserialized value of the specified serialized value"""

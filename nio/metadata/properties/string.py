@@ -1,4 +1,4 @@
-from nio.metadata.properties.typed import TypedProperty
+from nio.metadata.properties.typed import TypedProperty, ExprFunc
 
 
 class StringProperty(TypedProperty):

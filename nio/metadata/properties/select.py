@@ -31,7 +31,7 @@ class SelectProperty(TypedProperty):
         self.enum_type = enum_type
 
     def serialize(self, instance):
-        value = self.__get__(instance, self.__class__)
+        value = self.__get__(instance, self.__class__)()
         if value is not None and isinstance(value, Enum):
             return value.name
 

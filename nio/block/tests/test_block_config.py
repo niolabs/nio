@@ -36,7 +36,7 @@ class TestBlockConfig(NIOTestCase):
                                      dict(),
                                      None))
 
-        self.assertEqual(getattr(block, CONFIG_KEY), CONFIG_VAL)
+        self.assertEqual(getattr(block, CONFIG_KEY)(), CONFIG_VAL)
 
     def test_no_load_config(self):
         """Test that with no configuration the attribute exists,

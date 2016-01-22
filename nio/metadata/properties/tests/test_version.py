@@ -32,7 +32,7 @@ class TestVersion(NIOTestCaseNoModules):
         versions = ["1.2.3", "1.2.*", "1.*", "*", "1.1.1", "1.0.1rc1"]
         for version in versions:
             instance.version = version
-            self.assertEqual(instance.version, version)
+            self.assertEqual(instance.version(), version)
 
     def test_invalid_versions(self):
         """ assert that it rejects invalid values
@@ -204,6 +204,6 @@ class TestVersion(NIOTestCaseNoModules):
     def test_version_initialize(self):
 
         instance = ClassVersionInitialize()
-        self.assertEqual(instance.version_straight, "1.1.1")
-        self.assertEqual(instance.version_default, "1.1.2")
-        self.assertEqual(instance.version_both, "1.1.3")
+        self.assertEqual(instance.version_straight(), "1.1.1")
+        self.assertEqual(instance.version_default(), "1.1.2")
+        self.assertEqual(instance.version_both(), "1.1.3")

@@ -1,7 +1,7 @@
 from enum import Enum
 from datetime import timedelta
 from nio.metadata.properties import FloatProperty, SelectProperty, \
-    BoolProperty, ExpressionProperty
+    BoolProperty, StringProperty
 from nio.metadata.properties.int import IntProperty
 from nio.metadata.properties.list import ListProperty
 from nio.metadata.properties.object import ObjectProperty
@@ -27,10 +27,10 @@ class ContainerClass(PropertyHolder):
     string_property_default_env_variable = \
         StringProperty(default='[[ENV_VARIABLE]]')
 
-    expression_property = ExpressionProperty(attr_default='Whoops',
+    expression_property = StringProperty(attr_default='Whoops',
                                              default='Default to {{$v1}}')
     expression_property_default_env_variable = \
-        ExpressionProperty(default='[[ENV_VARIABLE]]')
+        StringProperty(default='[[ENV_VARIABLE]]')
 
     bool_property = BoolProperty(default=False)
     bool_property_default_env_variable = \
@@ -73,10 +73,10 @@ class TestTypes(NIOTestCase):
                          ['type'], str.__name__)
 
         self.assertEqual(description['expression_property']['type'],
-                         "expression")
+                         "str")
         self.assertEqual(
             description['expression_property_default_env_variable']
-            ['type'], "expression")
+            ['type'], "str")
 
         self.assertEqual(description['bool_property']['type'],
                          bool.__name__)
