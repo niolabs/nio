@@ -52,13 +52,13 @@ class NIOTestCase(TestCase):
         self._module_initializer = ModuleInitializer()
         for module_name in self.get_test_modules():
             self._module_initializer.register_module(
-                self._get_module(module_name),
+                self.get_module(module_name),
                 getattr(self, 'get_{}_module_context'.format(module_name))())
 
         # Perform a safe initialization in case a proxy never got cleaned up
         self._module_initializer.initialize(safe=True)
 
-    def _get_module(self, module_name):
+    def get_module(self, module_name):
         known_modules = {
             'scheduler': TestingSchedulerModule,
             'persistence': TestingPersistenceModule,
