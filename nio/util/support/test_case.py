@@ -2,11 +2,20 @@
   NIO test support base class
 
 """
+import importlib
 import logging.config
 import multiprocessing
 from unittest import TestCase
 
+from nio.modules.context import ModuleContext
 from nio.modules.initializer import ModuleInitializer
+
+# Known modules
+from nio.modules.scheduler.module import SchedulerModule
+from nio.modules.persistence.module import PersistenceModule
+from nio.modules.communication.module import CommunicationModule
+from nio.modules.security.module import SecurityModule
+from nio.modules.web.module import WebModule
 
 
 class NIOTestCase(TestCase):
@@ -22,56 +31,98 @@ class NIOTestCase(TestCase):
         super().__init__(methodName)
 
         logging.config.dictConfig(self.get_logging_config())
-        self.module_proxies = []
 
-    def get_persistence_implementation(self):
-        from nio.util.support.modules.persistence import Persistence
-        return Persistence
+    def get_persistence_module_context(self):
+        ctx = ModuleContext()
+        ctx.register_proxy(
+            importlib.import_module(
+                'nio.modules.persistence').Persistence,
+            importlib.import_module(
+                'nio.util.support.modules.persistence').Persistence
+        )
+        return ctx
 
-    def get_scheduler_implementation(self):
-        from nio.util.support.modules.scheduler import Job
-        return Job
+    def get_scheduler_module_context(self):
+        ctx = ModuleContext()
+        ctx.register_proxy(
+            importlib.import_module('nio.modules.scheduler').Job,
+            importlib.import_module('nio.util.support.modules.scheduler').Job
+        )
+        return ctx
 
-    def get_roles_implementation(self):
-        from nio.util.support.modules.security.roles import RolesProvider
-        return RolesProvider
+    def get_security_module_context(self):
+        ctx = ModuleContext()
+        ctx.register_proxy(
+            importlib.import_module(
+                'nio.modules.security.auth').Authenticator,
+            importlib.import_module(
+                'nio.util.support.modules.security.auth').Authenticator
+        )
+        ctx.register_proxy(
+            importlib.import_module(
+                'nio.modules.security.roles').RolesProvider,
+            importlib.import_module(
+                'nio.util.support.modules.security.roles').RolesProvider
+        )
+        ctx.register_proxy(
+            importlib.import_module(
+                'nio.modules.security.permissions').PermissionsProvider,
+            importlib.import_module(
+                'nio.util.support.modules.security.permissions'
+            ).PermissionsProvider
+        )
+        return ctx
 
-    def get_permissions_implementation(self):
-        from nio.util.support.modules.security.permissions \
-            import PermissionsProvider
-        return PermissionsProvider
+    def get_communication_module_context(self):
+        ctx = ModuleContext()
+        ctx.register_proxy(
+            importlib.import_module(
+                'nio.modules.communication.publisher').Publisher,
+            importlib.import_module(
+                'nio.util.support.modules.communication.publisher').Publisher
+        )
+        ctx.register_proxy(
+            importlib.import_module(
+                'nio.modules.communication.subscriber').Subscriber,
+            importlib.import_module(
+                'nio.util.support.modules.communication.subscriber').Subscriber
+        )
+        return ctx
 
-    def get_authenticator_implementation(self):
-        from nio.util.support.modules.security.auth import Authenticator
-        return Authenticator
-
-    def get_publisher_implementation(self):
-        from nio.util.support.modules.communication.publisher import Publisher
-        return Publisher
-
-    def get_subscriber_implementation(self):
-        from nio.util.support.modules.communication.subscriber \
-            import Subscriber
-        return Subscriber
-
-    def get_web_engine_implementation(self):
-        from nio.util.support.modules.web import WebEngine
-        return WebEngine
+    def get_web_module_context(self):
+        ctx = ModuleContext()
+        ctx.register_proxy(
+            importlib.import_module('nio.modules.web').WebEngine,
+            importlib.import_module('nio.util.support.modules.web').WebEngine
+        )
+        return ctx
 
     def setupModules(self):
         self._module_initializer = ModuleInitializer()
         for module_name in self.get_test_modules():
-            self._module_initializer.register_implementation(
-                module_name,
-                getattr(self, 'get_{}_implementation'.format(module_name))())
+            self._module_initializer.register_module(
+                self._get_module(module_name),
+                getattr(self, 'get_{}_module_context'.format(module_name))())
 
         # Perform a safe initialization in case a proxy never got cleaned up
         self._module_initializer.initialize(safe=True)
 
-        if 'permissions' in self.get_test_modules():
+        if 'security' in self.get_test_modules():
             # TODO: Remove once security module is refactored
             from niocore.modules.security import SecurityModule
             SecurityModule._reset({})
+
+    def _get_module(self, module_name):
+        known_modules = {
+            'scheduler': SchedulerModule,
+            'persistence': PersistenceModule,
+            'security': SecurityModule,
+            'communication': CommunicationModule,
+            'web': WebModule
+        }
+        if module_name not in known_modules:
+            raise ValueError("{} is not a valid module".format(module_name))
+        return known_modules.get(module_name)()
 
     def tearDownModules(self):
         # Perform a safe finalization in case anything wasn't proxied

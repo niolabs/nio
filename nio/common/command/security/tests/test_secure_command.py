@@ -45,8 +45,7 @@ class CommandHolderSecure3(CommandHolder):
 class TestCommand(NIOTestCase):
 
     def get_test_modules(self):
-        return super().get_test_modules() | {
-            'roles', 'permissions', 'authenticator'}
+        return super().get_test_modules() | {'security'}
 
     # Test command types
     def test_get_commands(self):
