@@ -13,7 +13,7 @@ class ModuleInitializer(object):
         self._registered_modules = []
         self._initialized_modules = []
 
-    def initialize(self, safe=False, **kwargs):
+    def initialize(self, safe=False):
         """ Initialize and proxy any registered proxy implmentations.
 
         This function will proxy any implmentations that have been registered
