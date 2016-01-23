@@ -6,12 +6,13 @@ from nio.metadata.properties.expression_util import Evaluator
 
 class ExprFunc(object):
 
-    def __init__(self, property, value):
+    def __init__(self, instance, value):
+        self._instance = instance
         self._value = value
-        self._type = property._type
-        self._attr_default = property._kwargs.get('attr_default', '')
+        self._type = instance._type
+        self._attr_default = instance._kwargs.get('attr_default', '')
+        self.attr_default = instance._kwargs.get('attr_default', '')
         self.evaluator = Evaluator(str(self._value), self._attr_default)
-        self.default = self._attr_default
 
     def __call__(self, signal=None):
         """ Evaluate and type cast the value """
@@ -38,6 +39,10 @@ class ExprFunc(object):
                 # get type casted here.
                 pass
         return value
+
+    @property
+    def default(self):
+        return self._instance.default
 
     def is_expression(self):
         return "{{" in self.evaluator.expression and \

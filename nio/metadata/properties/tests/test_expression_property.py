@@ -95,7 +95,7 @@ class TestEvalSignal(EvalSignalTestCase):
         self.configure_block(blk, {
             "expression": "It's a {{$foo}}"
         })
-        self.assertEqual(blk.expression.default, "Whoops")
+        self.assertEqual(blk.expression.attr_default, "Whoops")
         self.assertEqual(blk.expression(Signal({})), "It's a Whoops")
 
     def test_default_attr_default(self):
