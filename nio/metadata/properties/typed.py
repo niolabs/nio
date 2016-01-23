@@ -112,10 +112,12 @@ class TypedProperty(Property):
 
     def __set__(self, instance, value):
         self._check_allow_none(value)
-        if value is not None and not isinstance(value, self._type):
+        expression = ExprFunc(self, value)
+        if value is not None and not isinstance(value, self._type) and \
+                not expression.is_expression():
             raise TypeError("Must be a {0}".format(self._type))
         # Save an ExprFunc instead of just the regular str
-        self._values[instance] = ExprFunc(self, value)
+        self._values[instance] = expression
         # TODO: why does the second one of these fail?
         #import pdb; pdb.set_trace()
         #print('set a new value: {}'.format(self._values[instance]()))
