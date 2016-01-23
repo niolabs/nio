@@ -6,16 +6,16 @@ from nio.metadata.properties.expression_util import Evaluator
 
 class ExprFunc(object):
 
-    def __init__(self, value, type=str, attr_default=''):
-        self._object = value
-        self._type = type
-        self._attr_default = attr_default
-        self.evaluator = Evaluator(str(self._object), attr_default)
-        self.default = attr_default
+    def __init__(self, property, value):
+        self._value = value
+        self._type = property._type
+        self._attr_default = property._kwargs.get('attr_default', '')
+        self.evaluator = Evaluator(str(self._value), self._attr_default)
+        self.default = self._attr_default
 
     def __call__(self, signal=None):
         """ Evaluate and type cast the value """
-        value = self._object
+        value = self._value
         from nio.metadata.properties.holder import PropertyHolder
         from nio.metadata.properties.list import ListProperty
         import datetime
@@ -107,9 +107,7 @@ class TypedProperty(Property):
 
     def __get__(self, instance, cls):
         # In case we use the default, it also needs to be an ExprFunc
-        default = ExprFunc(self._default,
-                           type=self._type,
-                           attr_default=self._kwargs.get('attr_default', ''))
+        default = ExprFunc(self, self._default)
         return self._values.get(instance, default)
 
     def __set__(self, instance, value):
@@ -117,10 +115,7 @@ class TypedProperty(Property):
         if value is not None and not isinstance(value, self._type):
             raise TypeError("Must be a {0}".format(self._type))
         # Save an ExprFunc instead of just the regular str
-        self._values[instance] = ExprFunc(
-            value,
-            type=self._type,
-            attr_default=self._kwargs.get('attr_default', ''))
+        self._values[instance] = ExprFunc(self, value)
         # TODO: why does the second one of these fail?
         #import pdb; pdb.set_trace()
         #print('set a new value: {}'.format(self._values[instance]()))
