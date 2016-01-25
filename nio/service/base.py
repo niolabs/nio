@@ -95,7 +95,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
         The service creator can assume at this point that the service's
         configuration is complete.
 
-        If overriding, The service creator should call the on_start method
+        If overriding, The service creator should call the start method
         on the parent, after which it can assume that block router and blocks
         are started
         """
@@ -108,7 +108,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
     def stop(self):
         """Overrideable method to be called when the service stops.
 
-        If overriding, The service creator should call the on_stop method
+        If overriding, The service creator should call the stop method
         on the parent, after which it can assume that block router and blocks
         are stopped
         """
