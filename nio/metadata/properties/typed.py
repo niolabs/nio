@@ -17,17 +17,8 @@ class ExprFunc(object):
     def __call__(self, signal=None):
         """ Evaluate and type cast the value """
         value = self._value
-        from nio.metadata.properties.holder import PropertyHolder
-        from nio.metadata.properties.list import ListProperty
-        import datetime
-        import enum
         # TODO: these types should support expressions too
-        if not issubclass(self._type, PropertyHolder) and \
-                not issubclass(self._type, ListProperty) and \
-                not issubclass(self._type, list) and \
-                not issubclass(self._type, datetime.timedelta) and \
-                not issubclass(self._type, enum.Enum) and \
-                self.is_expression():
+        if self.is_expression():
             # Only evaluate if it's an expression
             value = self.evaluator.evaluate(signal or Signal())
             if self._type != str:
