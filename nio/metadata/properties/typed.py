@@ -27,12 +27,11 @@ class ExprFunc(object):
                 not issubclass(self._type, list) and \
                 not issubclass(self._type, datetime.timedelta) and \
                 not issubclass(self._type, enum.Enum) and \
-                not self._type is object:
+                self.is_expression():
+            # Only evaluate if it's an expression
             value = self.evaluator.evaluate(signal or Signal())
             if self._type != str:
-                # TODO: this really should be calling deserialize because it's
-                # not always this simple.
-                value = self._type(value)
+                value = self._instance.deserialize(value)
             else:
                 # nio 1.x ExpressionProperty does not needs to evaluate to a
                 # string. To keep that feature alive, StringProperty does not
