@@ -1,4 +1,3 @@
-from nio.common import ComponentStatus
 from nio.router.base import RouterStatus
 from nio.router.context import RouterContext
 from nio.common.command import command
@@ -12,7 +11,7 @@ from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
 from nio.modules.security.permissions.authorizer import has_permission
-from nio.util.flags_enum import FlagsEnum
+from nio.util.runner import Runner
 
 
 class BlockExecution(PropertyHolder):
@@ -44,7 +43,7 @@ class BlockMapping(PropertyHolder):
 @command_security('start', True, has_permission('services.start'))
 @command_security('stop', True, has_permission('services.stop'))
 @discoverable
-class Service(PropertyHolder, CommandHolder):
+class Service(PropertyHolder, CommandHolder, Runner):
 
     """The base class for services.
 
@@ -69,83 +68,28 @@ class Service(PropertyHolder, CommandHolder):
     # along with any other service properties
     sys_metadata = StringProperty(visible=True, default="")
 
-    def __init__(self):
+    def __init__(self, status_change_callback=None):
         """ Create a new service instance.
+
+        Args:
+            status_change_callback: method to call when status changes
 
         Take care of setting up instance variables in your service's
         constructor.
         """
 
-        super().__init__()
+        self._logger = get_nio_logger('service')
+        Runner.__init__(self, status_change_callback=status_change_callback)
 
         # store service type so that it gets serialized
         self.type = self.__class__.__name__
 
-        self._logger = get_nio_logger('service')
         self._block_router = None
         self.mgmt_signal_handler = None
         self._blocks = {}
         self.mappings = []
-        self._status = FlagsEnum(ComponentStatus)
-        self._status.set(ComponentStatus.created)
 
     def start(self):
-        """ Starts the service.
-
-        Starting a service comprises tasks such as:
-            Starting the block router
-            Starting each service block
-
-        """
-        self.status.set(ComponentStatus.starting)
-        try:
-            self.on_start()
-            self.status.set(ComponentStatus.started)
-        except Exception:
-            self._logger.exception("Failed to start service")
-            self.status.add(ComponentStatus.error)
-            raise
-
-    def stop(self):
-        """ Stops the service.
-
-        Stopping a service comprises tasks such as:
-            Stopping each service block
-            Stopping the block router
-
-        """
-        self.status.set(ComponentStatus.stopping)
-        self.on_stop()
-        # This change in status creates an error trying to use the log
-        # when the logging module was already finalized
-        self.status.set(ComponentStatus.stopped)
-
-    def configure(self, context):
-        """ Configures the service based on the context, the context
-        will contain configuration information serving to configuring
-        the service and its blocks.
-
-        Configuring a service comprises tasks such as:
-            Setting the service properties
-            Creating and configuring the block router
-            Creating and configuring each service block
-
-        Args:
-            context (ServiceContext): Specifies the information
-                used to configure the service including service
-                properties, block classes and properties for each
-                block included in the service execution.
-        """
-        self.status.set(ComponentStatus.configuring)
-        try:
-            self.on_configure(context)
-            self.status.set(ComponentStatus.configured)
-        except Exception:
-            self._logger.exception("Failed to configure service")
-            self.status.add(ComponentStatus.error)
-            raise
-
-    def on_start(self):
         """Overrideable method to be called when the service starts.
 
         The service creator can assume at this point that the service's
@@ -159,16 +103,9 @@ class Service(PropertyHolder, CommandHolder):
             self._block_router.start()
 
         for block in self._blocks.values():
-            try:
-                block.status.set(ComponentStatus.starting)
-                block.start()
-                block.status.set(ComponentStatus.started)
-            except Exception:
-                self._logger.exception(
-                    "Block: {0} failed to start".format(block.name))
-                raise
+            block.do_start()
 
-    def on_stop(self):
+    def stop(self):
         """Overrideable method to be called when the service stops.
 
         If overriding, The service creator should call the on_stop method
@@ -181,14 +118,12 @@ class Service(PropertyHolder, CommandHolder):
             self._block_router.status.set(RouterStatus.stopping)
 
         for block in self._blocks.values():
-            block.status.set(ComponentStatus.stopping)
-            block.stop()
-            block.status.set(ComponentStatus.stopped)
+            block.do_stop()
 
         if self._block_router:
             self._block_router.stop()
 
-    def on_configure(self, context):
+    def configure(self, context):
         """Configure the service based on the context
 
         Args:
@@ -234,11 +169,10 @@ class Service(PropertyHolder, CommandHolder):
         self._block_router.configure(router_context)
         self.mgmt_signal_handler = context.mgmt_signal_handler
 
-    @property
-    def status(self):
-        """ Provides service status
+    def get_logger(self):
+        """ Provides service logger
         """
-        return self._status
+        return self._logger
 
     def _create_block_context(self, block_type, block_properties,
                               service_context):
@@ -265,14 +199,7 @@ class Service(PropertyHolder, CommandHolder):
     def _create_and_configure_block(self, block_type, block_context):
         """ Instantiates and configures given block """
         block = block_type()
-        try:
-            block.status.set(ComponentStatus.configuring)
-            block.configure(block_context)
-            block.status.set(ComponentStatus.configured)
-        except Exception:
-            self._logger.exception(
-                "Block: {0} failed to configure".format(block.name))
-            raise
+        block.do_configure(block_context)
         return block
 
     @classmethod
