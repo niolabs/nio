@@ -34,7 +34,7 @@ class NIOWebTestCase(NIOTestCase):
     """
 
     def get_test_modules(self):
-        return super().get_test_modules() | {'web_engine'}
+        return super().get_test_modules() | {'web', 'security'}
 
     def setUp(self):
         super().setUp()

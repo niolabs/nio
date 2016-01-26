@@ -9,7 +9,7 @@ from nio.util.support.test_case import NIOTestCase
 class TestPublisherBase(NIOTestCase):
 
     def get_test_modules(self):
-        return super().get_test_modules() | {'publisher', 'subscriber'}
+        return super().get_test_modules() | {'communication'}
 
     def setUp(self):
         self._received_messages = []

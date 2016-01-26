@@ -6,7 +6,17 @@ import logging.config
 import multiprocessing
 from unittest import TestCase
 
+from nio.modules.context import ModuleContext
 from nio.modules.initializer import ModuleInitializer
+
+# Testing module implementations
+from nio.util.support.modules.scheduler.module import TestingSchedulerModule
+from nio.util.support.modules.persistence.module \
+    import TestingPersistenceModule
+from nio.util.support.modules.communication.module \
+    import TestingCommunicationModule
+from nio.util.support.modules.security.module import TestingSecurityModule
+from nio.util.support.modules.web.module import TestingWebModule
 
 
 class NIOTestCase(TestCase):
@@ -22,58 +32,48 @@ class NIOTestCase(TestCase):
         super().__init__(methodName)
 
         logging.config.dictConfig(self.get_logging_config())
-        self.module_proxies = []
 
-    def get_persistence_implementation(self):
-        from nio.util.support.modules.persistence import Persistence
-        return Persistence
+    def get_persistence_module_context(self):
+        return ModuleContext()
 
-    def get_scheduler_implementation(self):
-        from nio.util.support.modules.scheduler import Job
-        return Job
+    def get_scheduler_module_context(self):
+        return ModuleContext()
 
-    def get_roles_implementation(self):
-        from nio.util.support.modules.security.roles import RolesProvider
-        return RolesProvider
+    def get_security_module_context(self):
+        return ModuleContext()
 
-    def get_permissions_implementation(self):
-        from nio.util.support.modules.security.permissions \
-            import PermissionsProvider
-        return PermissionsProvider
+    def get_communication_module_context(self):
+        return ModuleContext()
 
-    def get_authenticator_implementation(self):
-        from nio.util.support.modules.security.auth import Authenticator
-        return Authenticator
-
-    def get_publisher_implementation(self):
-        from nio.util.support.modules.communication.publisher import Publisher
-        return Publisher
-
-    def get_subscriber_implementation(self):
-        from nio.util.support.modules.communication.subscriber \
-            import Subscriber
-        return Subscriber
-
-    def get_web_engine_implementation(self):
-        from nio.util.support.modules.web import WebEngine
-        return WebEngine
+    def get_web_module_context(self):
+        return ModuleContext()
 
     def setupModules(self):
         self._module_initializer = ModuleInitializer()
         for module_name in self.get_test_modules():
-            self._module_initializer.register_implementation(
-                module_name,
-                getattr(self, 'get_{}_implementation'.format(module_name))())
+            self._module_initializer.register_module(
+                self.get_module(module_name),
+                getattr(self, 'get_{}_module_context'.format(module_name))())
 
-        self._module_initializer.initialize()
+        # Perform a safe initialization in case a proxy never got cleaned up
+        self._module_initializer.initialize(safe=True)
 
-        if 'security' in self.get_test_modules():
-            # TODO: Remove once security module is refactored
-            from niocore.modules.security import SecurityModule
-            SecurityModule._reset({})
+    def get_module(self, module_name):
+        known_modules = {
+            'scheduler': TestingSchedulerModule,
+            'persistence': TestingPersistenceModule,
+            'security': TestingSecurityModule,
+            'communication': TestingCommunicationModule,
+            'web': TestingWebModule
+        }
+        if module_name not in known_modules:
+            raise ValueError("{} is not a valid module".format(module_name))
+        return known_modules.get(module_name)()
 
     def tearDownModules(self):
-        self._module_initializer.finalize()
+        # Perform a safe finalization in case anything wasn't proxied
+        # originally
+        self._module_initializer.finalize(safe=True)
 
     def get_test_modules(self):
         """ Returns set of modules to load during test

@@ -2,6 +2,16 @@
 
 class Persistence(object):
 
+    """ An implementation of the Persistence proxy that works in memory.
+
+    This will not actually persist any values, but will keep them in
+    memory to make sure that save/load commands work properly.
+
+    In other words, this will "persist" its data only as long as the current
+    environment is active. This is useful in unit-tests and in environments
+    where persistence is not desired, but is hardly useful in practice.
+    """
+
     def __init__(self, name):
         self._name = name
         self._values = {}
