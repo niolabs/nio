@@ -133,8 +133,9 @@ class TypedProperty(Property):
         # by default, get would still return the default value each time
         value = self._values.get(instance, self.default)
         if isinstance(value, ExprFunc):
-            # New style expression properties need to be evaluated first
-            value = value()
+            # New style expression properties need to extract out value
+            # TODO: it should not have to grab a private variable
+            value = value._value
         return value
 
     def deserialize(self, value):
