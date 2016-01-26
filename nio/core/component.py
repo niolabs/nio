@@ -23,8 +23,7 @@ class CoreComponent(Runner):
 
     def __init__(self):
         self._logger = get_nio_logger(self._name)
-        Runner.__init__(self,
-                        status_change_callback=self._on_status_change_callback)
+        super().__init__(status_change_callback=self._on_status_change_callback)
 
         self._context = None
 

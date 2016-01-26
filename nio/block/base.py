@@ -45,7 +45,7 @@ class Block(PropertyHolder, CommandHolder, Runner):
         # what that name is during configure()
         self._logger = get_nio_logger('default')
 
-        Runner.__init__(self, status_change_callback=status_change_callback)
+        super().__init__(status_change_callback=status_change_callback)
 
         # store block type so that it gets serialized
         self.type = self.__class__.__name__

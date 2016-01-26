@@ -1,19 +1,8 @@
 from copy import deepcopy
-from enum import Enum
-from nio.common import ComponentStatus
+
+from nio.common import RunnerStatus
 from nio.util.logging import get_nio_logger
-from nio.util.flags_enum import FlagsEnum
-
-
-class RouterStatus(Enum):
-
-    """Enum specifying the different types of router status that are possible"""
-
-    created = 1
-    stopped = 2
-    started = 3
-    stopping = 4
-    deliver_signal_error = 5
+from nio.util.runner import Runner
 
 
 class BlockRouterNotStarted(Exception):
@@ -61,7 +50,7 @@ class BlockReceiverData(object):
         return self._output_id
 
 
-class BlockRouter(object):
+class BlockRouter(Runner):
 
     """A Block Router receives service block execution information, processes
     it and becomes ready to receive signals from any participating block in
@@ -75,14 +64,11 @@ class BlockRouter(object):
         """ Create a new block router instance """
 
         self._logger = get_nio_logger('BlockRouter')
+        super().__init__(status_change_callback=self._on_status_change_callback)
 
         self._receivers = None
         self._clone_signals = False
-        self._status = \
-            FlagsEnum(RouterStatus,
-                      status_change_callback=self._on_status_change_callback)
         self._mgmt_signal_handler = None
-        self.status.set(RouterStatus.created)
 
     def configure(self, context):
         """Configures block router.
@@ -212,18 +198,6 @@ class BlockRouter(object):
                                           output_id)
         return receiver_data
 
-    def start(self):
-        """ Marks block router status as started """
-        self.status.set(RouterStatus.started)
-
-    def stop(self):
-        """ Marks block router status as stopped """
-        self.status.set(RouterStatus.stopped)
-
-    @property
-    def status(self):
-        return self._status
-
     def _on_status_change_callback(self, old_status, new_status):
         self._logger.info("Block Router status changed from: {0} to: {1}".
                           format(old_status.name, new_status.name))
@@ -253,20 +227,20 @@ class BlockRouter(object):
             signals (list): The signals that the block is notifying
             output_id: output identifier
         """
-        if self.status.is_set(RouterStatus.started):
+        if self.status.is_set(RunnerStatus.started):
 
             # determine if signals are to be cloned.
             clone_signals = \
                 self._clone_signals and len(self._receivers[block.name]) > 1
 
             for receiver_data in self._receivers[block.name]:
-                if receiver_data.block.status.is_set(ComponentStatus.error):
+                if receiver_data.block.status.is_set(RunnerStatus.error):
                     self._logger.debug(
                         "Block '{0}' has status 'error'. Not delivering "
                         "signals from '{1}'...".format(
                             receiver_data.block.name, block.name))
                     continue
-                elif receiver_data.block.status.is_set(ComponentStatus.warning):
+                elif receiver_data.block.status.is_set(RunnerStatus.warning):
                     self._logger.debug(
                         "Block '{0}' has status 'warning'. Delivering signals"
                         " anyway from '{1}...".format(receiver_data.block.name,
@@ -290,11 +264,11 @@ class BlockRouter(object):
                                          signals_to_send,
                                          receiver_data.input_id)
 
-        elif self.status.is_set(RouterStatus.stopped):
+        elif self.status.is_set(RunnerStatus.stopped):
             self._logger.info("Block Router is stopped, discarding signal"
                               " notification from block: {0}".
                               format(block.name))
-        elif self.status.is_set(RouterStatus.stopping):
+        elif self.status.is_set(RunnerStatus.stopping):
             self._logger.debug("Block Router is stopping, discarding signal"
                                " notification from block: {0}".
                                format(block.name))

@@ -62,8 +62,8 @@ class TestBlockRouter(NIOTestCase):
 
         router_context = RouterContext(execution, blocks, {"max_workers": 3})
 
-        block_router.configure(router_context)
-        block_router.start()
+        block_router.do_configure(router_context)
+        block_router.do_start()
 
         signals = [1, 2, 3, 4]
 
@@ -76,4 +76,4 @@ class TestBlockRouter(NIOTestCase):
         self.assertIsNotNone(receiver_block.signal_cache)
         self.assertEqual(receiver_block.signal_cache, signals)
 
-        block_router.stop()
+        block_router.do_stop()

@@ -1,4 +1,3 @@
-from nio.router.base import RouterStatus
 from nio.router.context import RouterContext
 from nio.common.command import command
 from nio.common.command.security import command_security
@@ -12,6 +11,7 @@ from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
 from nio.modules.security.permissions.authorizer import has_permission
 from nio.util.runner import Runner
+from nio.common import RunnerStatus
 
 
 class BlockExecution(PropertyHolder):
@@ -79,7 +79,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
         """
 
         self._logger = get_nio_logger('service')
-        Runner.__init__(self, status_change_callback=status_change_callback)
+        super().__init__(status_change_callback=status_change_callback)
 
         # store service type so that it gets serialized
         self.type = self.__class__.__name__
@@ -100,7 +100,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
         are started
         """
         if self._block_router:
-            self._block_router.start()
+            self._block_router.do_start()
 
         for block in self._blocks.values():
             block.do_start()
@@ -115,13 +115,13 @@ class Service(PropertyHolder, CommandHolder, Runner):
         if self._block_router:
             # 'alert' block controller that service will be
             # 'stopped' shortly
-            self._block_router.status.set(RouterStatus.stopping)
+            self._block_router.status.set(RunnerStatus.stopping)
 
         for block in self._blocks.values():
             block.do_stop()
 
         if self._block_router:
-            self._block_router.stop()
+            self._block_router.do_stop()
 
     def configure(self, context):
         """Configure the service based on the context
@@ -166,7 +166,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
                                        self._blocks,
                                        context.router_settings,
                                        context.mgmt_signal_handler)
-        self._block_router.configure(router_context)
+        self._block_router.do_configure(router_context)
         self.mgmt_signal_handler = context.mgmt_signal_handler
 
     def get_logger(self):

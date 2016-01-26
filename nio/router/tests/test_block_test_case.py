@@ -3,7 +3,8 @@ from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.block.base import Block
 from nio.common.signal.base import Signal
 from nio.common.signal.status import BlockStatusSignal
-from nio.common import ComponentStatus
+from nio.common import RunnerStatus
+
 
 class TestBlockTestCase(NIOBlockTestCase):
 
@@ -45,13 +46,13 @@ class TestBlockTestCase(NIOBlockTestCase):
         self.assert_block_status(b1, '')
         self.assert_block_status(b2, '')
 
-        b1.notify_management_signal(BlockStatusSignal(ComponentStatus.error))
-        self.assert_block_status(b1, ComponentStatus.error)
+        b1.notify_management_signal(BlockStatusSignal(RunnerStatus.error))
+        self.assert_block_status(b1, RunnerStatus.error)
         self.assert_num_mgmt_signals_notified(1, b1)
         self.assert_num_mgmt_signals_notified(0, b2)
 
-        b2.notify_management_signal(BlockStatusSignal(ComponentStatus.warning))
-        self.assert_block_status(b2, ComponentStatus.warning)
+        b2.notify_management_signal(BlockStatusSignal(RunnerStatus.warning))
+        self.assert_block_status(b2, RunnerStatus.warning)
         self.assert_num_mgmt_signals_notified(1, b1)
         self.assert_num_mgmt_signals_notified(1, b2)
 
@@ -65,7 +66,7 @@ class TestBlockTestCase(NIOBlockTestCase):
         self.configure_block(b1, {})
 
         self.assertFalse(self._management_notified)
-        b1.notify_management_signal(BlockStatusSignal(ComponentStatus.error))
+        b1.notify_management_signal(BlockStatusSignal(RunnerStatus.error))
         self.assertTrue(self._management_notified)
 
     def test_allows_signal_handler_override(self):

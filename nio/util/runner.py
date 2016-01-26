@@ -1,18 +1,36 @@
-from nio.common import ComponentStatus
+from enum import Enum
+
 from nio.util.flags_enum import FlagsEnum
 from nio.util.logging import get_nio_logger
 
 
+class RunnerStatus(Enum):
+    """ Runner Status
+
+    Status a runner can be at any time
+    """
+    created = 1
+    configuring = 2
+    configured = 3
+    stopping = 4
+    stopped = 5
+    starting = 6
+    started = 7
+    warning = 8
+    error = 9
+
+
 class Runner(object):
-    def __init__(self, status_change_callback=None):
+    def __init__(self, *args, status_change_callback=None, **kwargs):
         """ Create a new runnable instance.
 
         Initializes runnable status
 
         """
-        self._status = FlagsEnum(ComponentStatus,
+        super().__init__(*args, **kwargs)
+        self._status = FlagsEnum(RunnerStatus,
                                  status_change_callback=status_change_callback)
-        self.status.set(ComponentStatus.created)
+        self.status.set(RunnerStatus.created)
 
     def configure(self, context):
         """Overrideable method to be called when the runnable is configured
@@ -43,7 +61,7 @@ class Runner(object):
     def status(self, status):
         """ Status
 
-        Possible values are based on ComponentStatus
+        Possible values are based on RunnerStatus
 
         """
         self.logger.info("Setting status to {}".format(status.name))
@@ -58,13 +76,13 @@ class Runner(object):
             context: specific information needed for runnable's configuration
 
         """
-        self.status.set(ComponentStatus.configuring)
+        self.status.set(RunnerStatus.configuring)
         try:
             self.configure(context)
-            self.status.set(ComponentStatus.configured)
+            self.status.set(RunnerStatus.configured)
         except Exception:
             self.logger.exception("Failed to configure")
-            self.status.add(ComponentStatus.error)
+            self.status.add(RunnerStatus.error)
             raise
 
     def do_start(self):
@@ -73,13 +91,13 @@ class Runner(object):
         Ensures status is correctly set based on the outcome of the operation
 
         """
-        self.status.set(ComponentStatus.starting)
+        self.status.set(RunnerStatus.starting)
         try:
             self.start()
-            self.status.set(ComponentStatus.started)
+            self.status.set(RunnerStatus.started)
         except Exception:
             self.logger.exception("Failed to start")
-            self.status.add(ComponentStatus.error)
+            self.status.add(RunnerStatus.error)
             raise
 
     def do_stop(self):
@@ -88,17 +106,18 @@ class Runner(object):
         Ensures status is correctly set based on the outcome of the operation
 
         """
-        if self.status.is_set(ComponentStatus.stopped) or \
-           self.status.is_set(ComponentStatus.stopping):
+        if self.status.is_set(RunnerStatus.stopped) or \
+           self.status.is_set(RunnerStatus.stopping):
             self.logger.info("Already stopping or stopped")
             return
 
+        self.status.set(RunnerStatus.stopping)
         try:
             self.stop()
-            self.status.set(ComponentStatus.stopped)
+            self.status.set(RunnerStatus.stopped)
         except Exception:
             self.logger.exception("Failed to stop")
-            self.status.add(ComponentStatus.error)
+            self.status.add(RunnerStatus.error)
 
     def get_logger(self):
         return get_nio_logger(self.__class__.__name__)

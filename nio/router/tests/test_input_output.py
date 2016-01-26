@@ -188,8 +188,8 @@ class TestInputOutput(NIOTestCaseNoModules):
 
         router_context = RouterContext(execution, blocks)
 
-        block_router.configure(router_context)
-        block_router.start()
+        block_router.do_configure(router_context)
+        block_router.do_start()
 
         signals = [1, 2, 3, 4]
 
@@ -215,7 +215,7 @@ class TestInputOutput(NIOTestCaseNoModules):
         # clean up
         log2.signal_cache.remove(signals)
 
-        block_router.stop()
+        block_router.do_stop()
 
     def test_three_outputs_mix_inputs(self):
         block_router = BlockRouter()
@@ -248,8 +248,8 @@ class TestInputOutput(NIOTestCaseNoModules):
 
         router_context = RouterContext(execution, blocks)
 
-        block_router.configure(router_context)
-        block_router.start()
+        block_router.do_configure(router_context)
+        block_router.do_start()
 
         signals = [1, 2, 3, 4]
 
@@ -290,4 +290,4 @@ class TestInputOutput(NIOTestCaseNoModules):
         self.assertEqual(len(log1.signal_cache), 0)
         self.assertEqual(len(log2.signal_cache), 1)
 
-        block_router.stop()
+        block_router.do_stop()
