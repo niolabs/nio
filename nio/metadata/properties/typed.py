@@ -1,5 +1,5 @@
 from weakref import WeakKeyDictionary
-from nio.metadata.properties.base import Property, AllowNoneViolation
+from nio.metadata.properties.old_base import Property, AllowNoneViolation
 from nio.common.signal.base import Signal
 from nio.metadata.properties.expression_util import Evaluator
 
@@ -17,7 +17,6 @@ class ExprFunc(object):
     def __call__(self, signal=None):
         """ Evaluate and type cast the value """
         value = self._value
-        # TODO: these types should support expressions too
         if self.is_expression():
             # Only evaluate if it's an expression
             value = self.evaluator.evaluate(signal or Signal())

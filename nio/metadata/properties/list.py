@@ -1,7 +1,7 @@
 from collections import Iterable
 from nio.metadata.properties.typed import TypedProperty
 from nio.metadata.properties.holder import PropertyHolder
-from nio.metadata.properties.base import Property
+from nio.metadata.properties.old_base import Property
 from nio.util import ensure_list
 
 

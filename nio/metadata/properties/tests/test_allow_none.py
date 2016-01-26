@@ -1,4 +1,4 @@
-from nio.metadata.properties.base import AllowNoneViolation
+from nio.metadata.properties.old_base import AllowNoneViolation
 from nio.metadata.properties.holder import PropertyHolder
 from nio.metadata.properties.string import StringProperty
 from nio.util.support.test_case import NIOTestCase
