@@ -5,6 +5,12 @@ from nio.modules.communication.module import CommunicationModule
 
 class TestingCommunicationModule(CommunicationModule):
 
+    """ A version of the communication module used for unit tests.
+
+    This will proxy the Publisher and Subscriber classes that are also
+    used for unit tests. These perform the pub/sub opertaions in memory.
+    """
+
     def initialize(self, context):
         super().initialize(context)
         self.proxy_publisher_class(Publisher)
