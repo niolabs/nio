@@ -7,11 +7,11 @@ class ContainerClass(PropertyHolder):
     var1 = VarProperty()
     var2 = VarProperty()
     var3 = VarProperty()
+    default_int = VarProperty(default=1)
+    default_str = VarProperty(default='str')
 
 
 class TestVarProperties(NIOTestCase):
-    def setUp(self):
-        super().setUp()
 
     def test_to_from_dict(self):
         # test that different types can be defined,
@@ -32,3 +32,19 @@ class TestVarProperties(NIOTestCase):
         container_2.from_dict(container_1.to_dict())
 
         self.assertEqual(container_1.to_dict(), container_2.to_dict())
+
+    def test_default(self):
+        container = ContainerClass()
+        self.assertIsNotNone(container.default_int)
+        self.assertIsNotNone(container.default_str)
+        self.assertEqual(container.default_int(), 1)
+        self.assertEqual(container.default_str(), 'str')
+        self.assertEqual(container.default_int.default, 1)
+        self.assertEqual(container.default_str.default, 'str')
+
+    def test_experssion(self):
+        container = ContainerClass()
+        container.default_int = "{{ 1 + 2 }}"
+        container.default_str = "{{ 'a string' }}"
+        self.assertEqual(container.default_int(), 3)
+        self.assertEqual(container.default_str(), 'a string')

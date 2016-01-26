@@ -6,38 +6,33 @@ from nio.metadata.properties.expression_util import Evaluator
 
 class ExprFunc(object):
 
-    def __init__(self, value, type=str, attr_default=''):
-        self._object = value
-        self._type = type
-        self._attr_default = attr_default
-        self.evaluator = Evaluator(str(self._object), attr_default)
-        self.default = attr_default
+    def __init__(self, instance, value):
+        self._instance = instance
+        self._value = value
+        self._type = instance._type
+        self._attr_default = instance._kwargs.get('attr_default', '')
+        self.attr_default = instance._kwargs.get('attr_default', '')
+        self.evaluator = Evaluator(str(self._value), self._attr_default)
 
     def __call__(self, signal=None):
         """ Evaluate and type cast the value """
-        value = self._object
-        from nio.metadata.properties.holder import PropertyHolder
-        from nio.metadata.properties.list import ListProperty
-        import datetime
-        import enum
+        value = self._value
         # TODO: these types should support expressions too
-        if not issubclass(self._type, PropertyHolder) and \
-                not issubclass(self._type, ListProperty) and \
-                not issubclass(self._type, list) and \
-                not issubclass(self._type, datetime.timedelta) and \
-                not issubclass(self._type, enum.Enum) and \
-                not self._type is object:
+        if self.is_expression():
+            # Only evaluate if it's an expression
             value = self.evaluator.evaluate(signal or Signal())
             if self._type != str:
-                # TODO: this really should be calling deserialize because it's
-                # not always this simple.
-                value = self._type(value)
+                value = self._instance.deserialize(value)
             else:
                 # nio 1.x ExpressionProperty does not needs to evaluate to a
                 # string. To keep that feature alive, StringProperty does not
                 # get type casted here.
                 pass
         return value
+
+    @property
+    def default(self):
+        return self._instance.default
 
     def is_expression(self):
         return "{{" in self.evaluator.expression and \
@@ -107,20 +102,17 @@ class TypedProperty(Property):
 
     def __get__(self, instance, cls):
         # In case we use the default, it also needs to be an ExprFunc
-        default = ExprFunc(self._default,
-                           type=self._type,
-                           attr_default=self._kwargs.get('attr_default', ''))
+        default = ExprFunc(self, self._default)
         return self._values.get(instance, default)
 
     def __set__(self, instance, value):
         self._check_allow_none(value)
-        if value is not None and not isinstance(value, self._type):
+        expression = ExprFunc(self, value)
+        if value is not None and not isinstance(value, self._type) and \
+                not expression.is_expression():
             raise TypeError("Must be a {0}".format(self._type))
         # Save an ExprFunc instead of just the regular str
-        self._values[instance] = ExprFunc(
-            value,
-            type=self._type,
-            attr_default=self._kwargs.get('attr_default', ''))
+        self._values[instance] = expression
         # TODO: why does the second one of these fail?
         #import pdb; pdb.set_trace()
         #print('set a new value: {}'.format(self._values[instance]()))
@@ -141,8 +133,9 @@ class TypedProperty(Property):
         # by default, get would still return the default value each time
         value = self._values.get(instance, self.default)
         if isinstance(value, ExprFunc):
-            # New style expression properties need to be evaluated first
-            value = value()
+            # New style expression properties need to extract out value
+            # TODO: it should not have to grab a private variable
+            value = value._value
         return value
 
     def deserialize(self, value):

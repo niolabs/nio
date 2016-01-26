@@ -95,7 +95,7 @@ class TestEvalSignal(EvalSignalTestCase):
         self.configure_block(blk, {
             "expression": "It's a {{$foo}}"
         })
-        self.assertEqual(blk.expression.default, "Whoops")
+        self.assertEqual(blk.expression.attr_default, "Whoops")
         self.assertEqual(blk.expression(Signal({})), "It's a Whoops")
 
     def test_default_attr_default(self):
@@ -140,8 +140,8 @@ class TestEvalSignal(EvalSignalTestCase):
     def test_default_empty_exception(self):
         blk = ExprEmptyStrExcept()
         self.configure_block(blk, {})
-        with self.assertRaises(AttributeError):
-            blk.expression(self.signal)
+        result = blk.expression(self.signal)
+        self.assertEqual(result, '')
 
     def test_raw_string(self):
         """Ensure that expression evaluation passes raw strings
@@ -248,7 +248,8 @@ class TestEvalSignal(EvalSignalTestCase):
     def test_invalid_expr(self):
         """Ensure that ill-formed eval expressions are handled predictably
         """
-        self.signal_test("Don't close the brackets {{1 + 5", SyntaxError,
+        self.signal_test("Don't close the brackets {{1 + 5",
+                         "Don't close the brackets {{1 + 5",
                          False, False)
 
     def test_escape(self):
@@ -259,7 +260,7 @@ class TestEvalSignal(EvalSignalTestCase):
         self.signal_test("We want {{'\$three and \{{ %s \}} cents' % $v1}}",
                          "We want $three and {{ zero }} cents", True, True)
         self.signal_test("Please $don't \{{ evaluate this",
-                         "Please $don't {{ evaluate this", False, False)
+                         "Please $don't \{{ evaluate this", False, False)
 
     def test_method_call(self):
         self.make_signal('foo', 'bar', 'baz')
