@@ -8,7 +8,7 @@ class ContainerClass(PropertyHolder):
     default = FloatProperty(default=1.23)
 
 
-class TestIntProperty(NIOTestCase):
+class TestFloatProperty(NIOTestCase):
 
     def test_default(self):
         container = ContainerClass()
@@ -18,9 +18,9 @@ class TestIntProperty(NIOTestCase):
 
     def test_expression(self):
         container = ContainerClass()
-        container.property = "{{ 1 + 2 }}"
+        container.property = "{{ 1 + 2.1 }}"
         self.assertIsNotNone(container.property)
-        self.assertEqual(container.property(), 3)
+        self.assertEqual(container.property(), 3.1)
         self.assertEqual(container.default.default, 1.23)
 
     def test_expression_with_signal(self):
