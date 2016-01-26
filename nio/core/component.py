@@ -2,9 +2,8 @@
   NIO Core Component interface
 
 """
-from nio.common import ComponentStatus
 from nio.util.logging import get_nio_logger
-from nio.util.flags_enum import FlagsEnum
+from nio.util.runner import Runner
 
 
 class MissingComponent(Exception):
@@ -12,7 +11,7 @@ class MissingComponent(Exception):
     pass
 
 
-class CoreComponent(object):
+class CoreComponent(Runner):
     """ Base core component class.
 
     Contains base properties and functionality common to all components
@@ -23,28 +22,21 @@ class CoreComponent(object):
     default_order = 100
 
     def __init__(self):
-        self._context = None
         self._logger = get_nio_logger(self._name)
-        self._status = \
-            FlagsEnum(ComponentStatus,
-                      status_change_callback=self._on_status_change_callback)
-        self._status.set(ComponentStatus.created)
+        super().__init__(status_change_callback=self._on_status_change_callback)
+
+        self._context = None
 
     @property
     def name(self):
         return self._name
 
-    @property
-    def logger(self):
-        return self._logger
-
     @name.setter
     def name(self, name):
         self._name = name
 
-    @property
-    def status(self):
-        return self._status
+    def get_logger(self):
+        return self._logger
 
     @property
     def version(self):
@@ -79,14 +71,6 @@ class CoreComponent(object):
     def configure(self, context):
         """Configure method to override when subclassing component"""
         self._context = context
-
-    def start(self):
-        """Start method to override when subclassing component"""
-        pass
-
-    def stop(self):
-        """Stop method to override when subclassing component"""
-        pass
 
     # TODO: Move this method to core, it relies on the core context
     def get_dependency(self, name, optional=False):

@@ -79,8 +79,8 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
 
         router_context = RouterContext(execution, blocks)
 
-        block_router.configure(router_context)
-        block_router.start()
+        block_router.do_configure(router_context)
+        block_router.do_start()
 
         signals = [1, 2, 3, 4]
 
@@ -94,7 +94,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
         # clean up
         receiver_block.signal_cache.remove(signals)
 
-        block_router.stop()
+        block_router.do_stop()
 
     def test_valid_input_invalid_output(self):
         block_router = BlockRouter()
@@ -200,8 +200,8 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
                                receivers=["FirstInputBlock".lower()])]
         router_context = RouterContext(execution, blocks)
 
-        block_router.configure(router_context)
-        block_router.start()
+        block_router.do_configure(router_context)
+        block_router.do_start()
         signals = [1, 2, 3, 4]
 
         # make sure nothing has been delivered
@@ -213,4 +213,4 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
         # clean up
         receiver_block.signal_cache.remove(signals)
 
-        block_router.stop()
+        block_router.do_stop()

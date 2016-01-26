@@ -10,7 +10,7 @@ class StatusSignal(ManagementSignal):
     """ An internal signal to encapsulate status management signals.
 
     Args:
-        status (ComponentStatus): The signal status.
+        status (RunnerStatus): The signal status.
         msg (str): A message/explanation to go with the status change.
 
     """

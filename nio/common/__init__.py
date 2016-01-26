@@ -4,23 +4,8 @@
 
 """
 
-from enum import Enum
-
-
-class ComponentStatus(Enum):
-    """ Component Status
-
-    Status a component can be at any time
-    """
-    created = 1
-    configuring = 2
-    configured = 3
-    stopping = 4
-    stopped = 5
-    starting = 6
-    started = 7
-    warning = 8
-    error = 9
+# shortcut to RunnerStatus
+from nio.util.runner import RunnerStatus
 
 
 def get_class(cls):

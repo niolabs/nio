@@ -1,4 +1,5 @@
-from nio.router.base import BlockRouter, RouterStatus
+from nio.router.base import BlockRouter
+from nio.common import RunnerStatus
 from nio.util.threading import spawn
 
 
@@ -21,6 +22,6 @@ class ThreadedBaseBlockRouter(BlockRouter):
         try:
             block.process_signals(signals, input_id)
         except:
-            self.status.add(RouterStatus.deliver_signal_error)
+            self.status.add(RunnerStatus.error)
             self._logger.exception(
                 "{0}.process_signals failed".format(block.name))

@@ -88,8 +88,8 @@ class TestCloningSignals(NIOTestCase):
         router_context = RouterContext(execution, blocks,
                                        {"clone_signals": True})
 
-        block_router.configure(router_context)
-        block_router.start()
+        block_router.do_configure(router_context)
+        block_router.do_start()
 
         common_attribute = "common attribute"
         common_value = "common value"
@@ -123,7 +123,7 @@ class TestCloningSignals(NIOTestCase):
         self.assertNotEqual(receiver_block2.signal_cache,
                             signals)
 
-        block_router.stop()
+        block_router.do_stop()
 
     def test_deepcopy_failure(self):
         """ Asserts that when deepcopy fails, signals are delivered anyways,
@@ -151,8 +151,8 @@ class TestCloningSignals(NIOTestCase):
 
         router_context = RouterContext(execution, blocks)
 
-        block_router.configure(router_context)
-        block_router.start()
+        block_router.do_configure(router_context)
+        block_router.do_start()
 
         common_attribute = "common attribute"
         common_value = "common value"
@@ -189,4 +189,4 @@ class TestCloningSignals(NIOTestCase):
         self.assertEqual(receiver_block1.signal_cache,
                          signals)
 
-        block_router.stop()
+        block_router.do_stop()
