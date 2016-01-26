@@ -12,7 +12,7 @@ class ContainerClass(PropertyHolder):
     property = ObjectProperty(ContainedClass)
 
 
-class TestIntProperty(NIOTestCase):
+class TestObjectProperty(NIOTestCase):
 
     def test_default(self):
         container = ContainerClass()
