@@ -1,3 +1,13 @@
+"""
+
+ModuleInitializer - an object that keeps track of modules and configurations.
+
+A ModuleInitializer will have a list of module (nio.modules.module.Module)
+objects as well as what configuration contexts they should be initialized
+with. When instructed to initialize, the ModuleInitializer will determine
+the proper order to initialize the modules based on the module class
+definitions.
+"""
 from nio.util.logging import get_nio_logger
 from nio.modules.proxy import ProxyNotProxied, ProxyAlreadyProxied
 from nio.modules.module import Module
@@ -32,7 +42,7 @@ class ModuleInitializer(object):
                 except ProxyAlreadyProxied:
                     self.logger.warning(
                         "Module {} was already proxied, unproxying and trying "
-                        " again".format(module.__class__.__name__))
+                        "again".format(module.__class__.__name__))
                     module.finalize()
                     module.initialize(context)
             else:
