@@ -1,3 +1,4 @@
+from nio.common.signal.base import Signal
 from nio.metadata.properties.int import IntProperty
 from nio.metadata.properties.list import ListProperty
 from nio.metadata.properties.holder import PropertyHolder
@@ -9,12 +10,12 @@ class ContainedClass(PropertyHolder):
     # Note, property name and receiving property have to match
     string_property = StringProperty(default="str")
     int_property = IntProperty(default=5)
-    expression_property = StringProperty(default='{{ "value" }}')
+    expression_property = StringProperty(default='{{ $value }}')
 
 
 class ContainerClass(PropertyHolder):
     native_list = ListProperty(int)
-    holder_list = ListProperty(ContainedClass)
+    holder_list = ListProperty(ContainedClass, default=[ContainedClass()])
     property_list = ListProperty(IntProperty)
 
 
@@ -100,3 +101,20 @@ class TestListProperties(NIOTestCase):
         container_1 = ContainerClass()
 
         self.assertRaises(TypeError, container_1.from_dict, invalid_props)
+
+    def test_expression(self):
+        container = ContainerClass()
+        contained = ContainedClass()
+        contained.expression_property = "three is {{ 1 + 2 }}"
+        container.holder_list = [contained]
+        self.assertIsNotNone(container.holder_list)
+        self.assertEqual(
+            container.holder_list()[0].expression_property(), 'three is 3')
+
+    def test_expression_with_signal(self):
+        container = ContainerClass()
+        contained = ContainedClass()
+        self.assertIsNotNone(container.holder_list)
+        self.assertEqual(container.holder_list()[0].
+                         expression_property(Signal({'value': 'signal'})),
+                         'signal')
