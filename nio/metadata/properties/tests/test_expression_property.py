@@ -138,6 +138,7 @@ class TestEvalSignal(EvalSignalTestCase):
         self.assertEqual(result, '')
 
     def test_default_empty_exception(self):
+        """ default value of '' returns '' """
         blk = ExprEmptyStrExcept()
         self.configure_block(blk, {})
         result = blk.expression(self.signal)
@@ -254,13 +255,27 @@ class TestEvalSignal(EvalSignalTestCase):
 
     def test_escape(self):
         self.make_signal('zero')
-        # following test is not really signal dependent even though there is
-        # a '$' sign in it, however, current logic is very simple since it
-        # only looks for '$' to determine signal dependency
         self.signal_test("We want {{'\$three and \{{ %s \}} cents' % $v1}}",
                          "We want $three and {{ zero }} cents", True, True)
+        # TODO: following test is not really signal dependent even though there
+        # is a '$' sign in it, however, current logic is very simple since it
+        # only looks for '$' to determine signal dependency. The following test
+        # should pass:
+        # self.signal_test("Please {{ 'evaluate this' }} $not_a_signal",
+        #                  "Please evaluate this $not_a_signal", True, False)
+        self.signal_test("Please {{ 'evaluate this' }} $not_a_signal",
+                         "Please evaluate this $not_a_signal", True, True)
+        # Do not escape since it's not a real expression without the escape
         self.signal_test("Please $don't \{{ evaluate this",
                          "Please $don't \{{ evaluate this", False, False)
+        # Use escape character if curly braces would otherwise be an expression
+        # TODO: similar to the comment earlier in this test, this isn't really
+        # supposed to be an expression or require a signal. Instead this test
+        # should pass:
+        # self.signal_test("Please $don't \{{ evaluate this }}",
+        #                  "Please $don't {{ evaluate this }}", False, False)
+        self.signal_test("Please $don't \{{ evaluate this }}",
+                         "Please $don't {{ evaluate this }}", True, True)
 
     def test_method_call(self):
         self.make_signal('foo', 'bar', 'baz')
