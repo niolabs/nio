@@ -17,6 +17,7 @@ class BaseProperty:
                  visible=True, allow_none=False, **kwargs):
         self.type = _type
         self.default = kwargs.get("default", None)
+        self._default_property_value = PropertyValue(self, self.default)
 
         kwargs["title"] = title
         kwargs["visible"] = visible
@@ -42,13 +43,7 @@ class BaseProperty:
             and allow_none is False.
 
         """
-        try:
-            return self._values[instance]
-        except:
-            if "default" in self.kwargs:
-                return PropertyValue(self, self.kwargs["default"])
-            else:
-                return PropertyValue(self)
+        return self._values.get(instance, self._default_property_value)
 
     def __set__(self, instance, value):
         """ Save the value as a PropertyValue """
