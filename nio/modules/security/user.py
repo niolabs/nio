@@ -3,21 +3,16 @@
     User support
 
 """
-from threading import current_thread
-
-
-def get_current_user():
-    thread = current_thread()
-    return getattr(thread, "user", None)
 
 
 class User(object):
 
     """ User class
 
-    Represents the logged in User and roles it may have
+    Represents the logged in User
 
     """
 
-    def __init__(self, name='Guest'):
+    def __init__(self, name='Guest', **kwargs):
+        super().__init__(**kwargs)
         self.name = name

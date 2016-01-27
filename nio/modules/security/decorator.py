@@ -4,10 +4,7 @@
 
 """
 import threading
-from nio.modules.security import Unauthorized
-from nio.modules.security.permissions.authorizer import has_permission
-from nio.modules.security.condition import SecureCondition
-from nio.util import ensure_is
+from nio.modules.security.authorizer import Authorizer, Unauthorized
 
 
 class protected_access(object):
@@ -17,19 +14,24 @@ class protected_access(object):
     Retrieve user from current thread and evaluate access
     """
 
-    def __init__(self, permissions, meet_all=True):
-        permissions = ensure_is(permissions, [list, tuple], lambda x: [x])
-        self._condition = SecureCondition("unused", meet_all,
-                                          [has_permission(permission)
-                                           for permission in permissions])
+    def __init__(self, *args, meet_all=True):
+        self._tasks = args
+        self._meet_all = meet_all
 
     def __call__(self, f):
         def wrapped_f(*args):
             # retrieve user
             thread = threading.current_thread()
             user = getattr(thread, "user", None)
-            # evaluate conditions
-            if not user or not self._condition.evaluate(user):
+            if user is None:
                 raise Unauthorized()
+
+            # evaluate all of the tasks
+            Authorizer.authorize_multiple(
+                user, *self._tasks, meet_all=self._meet_all)
             return f(*args)
         return wrapped_f
+
+
+def _set_user(user):
+    setattr(threading.current_thread(), "user", user)
