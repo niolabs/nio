@@ -3,32 +3,34 @@
   Command Security decorator
 
 """
+from nio.common.command.security.command import SecureCommand
+from nio.common.command.holder import CommandHolder
 
-# from nio.common.command.security.command import SecureCommand
-# from nio.modules.security.condition import SecureCondition
 
-
-def command_security(name, all_conditions, *conditions):
+def command_security(name, *tasks, meet_all=True):
     """ Decorator for defining a command that requires security
 
     Args:
         name (str): Command name
-        all_conditions (bool): True to validate all conditions are met
+        tasks (list): List of tasks
+        meet_all (bool): True to validate all tasks are met
            before the command can be executed
-        conditions (list): List of conditions (methods returning boolean)
     """
 
     def wrap_command_security(cls):
+        if not issubclass(cls, CommandHolder):
+            raise TypeError(
+                "Must place command_security decorator on a CommandHolder")
+
+        cmd = cls.get_commands_entry().get(name)
+        if cmd is not None:
+            # Command already exists, just adding security
+            sec_cmd = SecureCommand(
+                cmd.name, *tasks, title=cmd.title, meet_all=meet_all)
+            for param in cmd.parameters:
+                sec_cmd.add_parameter(param)
+        else:
+            sec_cmd = SecureCommand(name, *tasks, meet_all=meet_all)
+        cls.add_command(sec_cmd)
         return cls
-        # sec_cond = SecureCondition(name, all_conditions, conditions)
-        # # TODO: Check if cls is CommandHolder
-        # cmd = cls.get_commands_entry().get(name)
-        # if cmd is not None:
-            # sec_cmd = SecureCommand(cmd.name, sec_cond, cmd.title)
-            # for param in cmd.parameters:
-                # sec_cmd.add_parameter(param)
-        # else:
-            # sec_cmd = SecureCommand(name, sec_cond)
-        # cls.add_command(sec_cmd)
-        # return cls
     return wrap_command_security

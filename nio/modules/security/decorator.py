@@ -14,8 +14,8 @@ class protected_access(object):
     Retrieve user from current thread and evaluate access
     """
 
-    def __init__(self, *args, meet_all=True):
-        self._tasks = args
+    def __init__(self, *tasks, meet_all=True):
+        self._tasks = tasks
         self._meet_all = meet_all
 
     def __call__(self, f):

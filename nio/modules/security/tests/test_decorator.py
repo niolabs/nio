@@ -46,7 +46,6 @@ class TestAuthorizedAccess(NIOTestCaseNoModules):
     def test_authorized_access(self):
         """ Asserts that right user is authorized to execute.
         """
-
         secured_class = SecuredClass()
 
         # A hacker should not be able to call the secured method

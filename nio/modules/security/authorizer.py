@@ -29,9 +29,9 @@ class Authorizer(ModuleProxy):
         raise NotImplementedError()
 
     @classmethod
-    def authorize_multiple(cls, user, *args, meet_all=True):
+    def authorize_multiple(cls, user, *tasks, meet_all=True):
         """ Authorize a user against multiple tasks """
-        for task in args:
+        for task in tasks:
             if meet_all:
                 # Since they all need to pass, just try them, if one fails
                 # it will raise the exception here
