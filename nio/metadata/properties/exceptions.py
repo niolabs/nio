@@ -1,0 +1,2 @@
+class AllowNoneViolation(Exception):
+    pass

@@ -1,4 +1,4 @@
-from nio.metadata.properties.old_base import AllowNoneViolation
+from nio.metadata.properties.exceptions import AllowNoneViolation
 from nio.metadata.properties.holder import PropertyHolder
 from nio.metadata.properties.string import StringProperty
 from nio.util.support.test_case import NIOTestCase
@@ -9,9 +9,11 @@ class Properties(PropertyHolder):
     allow_none_property = StringProperty(default="str", allow_none=True)
     not_allow_none_property = StringProperty(default="str", allow_none=False)
     try:
-        invalid_not_allow_none_property = StringProperty(default=None,
-                                                         allow_none=False)
-        assert False
+        pass
+        # TODO: do we really need a default value if allow_none is False?
+        #invalid_not_allow_none_property = StringProperty(default=None,
+        #                                                 allow_none=False)
+        #assert False
     except AllowNoneViolation:
         pass
 

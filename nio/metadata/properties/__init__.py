@@ -1,5 +1,4 @@
 from .bool import BoolProperty
-from .expression import ExpressionProperty
 from .holder import PropertyHolder
 from .int import IntProperty
 from .float import FloatProperty

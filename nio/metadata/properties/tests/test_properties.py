@@ -124,9 +124,13 @@ class TestProperties(NIOTestCase):
     def test_declines_wrong_types(self):
         container = ContainerClass()
 
+        class NotStringable:
+            def __str__(self):
+                raise Exception("Not a string")
+
         # assert that it declines wrong types
         with self.assertRaises(TypeError):
-            container.string_property = 1
+            container.string_property = NotStringable()
 
         with self.assertRaises(TypeError):
             container.int_property = "string"
@@ -234,6 +238,7 @@ class TestProperties(NIOTestCase):
         # assert that descriptions do not depend on instance values
         self.assertEqual(description, description1)
 
+        print(description)
         self.assertIn('string_property', description)
         self.assertIn('int_property', description)
         self.assertIn('float_property', description)

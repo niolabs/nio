@@ -1,16 +1,8 @@
-from nio.metadata.properties.typed import TypedProperty, ExprFunc
+from nio.metadata.properties.base import BaseProperty
+from nio.metadata.types.string import StringType
 
 
-class StringProperty(TypedProperty):
-    """ Defines a property for a string type
-
-    """
+class StringProperty(BaseProperty):
 
     def __init__(self, **kwargs):
-        super().__init__(str, **kwargs)
-
-    def deserialize(self, value):
-        try:
-            return str(value)
-        except ValueError:
-            raise ValueError("Unable to cast '{0}' to a string".format(value))
+        super().__init__(StringType(), **kwargs)

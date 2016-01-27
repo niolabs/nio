@@ -27,8 +27,7 @@ class ContainerClass(PropertyHolder):
     string_property_default_env_variable = \
         StringProperty(default='[[ENV_VARIABLE]]')
 
-    expression_property = StringProperty(attr_default='Whoops',
-                                             default='Default to {{$v1}}')
+    expression_property = StringProperty(default='Default to {{$v1}}')
     expression_property_default_env_variable = \
         StringProperty(default='[[ENV_VARIABLE]]')
 

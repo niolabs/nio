@@ -1,4 +1,5 @@
 from nio.metadata.properties.typed import TypedProperty
+from nio.metadata.properties.base import BaseProperty
 from nio.metadata.properties.timedelta import TimeDeltaProperty
 from nio.common.versioning.check import compare_versions, \
     VersionCheckResult, InvalidVersionFormat, is_version_valid, \
@@ -218,8 +219,9 @@ class PropertyHolder(object):
             classes = inspect.getmro(cls)
             for _class in classes:
                 for (prop_name, prop) in _class.__dict__.items():
-                    if (isinstance(prop, TypedProperty) and
-                            prop_name not in properties):
+                    if ((isinstance(prop, TypedProperty) or
+                         isinstance(prop, BaseProperty)) and
+                        prop_name not in properties):
                         properties[prop_name] = prop
 
             # cache properties

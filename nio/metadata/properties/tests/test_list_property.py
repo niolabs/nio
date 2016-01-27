@@ -87,7 +87,8 @@ class TestListProperties(NIOTestCase):
 
         container_2 = ContainerClass()
         # Load container 2 with the dictionary of container 1
-        container_2.from_dict(container_1.to_dict())
+        one = container_1.to_dict()
+        container_2.from_dict(one)
 
         self.assertEqual(container_1.to_dict(), container_2.to_dict())
 

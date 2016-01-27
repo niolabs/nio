@@ -22,7 +22,6 @@ class ValueSignal(Signal):
 
 class EvaluatorBlock(Block):
     expression = StringProperty(
-        attr_default='Whoops',
         default='Default to {{$v1}}')
 
 
@@ -30,30 +29,18 @@ class ExprDefaultBlock(Block):
     expression = StringProperty()
 
 
-class ExprExceptionBlock(Block):
-    expression = StringProperty(attr_default=AttributeError)
-
-
 class MyCustomException(Exception):
     pass
-
-
-class CustomExceptionBlock(Block):
-    expression = StringProperty(attr_default=MyCustomException)
 
 
 class ExprEmptyStr(Block):
     expression = StringProperty(default='')
 
 
-class ExprEmptyStrExcept(Block):
-    expression = StringProperty(default='', attr_default=AttributeError)
-
-
 class MultiExpression(Block):
-    e1 = StringProperty(default='', attr_default=AttributeError)
-    e2 = StringProperty(default='', attr_default=None)
-    e3 = StringProperty(defulat='', attr_default='Fandango')
+    e1 = StringProperty(default='')
+    e2 = StringProperty(default='')
+    e3 = StringProperty(defulat='')
 
 
 class EvalSignalTestCase(NIOBlockTestCase):
@@ -83,46 +70,26 @@ class EvalSignalTestCase(NIOBlockTestCase):
             result = blk.expression(self.signal)
             self.assertEqual(result, expected)
 
-        self.assertEqual(blk.expression.is_expression(), is_expression)
-        self.assertEqual(blk.expression.depends_on_signal(), depends_on_signal)
-        self.assertEqual(blk.expression.get_expression(), expr)
+        # TODO: isn't everything an expression now?
+        #self.assertEqual(blk.expression.is_expression(), is_expression)
+
+        # TODO: do we care if it depends on a signal?
+        #self.assertEqual(blk.expression.depends_on_signal(), depends_on_signal)
+
+        # value is the raw config without being evaluated
+        self.assertEqual(blk.expression.value, expr)
 
 
 class TestEvalSignal(EvalSignalTestCase):
 
-    def test_attr_default(self):
+    def test_attr_not_on_signal(self):
+        """ Exception is raised if attribute doesn't exist on Signal """
         blk = EvaluatorBlock()
         self.configure_block(blk, {
-            "expression": "It's a {{$foo}}"
+            "expression": "It's a {{ $foo }}"
         })
-        self.assertEqual(blk.expression.attr_default, "Whoops")
-        self.assertEqual(blk.expression(Signal({})), "It's a Whoops")
-
-    def test_default_attr_default(self):
-        blk = ExprDefaultBlock()
-        self.configure_block(blk, {
-            "expression": "{{$foo}}"
-        })
-        result = blk.expression(self.signal)
-        self.assertEqual(result, '')
-
-    def test_attr_default_exception(self):
-        blk = ExprExceptionBlock()
-        self.configure_block(blk, {
-            "expression": "Don't {{$foo}}"
-        })
-        self.make_signal()
         with self.assertRaises(AttributeError):
-            blk.expression(self.signal)
-
-    def test_attr_custom_exception(self):
-        blk = CustomExceptionBlock()
-        self.configure_block(blk, {
-            "expression": "Don't {{$foo}}"
-        })
-        self.make_signal()
-        with self.assertRaises(MyCustomException):
-            blk.expression(self.signal)
+            blk.expression(Signal({}))
 
     def test_default_expression(self):
         blk = EvaluatorBlock()
@@ -133,13 +100,6 @@ class TestEvalSignal(EvalSignalTestCase):
 
     def test_default_empty(self):
         blk = ExprEmptyStr()
-        self.configure_block(blk, {})
-        result = blk.expression(self.signal)
-        self.assertEqual(result, '')
-
-    def test_default_empty_exception(self):
-        """ default value of '' returns '' """
-        blk = ExprEmptyStrExcept()
         self.configure_block(blk, {})
         result = blk.expression(self.signal)
         self.assertEqual(result, '')
@@ -172,7 +132,7 @@ class TestEvalSignal(EvalSignalTestCase):
         """
 
         self.make_signal("soccer world cup")
-        self.signal_test("The {{$v1}} is on!",
+        self.signal_test("The {{ $v1 }} is on!",
                          "The soccer world cup is on!", True, True)
 
     def test_multiple_signal_expr(self):
@@ -201,7 +161,7 @@ class TestEvalSignal(EvalSignalTestCase):
         """Ensure math operations are allowed
         """
 
-        self.signal_test("{{math.sin(math.radians(90))}}", 1.0, True, False)
+        self.signal_test("{{ math.sin(math.radians(90)) }}", 1.0, True, False)
 
     def test_datetime(self):
         """Ensure datetime operations are allowed
@@ -225,26 +185,17 @@ class TestEvalSignal(EvalSignalTestCase):
         self.signal_test("Talking about {{$v1['who']}} and the Jets",
                          "Talking about Baron Samedi and the Jets", True, True)
 
-    def test_custom_default(self):
-        """ Ensure that the default value is interpolated when the
-        target property does not exist.
-
-        """
-        self.make_signal()
-        self.signal_test("The value is: {{$value + 'ie!!'}}",
-                         "The value is: Whoopsie!!", True, True)
-
     def test_invalid_python(self):
         """ Ensure that expression evaluation raises an exception when the
         python is invalid.
 
         """
-        self.make_signal(1, 2)
+        self.make_signal(1, 2, 'string')
         self.signal_test("The value is: {{''.join([$v1,$V2])}}", TypeError,
                          True, True)
-        self.signal_test("{{print $v1}}", SyntaxError, True, True)
-        self.signal_test("{{1 + int($value)}}", ValueError, True, True)
-        self.signal_test("{{foo + str($v1)}}", NameError, True, True)
+        self.signal_test("{{ print $v1 }}", SyntaxError, True, True)
+        self.signal_test("{{ 1 + int($_v3) }}", ValueError, True, True)
+        self.signal_test("{{ foo + str($v1) }}", NameError, True, True)
 
     def test_invalid_expr(self):
         """Ensure that ill-formed eval expressions are handled predictably
@@ -326,20 +277,18 @@ class TestEvalSignal(EvalSignalTestCase):
         self.make_signal(1)
         blk = MultiExpression()
         self.configure_block(blk, {
-            "e1": "{{$noexist}}",
-            "e2": "{{$noexist}}",
-            "e3": "{{$noexist}}"
+            "e1": "{{ $v1 }}",
+            "e2": "{{ $noexist }}",
+            "e3": "{{ 'string' }}"
         })
-
-        with self.assertRaises(AttributeError):
-            blk.e1(self.signal)
-
-        self.assertIsNone(blk.e2(self.signal))
-        self.assertEqual(blk.e3(self.signal), 'Fandango')
+        self.assertEqual(blk.e1(self.signal), 1)
+        with self.assertRaises(Exception):
+            blk.e2(self.signal)
+        self.assertEqual(blk.e3(self.signal), 'string')
 
     def test_sub_dicts(self):
         """ Make sure if a signal contains a dict it's subscriptable """
-        blk = ExprExceptionBlock()
+        blk = ExprDefaultBlock()
         self.configure_block(blk, {
             "expression": "{{ $v1['a'] }}"
         })
