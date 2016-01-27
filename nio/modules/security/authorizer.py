@@ -12,7 +12,8 @@ class Unauthorized(Exception):
 
 class Authorizer(ModuleProxy):
 
-    def authorize(self, user, task):
+    @classmethod
+    def authorize(cls, user, task):
         """ Ensure a user can perform a task.
 
         Args:
@@ -27,16 +28,17 @@ class Authorizer(ModuleProxy):
         """
         raise NotImplementedError()
 
-    def authorize_multiple(self, user, *args, meet_all=True):
+    @classmethod
+    def authorize_multiple(cls, user, *args, meet_all=True):
         """ Authorize a user against multiple tasks """
         for task in args:
             if meet_all:
                 # Since they all need to pass, just try them, if one fails
                 # it will raise the exception here
-                self.authorize(user, task)
+                cls.authorize(user, task)
             else:
                 try:
-                    self.authorize(user, task)
+                    cls.authorize(user, task)
                     # We need any of them to pass and this one has, let's
                     # break out and call it done
                     break
