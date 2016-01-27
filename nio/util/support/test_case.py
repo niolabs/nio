@@ -28,8 +28,8 @@ class NIOTestCase(TestCase):
 
     """
 
-    def __init__(self, methodName='runTests'):
-        super().__init__(methodName)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         logging.config.dictConfig(self.get_logging_config())
 
@@ -71,8 +71,7 @@ class NIOTestCase(TestCase):
         return known_modules.get(module_name)()
 
     def tearDownModules(self):
-        # Perform a safe finalization in case anything wasn't proxied
-        # originally
+        # Perform a safe finalization in case anything wasn't proxied first
         self._module_initializer.finalize(safe=True)
 
     def get_test_modules(self):
@@ -81,10 +80,6 @@ class NIOTestCase(TestCase):
         during a test
         """
         return {'scheduler', 'persistence'}
-
-    def setUpSettings(self):
-        """ Sets Settings before running a unit test """
-        pass
 
     def get_logging_config(self):
         return {
@@ -126,20 +121,12 @@ class NIOTestCase(TestCase):
             else:
                 print('Setting multiprocess start method, details: {0}'.
                       format(str(e)))
-        # Initialize settings
-        self.setUpSettings()
         # setup Modules
         self.setupModules()
 
     def tearDown(self):
         super().tearDown()
         self.tearDownModules()
-
-    def get_provider_settings(self):
-        """ Override this method for specifying settings
-        for the config provider
-        """
-        return {}
 
 
 class NIOTestCaseNoModules(NIOTestCase):
