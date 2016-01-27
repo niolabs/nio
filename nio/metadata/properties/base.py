@@ -23,8 +23,6 @@ class BaseProperty:
         kwargs["title"] = title
         kwargs["visible"] = visible
         kwargs["allow_none"] = allow_none
-        # TODO: is kwargs private or not?
-        self._kwargs = kwargs
         self.kwargs = kwargs
 
         self._values = WeakKeyDictionary()

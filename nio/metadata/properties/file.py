@@ -54,7 +54,7 @@ class FileProperty(StringProperty):
             return None
 
     def __get__(self, instance, value):
-        mode = self._kwargs.get('mode', None)
+        mode = self.kwargs.get('mode', None)
         return self.FileHolder(super().__get__(instance, value)(), mode)
 
     def get_type_name(self):
