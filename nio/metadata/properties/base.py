@@ -16,9 +16,7 @@ class BaseProperty:
     def __init__(self, _type, title=None,
                  visible=True, allow_none=False, **kwargs):
         self.type = _type
-        self.default_property_value = \
-            PropertyValue(self, kwargs.get("default", None))
-        self.default = self.default_property_value.value
+        self.default = kwargs.get("default", None)
 
         kwargs["title"] = title
         kwargs["visible"] = visible
