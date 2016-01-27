@@ -19,7 +19,6 @@ class BaseProperty:
         self.default_property_value = \
             PropertyValue(self, kwargs.get("default", None))
         self.default = self.default_property_value.value
-        self.data_type = _type.data_type()
 
         kwargs["title"] = title
         kwargs["visible"] = visible
@@ -30,7 +29,7 @@ class BaseProperty:
 
         self._values = WeakKeyDictionary()
 
-        self.description = dict(type=self.data_type, **kwargs)
+        self.description = dict(type=_type.data_type(), **kwargs)
 
     def __get__(self, instance, owner):
         """ Return the PropertyValue
@@ -66,7 +65,7 @@ class BaseProperty:
         self._values[instance] = property_value
 
     def __str__(self):
-        return "type is: %s, args are %s" % (self.data_type,
+        return "type is: %s, args are %s" % (self.type,
                                              self.kwargs)
 
     def serialize(self, instance):

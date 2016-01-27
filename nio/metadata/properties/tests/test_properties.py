@@ -282,4 +282,6 @@ class TestProperties(NIOTestCase):
 
     def test_print_property_info(self):
         prop_info = str(StringProperty())
-        self.assertIn("type is: str, args are", prop_info)
+        self.assertIn("type is: "
+                      "<class 'nio.metadata.types.string.StringType'>, "
+                      "args are", prop_info)
