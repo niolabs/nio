@@ -17,9 +17,9 @@ class BaseProperty:
                  visible=True, allow_none=False, **kwargs):
         self.type = _type
         self.default_property_value = \
-            PropertyValue(self, kwargs.get("default", _type.default))
+            PropertyValue(self, kwargs.get("default", None))
         self.default = self.default_property_value.value
-        self.data_type = type(_type.default).__name__
+        self.data_type = _type.data_type()
 
         kwargs["title"] = title
         kwargs["visible"] = visible
@@ -33,7 +33,27 @@ class BaseProperty:
         self.description = dict(type=self.data_type, **kwargs)
 
     def __get__(self, instance, owner):
-        return self._values.get(instance, self.default_property_value)
+        """ Return the PropertyValue
+
+        Returns:
+            PropertyValue: The value for the given instance
+
+            If a value has not been set, return a PropertyValue with the
+            default value. If a value has not been set and a default is not
+            defined, return None.
+
+        Raises:
+            Exception: If a value has not been set and a default is not defined
+            and allow_none is False.
+
+        """
+        try:
+            return self._values[instance]
+        except:
+            if "default" in self.kwargs:
+                return PropertyValue(self, self.kwargs["default"])
+            else:
+                return PropertyValue(self)
 
     def __set__(self, instance, value):
         """ Save the value as a PropertyValue """

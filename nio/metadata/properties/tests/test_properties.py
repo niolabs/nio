@@ -151,7 +151,7 @@ class TestProperties(NIOTestCase):
             del container.list_property
 
     def test_serialize_default(self):
-        default_properties = {"string_property": "",
+        default_properties = {"string_property": None,
                               "int_property": 0,
                               "float_property": 0.0,
                               "object_property": {

@@ -19,6 +19,3 @@ class TestTypes(NIOTestCase):
         value = NotStringable()
         with self.assertRaises(Exception):
             StringType.deserialize(value)
-
-    def test_string_type_default(self):
-        self.assertEqual(StringType().default, '')

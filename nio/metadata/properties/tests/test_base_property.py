@@ -1,30 +1,54 @@
 from unittest.mock import MagicMock
 from nio.metadata.properties.base import BaseProperty
-from nio.metadata.types.string import StringType
 from nio.util.support.test_case import NIOTestCase
 
 
 class TestBaseProperty(NIOTestCase):
 
-    def test_base_property(self):
+    def test_set_and_get_value(self):
         type = MagicMock()
-        property = BaseProperty(type)
-        property.__set__(MagicMock(), MagicMock())
-        property.__get__(MagicMock(), MagicMock())
-        property.serialize(MagicMock())
-        property.deserialize(MagicMock())
-
-    def test_string_type(self):
-        type = StringType()
-        property = BaseProperty(type)
         instance = MagicMock()
-        self.assertEqual(property.type, type)
-        # Set a value on a property instance
-        set_value = 'string'
+        property = BaseProperty(type)
+        set_values = ["", "string", 1, {}, []]
+        get_values = []
+        for set_value in set_values:
+            property.__set__(instance, set_value)
+            get_value = property.__get__(instance, MagicMock())
+            get_values.append(get_value())
+        self.assertEqual(set_values, get_values)
+
+    def test_not_allow_none(self):
+        type = MagicMock()
+        instance = MagicMock()
+        property = BaseProperty(type)
+        set_value = None
+        with self.assertRaises(Exception):
+            property.__set__(instance, set_value)
+        get_value = property.__get__(instance, MagicMock())
+        with self.assertRaises(Exception):
+            get_value()
+
+    def test_allow_none(self):
+        type = MagicMock()
+        instance = MagicMock()
+        property = BaseProperty(type, allow_none=True)
+        set_value = None
         property.__set__(instance, set_value)
-        # Get the value for that instance
         get_value = property.__get__(instance, MagicMock())
         self.assertEqual(set_value, get_value())
-        # Get a value for a new instance
-        get_value = property.__get__(MagicMock(), MagicMock())
-        self.assertEqual(type.default, get_value())
+
+    def test_serialize(self):
+        type = MagicMock()
+        type.serialize = lambda value: value
+        instance = MagicMock()
+        property = BaseProperty(type)
+        value = 'value'
+        property.__set__(instance, value)
+        self.assertEqual(value, property.serialize(instance))
+
+    def test_deserialize(self):
+        type = MagicMock()
+        type.deserialize = lambda value: value
+        property = BaseProperty(type)
+        value = 'value'
+        self.assertEqual(value, property.deserialize(value))

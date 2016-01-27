@@ -27,7 +27,7 @@ class Block(PropertyHolder, CommandHolder):
 
     version = VersionProperty(version='0.0.0')
     type = StringProperty(visible=False, readonly=True)
-    name = StringProperty(visible=False)
+    name = StringProperty(default=__name__, visible=False)
     log_level = SelectProperty(LogLevel, title="Log Level", default="NOTSET")
 
     def __init__(self):
