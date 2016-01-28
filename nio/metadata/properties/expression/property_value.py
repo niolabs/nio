@@ -35,10 +35,10 @@ class PropertyValue:
         if isinstance(self.value, str):
             value = self.evaluator.evaluate(signal or Signal())
             return self._property.deserialize(value)
-        elif self.value is not None or self._property.kwargs["allow_none"]:
-            return self.value
+        elif self.value is not None:
+            return self._property.deserialize(self.value)
         elif self.value is None and self._property.kwargs["allow_none"]:
-            return self.value
+            return None
         else:
             raise Exception("Property value None is not allowed")
 
