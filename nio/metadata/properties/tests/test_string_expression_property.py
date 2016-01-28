@@ -175,7 +175,7 @@ class TestEvalSignal(EvalSignalTestCase):
 
     def test_inner_dict(self):
         """Inner dictionaries need spaces before and after"""
-        self.signal_test('{{ {"a": 1, "b": 2} }}', str({"b": 2, "a": 1}),
+        self.signal_test('{{ {"a": 1} }}', str({"a": 1}),
                          True, False)
 
     def test_dict_subscript(self):
