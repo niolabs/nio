@@ -27,6 +27,8 @@ class PropertyValue:
             return self._property.deserialize(value)
         elif self.value is not None or self._property.kwargs["allow_none"]:
             return self.value
+        elif self.value is None and self._property.kwargs["allow_none"]:
+            return self.value
         else:
             raise Exception("Property value None is not allowed")
 

@@ -19,7 +19,7 @@ class ContainedClass(PropertyHolder):
 
 class ContainerClass(PropertyHolder):
     # Note, property name and receiving property have to match
-    string_property = StringProperty()
+    string_property = StringProperty(default='')
     int_property = IntProperty(default=0)
     float_property = FloatProperty(default=0.0)
     object_property = ObjectProperty(ContainedClass)
@@ -151,7 +151,7 @@ class TestProperties(NIOTestCase):
             del container.list_property
 
     def test_serialize_default(self):
-        default_properties = {"string_property": None,
+        default_properties = {"string_property": '',
                               "int_property": 0,
                               "float_property": 0.0,
                               "object_property": {

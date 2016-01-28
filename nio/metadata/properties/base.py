@@ -55,12 +55,9 @@ class BaseProperty:
                                              self.kwargs)
 
     def serialize(self, instance):
-        # TODO: where is serialize used? Should it really be evaluating?
-        try:
-            value = self.__get__(instance, instance)()
-        except:
-            # If property value cannot be evaluated, just get the raw value
-            value = self.__get__(instance, instance).value
+        value = self.__get__(instance, instance).value
+        # TODO: for non-string properties, this can return a string if it's an
+        # expression
         return self.type.serialize(value)
 
     def deserialize(self, value):

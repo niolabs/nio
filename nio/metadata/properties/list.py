@@ -2,6 +2,7 @@ from collections import Iterable
 from nio.metadata.properties.typed import TypedProperty
 from nio.metadata.properties.holder import PropertyHolder
 from nio.metadata.properties.old_base import Property
+from nio.metadata.properties.base import BaseProperty
 from nio.util import ensure_list
 
 
@@ -69,7 +70,8 @@ class ListProperty(TypedProperty):
             list_obj_inst = self._list_obj_type()
 
             # Figure out what form of deserialization will happen
-            if issubclass(self._list_obj_type, Property):
+            if issubclass(self._list_obj_type, Property) or \
+                    issubclass(self._list_obj_type, BaseProperty):
                 # the items are properties, we will call deserialize
                 list_obj_inst.__set__(self, list_obj_inst.deserialize(element))
             elif issubclass(self._list_obj_type, PropertyHolder):
