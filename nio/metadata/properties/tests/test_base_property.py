@@ -7,6 +7,7 @@ class TestBaseProperty(NIOTestCase):
 
     def test_set_and_get_value(self):
         type = MagicMock()
+        type.deserialize = lambda value: value
         instance = MagicMock()
         property = BaseProperty(type)
         set_values = ["", "string", 1, {}, []]
@@ -40,6 +41,7 @@ class TestBaseProperty(NIOTestCase):
     def test_serialize(self):
         type = MagicMock()
         type.serialize = lambda value: value
+        type.deserialize = lambda value: value
         instance = MagicMock()
         property = BaseProperty(type)
         value = 'value'

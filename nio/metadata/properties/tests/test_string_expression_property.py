@@ -113,7 +113,7 @@ class TestEvalSignal(EvalSignalTestCase):
         """Ensure that signals are evaluated correctly
         """
 
-        self.signal_test("{{1 + 5}}", 6, True, False)
+        self.signal_test("{{1 + 5}}", str(6), True, False)
 
     def test_expr_in_string(self):
         """Ensure that when an error is detected it returns None
@@ -161,7 +161,8 @@ class TestEvalSignal(EvalSignalTestCase):
         """Ensure math operations are allowed
         """
 
-        self.signal_test("{{ math.sin(math.radians(90)) }}", 1.0, True, False)
+        self.signal_test("{{ math.sin(math.radians(90)) }}", str(1.0),
+                         True, False)
 
     def test_datetime(self):
         """Ensure datetime operations are allowed
@@ -170,11 +171,11 @@ class TestEvalSignal(EvalSignalTestCase):
         from datetime import datetime
         self.make_signal(datetime.utcnow())
         self.signal_test('{{($v1 - datetime.datetime.utcnow()).'
-                         'total_seconds() < 1}}', True, True, True)
+                         'total_seconds() < 1}}', str(True), True, True)
 
     def test_inner_dict(self):
         """Inner dictionaries need spaces before and after"""
-        self.signal_test('{{ {"a": 1, "b": 2} }}', {"b": 2, "a": 1},
+        self.signal_test('{{ {"a": 1, "b": 2} }}', str({"b": 2, "a": 1}),
                          True, False)
 
     def test_dict_subscript(self):
@@ -238,16 +239,16 @@ class TestEvalSignal(EvalSignalTestCase):
     def test_returns_list(self):
         self.make_signal([1, 2, 3])
         self.signal_test("{{['a', 'b', 'c', 'easy as'] + $v1}}",
-                         ['a', 'b', 'c', 'easy as', 1, 2, 3], True, True)
+                         str(['a', 'b', 'c', 'easy as', 1, 2, 3]), True, True)
 
     def test_return_signal(self):
         self.make_signal([1, 2, 3])
-        self.signal_test("{{$}}", self.signal, True, True)
+        self.signal_test("{{$}}", str(self.signal), True, True)
 
     def test_hasattr(self):
         self.make_signal(1, 2, 3)
-        self.signal_test("{{hasattr($, 'v1')}}", True, True, True)
-        self.signal_test("{{hasattr($, 'baz')}}", False, True, True)
+        self.signal_test("{{hasattr($, 'v1')}}", str(True), True, True)
+        self.signal_test("{{hasattr($, 'baz')}}", str(False), True, True)
 
     def test_direct_attr_ref(self):
         self.make_signal(1)
@@ -266,7 +267,7 @@ class TestEvalSignal(EvalSignalTestCase):
     def test_random(self):
         """Ensure import on the fly is allowed
         """
-        self.signal_test("{{__import__('random').randint(1,1)}}", 1,
+        self.signal_test("{{__import__('random').randint(1,1)}}", str(1),
                          True, False)
 
     def test_no_cache_collision(self):
@@ -281,7 +282,7 @@ class TestEvalSignal(EvalSignalTestCase):
             "e2": "{{ $noexist }}",
             "e3": "{{ 'string' }}"
         })
-        self.assertEqual(blk.e1(self.signal), 1)
+        self.assertEqual(blk.e1(self.signal), str(1))
         with self.assertRaises(Exception):
             blk.e2(self.signal)
         self.assertEqual(blk.e3(self.signal), 'string')
@@ -293,4 +294,4 @@ class TestEvalSignal(EvalSignalTestCase):
             "expression": "{{ $v1['a'] }}"
         })
         self.make_signal({'a': 1, 'b': 2})
-        self.assertEqual(blk.expression(self.signal), 1)
+        self.assertEqual(blk.expression(self.signal), str(1))

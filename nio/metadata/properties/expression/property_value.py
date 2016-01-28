@@ -13,9 +13,8 @@ class PropertyValue:
     def __call__(self, signal=None):
         """ Return value, evaluated if it is an expression """
         if isinstance(self.value, str):
-            # TODO: this should deserialize to return the proper type
-            # Then the PropertyValue needs to know its type?
-            return self.evaluator.evaluate(signal or Signal())
+            value = self.evaluator.evaluate(signal or Signal())
+            return self._property.deserialize(value)
         elif self.value is not None or self._property.kwargs["allow_none"]:
             return self.value
         else:
