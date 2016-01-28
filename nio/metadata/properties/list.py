@@ -70,8 +70,7 @@ class ListProperty(TypedProperty):
             list_obj_inst = self._list_obj_type()
 
             # Figure out what form of deserialization will happen
-            if issubclass(self._list_obj_type, Property) or \
-                    issubclass(self._list_obj_type, BaseProperty):
+            if issubclass(self._list_obj_type, Property):
                 # the items are properties, we will call deserialize
                 list_obj_inst.__set__(self, list_obj_inst.deserialize(element))
             elif issubclass(self._list_obj_type, PropertyHolder):
@@ -79,6 +78,8 @@ class ListProperty(TypedProperty):
                 list_obj_inst.from_dict(element)
             else:
                 # They are some other type, assign val to object
+                # TODO: if the item is a BaseProperty, do we need to do
+                # something special?
                 list_obj_inst = element
 
             list_to_assign.append(list_obj_inst)

@@ -15,10 +15,20 @@ class PropertyValue:
 
     def _validate_value(self):
         # Check that the value is the correct type
-        self._property.deserialize(self.value)
+        if not self.is_expression():
+            # The value doesn't need to be vaildated if it's an expression
+            self._property.deserialize(self.value)
         # Check if we are setting None if that's now allowed
         if not self._property.kwargs["allow_none"] and self.value is None:
             raise AllowNoneViolation
+
+    def is_expression(self):
+        # TODO: this code should not be both here and in evaluator
+        try:
+            return "{{" in self.value and \
+                    "}}" in self.value
+        except:
+            return False
 
     def __call__(self, signal=None):
         """ Return value, evaluated if it is an expression """

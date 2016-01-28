@@ -13,15 +13,18 @@ class TestIntProperty(NIOTestCase):
     def test_default(self):
         container = ContainerClass()
         self.assertIsNotNone(container.property)
-        self.assertEqual(container.property(), 0)
-        self.assertEqual(container.default.default, 1)
+        with self.assertRaises(Exception):
+            container.property()
+        self.assertEqual(container.default(), 1)
+        # TODO: add ability to get 'default' from PropertyValue
+        #self.assertEqual(container.default.default, 1)
 
     def test_expression(self):
         container = ContainerClass()
         container.property = "{{ 1 + 2 }}"
         self.assertIsNotNone(container.property)
         self.assertEqual(container.property(), 3)
-        self.assertEqual(container.default.default, 1)
+        #self.assertEqual(container.default.default, 1)
 
     def test_expression_with_signal(self):
         container = ContainerClass()

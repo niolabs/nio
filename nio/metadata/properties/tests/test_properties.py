@@ -44,18 +44,18 @@ class TestProperties(NIOTestCase):
     def test_validate_dict(self):
         container = ContainerClass
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             container.validate_dict({'int_property': 'foo'})
 
         with self.assertRaises(ValueError):
             container.validate_dict({'float_property': 'foo'})
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             container.validate_dict({
                 'list_property': [{'int_property': 'foo'}]
             })
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             container.validate_dict({
                 'object_property': {
                     'int_property': 'bar'
