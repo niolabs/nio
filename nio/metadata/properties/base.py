@@ -1,5 +1,4 @@
 from weakref import WeakKeyDictionary
-from nio.metadata.properties.exceptions import AllowNoneViolation
 from nio.metadata.properties.expression.property_value import PropertyValue
 
 
@@ -15,14 +14,15 @@ class BaseProperty:
 
     def __init__(self, _type, title=None,
                  visible=True, allow_none=False, **kwargs):
-        self.type = _type
-        self.default = kwargs.get("default", None)
-        self._default_property_value = PropertyValue(self, self.default)
-
         kwargs["title"] = title
         kwargs["visible"] = visible
         kwargs["allow_none"] = allow_none
         self.kwargs = kwargs
+
+        self.type = _type
+        self.default = kwargs.get("default", None)
+        self._default_property_value = PropertyValue(
+            self, self.default, validate=False)
 
         self._values = WeakKeyDictionary()
 
@@ -47,11 +47,6 @@ class BaseProperty:
 
     def __set__(self, instance, value):
         """ Save the value as a PropertyValue """
-        # First check that the value is the correct type
-        self.deserialize(value)
-        # Check if we are setting None if that's now allowed
-        if not self.kwargs["allow_none"] and value is None:
-            raise AllowNoneViolation
         property_value = PropertyValue(self, value)
         self._values[instance] = property_value
 
