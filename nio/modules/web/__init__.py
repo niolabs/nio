@@ -4,9 +4,6 @@
 
 """
 from nio.modules.proxy import ModuleProxy
-# from nio.common.command.security import SecureCommand
-# from nio.modules.security.permissions.authorizer import has_permission
-# from nio.modules.security.condition import SecureCondition
 
 
 class WebHandler(object):
@@ -50,25 +47,6 @@ class RESTHandler(WebHandler):
 
     def on_options(self, request, response):
         raise NotImplementedError()
-
-    def _set_security(self):
-        pass
-        # self.commands = \
-            # [SecureCommand(api_endpoint,
-                           # SecureCondition(name, True,
-                                           # has_permission(permissions)))
-             # for (api_endpoint, name, permissions) in
-             # self.get_security_descriptors()]
-
-    @staticmethod
-    def get_security_descriptors():
-        """ To be overriden by handlers securing their endpoints
-
-        Returns:
-            list of tuples with following format:
-                (api_endpoint (str), name (str), permissions (str))
-        """
-        return []
 
 
 class WebServer(object):
