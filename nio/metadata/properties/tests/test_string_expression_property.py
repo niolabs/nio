@@ -1,4 +1,5 @@
 from inspect import isclass
+from unittest import skip
 from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.block.base import Block
 from nio.common.signal.base import Signal
@@ -156,6 +157,14 @@ class TestEvalSignal(EvalSignalTestCase):
         self.make_signal("From amk Thu May 14 19:12:10 1998")
         self.signal_test("{{re.match(r'From\s+', $v1).group(0)}}", 'From ',
                          True, True)
+
+    @skip("TODO: Allow access to signal attrs with numeric chars")
+    def test_signal_key_as_int(self):
+        """Ensure that signals are evaluated correctly
+        """
+
+        self.signal = Signal({'1': 2})
+        self.signal_test("{{ $1 }}", str(2), True, True)
 
     def test_math(self):
         """Ensure math operations are allowed
