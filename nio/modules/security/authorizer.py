@@ -5,7 +5,7 @@ class Unauthorized(Exception):
 
     """ Unauthorized security Exception
 
-    Exception triggered when the user using the system is not authorized
+    Exception triggered when a user is not authorized to perform a task
     """
     pass
 
@@ -30,7 +30,34 @@ class Authorizer(ModuleProxy):
 
     @classmethod
     def authorize_multiple(cls, user, *tasks, meet_all=True):
-        """ Authorize a user against multiple tasks """
+        """ Authorize a user against multiple tasks.
+
+        This method is provided as a helper to authorize a user against
+        multiple tasks. It will call Authorizer.authorize. You may override
+        this in your implementation if it is needed for some reason, but it
+        is recommended to leave it.
+
+        Example:
+            This example ensures that the user can perform t1 OR t2.
+            >>> Authorizer.authorize_multiple(
+                    User('test'), SecureTask('t1'), SecureTask('t2'),
+                    meet_all=False)
+
+        Args:
+            user (User): A user object to check permissions against
+            *tasks (list of SecureTasks): In a *args strucutre, pass in any
+                number of SecureTask objects to check that the user can perform
+            meet_all (bool): Whether or not the user must be able to perform
+                all of the tasks or just one. The method will short-circuit
+                as expected for either value of this bool.
+
+        Returns:
+            None: Same as the Authorizer.authorize method
+
+        Raises:
+            Unauthorized: Just like Authorizer.authorize, this will raise
+                an exception if the user cannot perform the tasks.
+        """
         for task in tasks:
             if meet_all:
                 # Since they all need to pass, just try them, if one fails
