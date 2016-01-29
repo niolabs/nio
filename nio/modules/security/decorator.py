@@ -4,6 +4,7 @@
 
 """
 import threading
+from nio.modules.security.task import SecureTask
 from nio.modules.security.authorizer import Authorizer, Unauthorized
 
 
@@ -15,7 +16,9 @@ class protected_access(object):
     """
 
     def __init__(self, *tasks, meet_all=True):
-        self._tasks = tasks
+        self._tasks = [task if isinstance(task, SecureTask)
+                       else SecureTask(task)
+                       for task in tasks]
         self._meet_all = meet_all
 
     def __call__(self, f):

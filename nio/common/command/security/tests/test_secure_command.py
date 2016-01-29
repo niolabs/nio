@@ -37,6 +37,7 @@ class TestCommand(NIOTestCase):
         self.assertIsInstance(cmds['cmd_with_params'], Command)
         self.assertIsInstance(cmds['cmd_without_params'], Command)
         self.assertIsInstance(cmds['to_be_renamed'], SecureCommand)
+        self.assertIsInstance(cmds['secure_single_task'], SecureCommand)
         self.assertIsInstance(cmds['secure_any_task'], SecureCommand)
         self.assertIsInstance(cmds['secure_all_tasks'], SecureCommand)
 

@@ -26,10 +26,6 @@ class StaticHandler(WebHandler):
 
 class RESTHandler(WebHandler):
 
-    def __init__(self, route):
-        super().__init__(route)
-        self._set_security()
-
     def is_collection(self):
         return False
 
