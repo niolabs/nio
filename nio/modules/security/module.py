@@ -1,24 +1,19 @@
-from nio.modules.security.auth import Authenticator
-from nio.modules.security.permissions import PermissionsProvider
-from nio.modules.security.roles import RolesProvider
+from nio.modules.security.authenticator import Authenticator
+from nio.modules.security.authorizer import Authorizer
 from nio.modules.module import Module
 
 
 class SecurityModule(Module):
 
-    def proxy_auth_class(self, auth_class):
-        Authenticator.proxy(auth_class)
+    def proxy_authenticator_class(self, authn_class):
+        Authenticator.proxy(authn_class)
 
-    def proxy_permissions_class(self, permissions_class):
-        PermissionsProvider.proxy(permissions_class)
-
-    def proxy_roles_class(self, roles_class):
-        RolesProvider.proxy(roles_class)
+    def proxy_authorizer_class(self, authz_class):
+        Authorizer.proxy(authz_class)
 
     def finalize(self):
         Authenticator.unproxy()
-        RolesProvider.unproxy()
-        PermissionsProvider.unproxy()
+        Authorizer.unproxy()
         super().finalize()
 
     def get_module_order(self):

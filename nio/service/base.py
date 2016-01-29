@@ -9,12 +9,13 @@ from nio.metadata.properties import PropertyHolder, VersionProperty, \
 from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
-from nio.modules.security.permissions.authorizer import has_permission
+from nio.modules.security.task import SecureTask
 from nio.util.runner import Runner
 from nio.common import RunnerStatus
 
 
 class BlockExecution(PropertyHolder):
+
     """ Defines a single block execution within a potential execution graph
     A block execution is defined by a block name (name) and a set of block
     receivers where each receiver is identified by a block name.
@@ -27,6 +28,7 @@ class BlockExecution(PropertyHolder):
 
 
 class BlockMapping(PropertyHolder):
+
     """ Allows a mapping of a given block based on another block
     This information is parsed/used internally by the core system
     """
@@ -40,8 +42,8 @@ class BlockMapping(PropertyHolder):
 @command('status', method="full_status")
 @command('heartbeat')
 @command('runproperties')
-@command_security('start', True, has_permission('services.start'))
-@command_security('stop', True, has_permission('services.stop'))
+@command_security('start', SecureTask('services.start'))
+@command_security('stop', SecureTask('services.stop'))
 @discoverable
 class Service(PropertyHolder, CommandHolder, Runner):
 

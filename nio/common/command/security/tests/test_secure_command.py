@@ -1,44 +1,26 @@
+from unittest.mock import patch
 from nio.common.command import command, Command
 from nio.common.command.holder import CommandHolder
 from nio.common.command.params.int import IntParameter
 from nio.common.command.params.string import StringParameter
 from nio.common.command.security import command_security, SecureCommand
-from nio.modules.security.authorize.user import user_is
-from nio.modules.security.permissions.authorizer import has_permission
-from nio.modules.security.authorize.role import in_role
-from nio.modules.security.condition import SecureCondition
+from nio.modules.security.authorizer import Authorizer, Unauthorized
+from nio.modules.security.task import SecureTask
 from nio.modules.security.user import User
 from nio.util.support.test_case import NIOTestCase
 
 
-@command_security('walk', True,
-                  has_permission('*'),
-                  user_is('peter'),
-                  in_role('admin'))
-@command('talk', StringParameter("phrase"), IntParameter("times"))
-@command('walk', IntParameter("steps"))
-@command('sleep')
-@command_security('f_john', True, user_is('john'))
-@command_security('f_either', False, user_is('john'), user_is('ben'))
-@command_security('f_admin', False, in_role('admin'))
-@command_security('f_perm', False,
-                  has_permission(['delete_block', 'delete_service']))
+@command_security('to_be_renamed', SecureTask('t1'))
+@command('cmd_with_params', StringParameter("phrase"), IntParameter("times"))
+@command('cmd_without_params')
+@command('to_be_renamed', IntParameter("steps"))
+@command_security('secure_single_task', SecureTask('valid_john'),
+                  meet_all=True)
+@command_security('secure_any_task', SecureTask('t1'), SecureTask('t2'),
+                  meet_all=False)
+@command_security('secure_all_tasks', SecureTask('t1'), SecureTask('t2'),
+                  meet_all=True)
 class CommandHolderSecure(CommandHolder):
-    pass
-
-
-def is_anonymous(user):
-    return user.name == "Anonymous"
-
-
-@command_security('f_debug', True, is_anonymous)
-class CommandHolderSecure2(CommandHolder):
-    pass
-
-
-@command_security('f_debug', True, has_permission('delete_block'),
-                  123)
-class CommandHolderSecure3(CommandHolder):
     pass
 
 
@@ -51,38 +33,83 @@ class TestCommand(NIOTestCase):
     def test_get_commands(self):
         cmd = CommandHolderSecure()
         cmds = cmd.get_commands()
-        self.assertEqual(7, len(cmds))
-        self.assertEqual(Command, cmds['talk'].__class__)
-        self.assertEqual(Command, cmds['sleep'].__class__)
-        self.assertEqual(SecureCommand, cmds['f_john'].__class__)
-        self.assertEqual(SecureCommand, cmds['f_admin'].__class__)
-        self.assertEqual(SecureCommand, cmds['f_perm'].__class__)
-        self.assertEqual(SecureCommand, cmds['walk'].__class__)
+        self.assertEqual(6, len(cmds))
+        self.assertIsInstance(cmds['cmd_with_params'], Command)
+        self.assertIsInstance(cmds['cmd_without_params'], Command)
+        self.assertIsInstance(cmds['to_be_renamed'], SecureCommand)
+        self.assertIsInstance(cmds['secure_single_task'], SecureCommand)
+        self.assertIsInstance(cmds['secure_any_task'], SecureCommand)
+        self.assertIsInstance(cmds['secure_all_tasks'], SecureCommand)
 
-    # Test can_invoke is available, conditions are set
-    def test_check_commands(self):
-        cmd = CommandHolderSecure()
-        f_john = cmd.get_commands()['f_john']
-        self.assertIsNotNone(f_john)
-        self.assertTrue(f_john.can_invoke(User('john')))
-        self.assertFalse(f_john.can_invoke(None))
-        self.assertTrue(SecureCondition, f_john._condition.__class__)
-        self.assertEqual(1, len(f_john._condition._conditions))
-        self.assertTrue(f_john._condition._all)
-        f_either = cmd.get_commands()['f_either']
-        self.assertIsNotNone(f_either)
-        self.assertTrue(f_either.can_invoke(User('ben')))
+    def test_check_single_secure_task(self):
+        """ Make sure a command can be secured with a single task """
+        cmd = CommandHolderSecure().get_commands().get('secure_single_task')
+        self.assertIsInstance(cmd, SecureCommand)
+        # Simulate a successful authorization
+        with patch.object(Authorizer, 'authorize', return_value=None):
+            self.assertTrue(cmd.can_invoke(User('john')))
+        # Simulate a failed authorization
+        with patch.object(Authorizer, 'authorize', side_effect=Unauthorized):
+            self.assertFalse(cmd.can_invoke(User('john')))
 
-    # Test other conditions
-    def test_evaluate_conditions(self):
-        cmd = CommandHolderSecure2()
-        cmd_debug = cmd.get_commands()['f_debug']
-        self.assertIsNotNone(cmd_debug)
-        self.assertTrue(cmd_debug.can_invoke(User('Anonymous')))
+    def test_check_any_secure_task(self):
+        """ Make sure a command can be secured with any of multiple tasks """
+        cmd = CommandHolderSecure().get_commands().get('secure_any_task')
+        self.assertIsInstance(cmd, SecureCommand)
 
-    # Test invalid conditions
-    def test_invalid_conditions(self):
-        cmd = CommandHolderSecure3()
-        cmd_debug = cmd.get_commands()['f_debug']
-        self.assertIsNotNone(cmd_debug)
-        self.assertFalse(cmd_debug.can_invoke(User()))
+        # Simulate two successful authorizations
+        with patch.object(Authorizer, 'authorize', return_value=None) as auth:
+            self.assertTrue(cmd.can_invoke(User('john')))
+            # Authorize should only be called once since we can short circuit
+            # after the first success
+            self.assertEqual(auth.call_count, 1)
+
+        # Simulate one failed and one successful authorization
+        with patch.object(Authorizer, 'authorize',
+                          side_effect=[Unauthorized, None]) as auth:
+            self.assertTrue(cmd.can_invoke(User('john')))
+            # Authorize should have been called with 2 different tasks
+            self.assertEqual(auth.call_count, 2)
+
+        # Simulate two failed authorizations
+        with patch.object(Authorizer, 'authorize',
+                          side_effect=[Unauthorized, Unauthorized]) as auth:
+            self.assertFalse(cmd.can_invoke(User('john')))
+            self.assertEqual(auth.call_count, 2)
+
+    def test_check_all_secure_task(self):
+        """ Make sure a command can be secured with all of multiple tasks """
+        cmd = CommandHolderSecure().get_commands().get('secure_all_tasks')
+        self.assertIsInstance(cmd, SecureCommand)
+
+        # Simulate two successful authorizations
+        with patch.object(Authorizer, 'authorize', return_value=None) as auth:
+            self.assertTrue(cmd.can_invoke(User('john')))
+            # Authorize should have been called with 2 different tasks
+            self.assertEqual(auth.call_count, 2)
+
+        # Simulate one failed and one successful authorization
+        with patch.object(Authorizer, 'authorize',
+                          side_effect=[None, Unauthorized]) as auth:
+            self.assertFalse(cmd.can_invoke(User('john')))
+            # Authorize should have been called with 2 different tasks
+            self.assertEqual(auth.call_count, 2)
+
+        # Simulate two failed authorizations
+        with patch.object(Authorizer, 'authorize',
+                          side_effect=[Unauthorized, Unauthorized]) as auth:
+            self.assertFalse(cmd.can_invoke(User('john')))
+            # Authorize should only be called once since we can short circuit
+            # after the first success
+            self.assertEqual(auth.call_count, 1)
+
+    def test_check_renamed_command(self):
+        """ Make sure a renamed command can be secured """
+        cmd = CommandHolderSecure().get_commands().get('to_be_renamed')
+        self.assertIsInstance(cmd, SecureCommand)
+        # Simulate a successful authorization
+        with patch.object(Authorizer, 'authorize', return_value=None):
+            self.assertTrue(cmd.can_invoke(User('john')))
+        # Simulate a failed authorization
+        with patch.object(Authorizer, 'authorize', side_effect=Unauthorized):
+            self.assertFalse(cmd.can_invoke(User('john')))
