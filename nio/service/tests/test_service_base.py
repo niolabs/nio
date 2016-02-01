@@ -3,7 +3,7 @@ from unittest.mock import Mock
 from nio.router.base import BlockRouter
 from nio.service.base import Service
 from nio.service.context import ServiceContext
-from nio.common.signal.base import Signal
+from nio.signal.base import Signal
 from nio.util.support.test_case import NIOTestCaseNoModules
 
 

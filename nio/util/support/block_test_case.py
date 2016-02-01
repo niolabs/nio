@@ -7,7 +7,7 @@ from nio.router.base import InvalidBlockOutput
 from nio.util.support.test_case import NIOTestCase
 from nio.router.base import BlockRouter
 from nio.block.context import BlockContext
-from nio.common.signal.status import StatusSignal
+from nio.signal.status import StatusSignal
 
 
 class TestBlockRouter(BlockRouter):

@@ -14,7 +14,7 @@ from nio.modules.persistence import Persistence
 from nio.block.context import BlockContext
 from nio.block.terminals import Terminal, TerminalType, input, output
 from nio.util.runner import Runner
-from nio.common.signal.status import BlockStatusSignal
+from nio.signal.status import BlockStatusSignal
 
 
 @input("default")
@@ -132,7 +132,7 @@ class Block(PropertyHolder, CommandHolder, Runner):
         if isinstance(signal, BlockStatusSignal):
             # set service block is part of
             signal.service_name = self._service_name
-            signal.name = self.name
+            signal.block_name = self.name
             self.status.add(signal.status)
         self._block_router.notify_management_signal(self, signal)
 
