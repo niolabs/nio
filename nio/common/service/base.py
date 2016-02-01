@@ -7,7 +7,8 @@ from nio.common.command.holder import CommandHolder
 from nio import discoverable
 from nio.common.versioning.dependency import DependsOn
 from nio.metadata.properties import PropertyHolder, VersionProperty, \
-    BoolProperty, ListProperty, StringProperty, VarProperty, SelectProperty
+    BoolProperty, ListProperty, StringProperty, SelectProperty
+from nio.metadata.properties.base import BaseProperty
 from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
@@ -17,7 +18,7 @@ from nio.util.flags_enum import FlagsEnum
 
 class BlockExecution(PropertyHolder):
     name = StringProperty()
-    receivers = VarProperty()
+    receivers = BaseProperty()
 
 
 class BlockMapping(PropertyHolder):

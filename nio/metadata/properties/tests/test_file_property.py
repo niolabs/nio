@@ -32,11 +32,11 @@ class TestFileProperty(NIOTestCase):
 
         container = FileContainerClass()
         self.assertEqual(container.file_property.value, "default_filename")
-        self.assertIsNone(container.file_property.file)
+        self.assertIsNone(container.file_property().file)
 
         container.file_property = __file__
         self.assertIsNotNone(container.file_property)
-        self.assertTrue(isfile(container.file_property.file))
+        self.assertTrue(isfile(container.file_property().file))
 
     def test_with_on_property(self):
         """ Asserts that 'with' construct works as expected
@@ -49,7 +49,7 @@ class TestFileProperty(NIOTestCase):
         container = FileContainerClass()
         container.file_property = self.tmp_block_file
 
-        with container.file_property as my_stream:
+        with container.file_property() as my_stream:
             line = my_stream.read(len(file_contents))
             self.assertEqual(line, file_contents)
 
@@ -57,6 +57,7 @@ class TestFileProperty(NIOTestCase):
         """ Asserts 'mode' keyword argument when defining property
         """
 
+        # Populate test file with some text
         file_contents = 'file contents, to be deleted'
         with open(self.tmp_block_file, "+w") as my_stream:
             print(file_contents, file=my_stream)
@@ -64,14 +65,14 @@ class TestFileProperty(NIOTestCase):
         container = FileContainerClass()
         container.file_property = self.tmp_block_file
 
-        with container.file_property as my_stream:
+        with container.file_property() as my_stream:
             with self.assertRaises(UnsupportedOperation):
                 my_stream.write("not allowed")
 
         container = FileWritableContainerClass()
         container.file_property = self.tmp_block_file
         new_contents = "allowed"
-        with container.file_property as my_stream:
+        with container.file_property() as my_stream:
             # write from the beginning
             my_stream.seek(0)
             print(new_contents, file=my_stream)
@@ -87,8 +88,8 @@ class TestFileProperty(NIOTestCase):
         container = FileContainerClass()
         # build absolute path to this test file
         container.file_property = __file__
-        self.assertTrue(isfile(container.file_property.file))
-        self.assertEqual(container.file_property.file, __file__)
+        self.assertTrue(isfile(container.file_property().file))
+        self.assertEqual(container.file_property().file, __file__)
 
     def test_relative_file_to_working_dir(self):
         """ Assert that a file from the cwd can be accessed only by name """
@@ -100,6 +101,6 @@ class TestFileProperty(NIOTestCase):
         # We are going to pretend that our working directory is one level up
         # from this test file's test directory
         with patch('os.getcwd', return_value=dirname(dirname(__file__))):
-            self.assertIsNotNone(container.file_property.file)
-            self.assertTrue(isfile(container.file_property.file))
-            self.assertEqual(container.file_property.file, __file__)
+            self.assertIsNotNone(container.file_property().file)
+            self.assertTrue(isfile(container.file_property().file))
+            self.assertEqual(container.file_property().file, __file__)

@@ -1,11 +1,11 @@
 from nio.metadata.types.base import Type
 
 
-class StringType(Type):
+class BoolType(Type):
 
     @staticmethod
     def data_type():
-        return "str"
+        return "bool"
 
     @staticmethod
     def serialize(value, **kwargs):
@@ -14,8 +14,8 @@ class StringType(Type):
 
     @staticmethod
     def deserialize(value, **kwargs):
-        """ Convert value to string """
+        """ Convert value to bool"""
         try:
-            return str(value)
+            return bool(value)
         except:
-            raise TypeError("Unable to cast value to a string")
+            raise TypeError("Unable to cast value to bool: {}".format(value))

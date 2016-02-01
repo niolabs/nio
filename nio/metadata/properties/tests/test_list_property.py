@@ -14,9 +14,9 @@ class ContainedClass(PropertyHolder):
 
 
 class ContainerClass(PropertyHolder):
-    native_list = ListProperty(int)
+    native_list = ListProperty(int, default=[1])
     holder_list = ListProperty(ContainedClass, default=[ContainedClass()])
-    property_list = ListProperty(IntProperty)
+    property_list = ListProperty(IntProperty, default=[IntProperty(default=2)])
 
 
 class TestListProperties(NIOTestCase):
@@ -64,6 +64,7 @@ class TestListProperties(NIOTestCase):
         container.holder_list = self.holder_list_to_use
 
         # Now make sure getting the list gets the same one
+        self.maxDiff = None
         self.assertEqual(self.holder_list_to_use, container.holder_list())
 
     def test_property_type(self):
@@ -85,12 +86,13 @@ class TestListProperties(NIOTestCase):
         container_1.holder_list = self.holder_list_to_use
         container_1.property_list = self.prop_list_to_use
 
-        container_2 = ContainerClass()
         # Load container 2 with the dictionary of container 1
+        container_2 = ContainerClass()
         one = container_1.to_dict()
         container_2.from_dict(one)
+        two = container_2.to_dict()
 
-        self.assertEqual(container_1.to_dict(), container_2.to_dict())
+        self.assertEqual(one, two)
 
     def test_bad_dict(self):
         """Make sure attempts to deserialize something not a list
@@ -101,7 +103,8 @@ class TestListProperties(NIOTestCase):
         }
         container_1 = ContainerClass()
 
-        self.assertRaises(TypeError, container_1.from_dict, invalid_props)
+        with self.assertRaises(TypeError):
+            container_1.from_dict(invalid_props)
 
     def test_expression(self):
         container = ContainerClass()
@@ -119,3 +122,13 @@ class TestListProperties(NIOTestCase):
         self.assertEqual(container.holder_list()[0].
                          expression_property(Signal({'value': 'signal'})),
                          'signal')
+
+    def test_defaults(self):
+        defaults = ContainerClass.get_serializable_defaults()
+        # TODO: test these other list types
+        #self.assertEqual(defaults["native_list"], {})
+        self.assertEqual(defaults["holder_list"],
+                         [{'string_property': 'str',
+                           'int_property': 5,
+                           'expression_property' : '{{ $value }}'}])
+        #self.assertEqual(defaults["property_list"], {})

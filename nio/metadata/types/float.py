@@ -1,11 +1,11 @@
 from nio.metadata.types.base import Type
 
 
-class StringType(Type):
+class FloatType(Type):
 
     @staticmethod
     def data_type():
-        return "str"
+        return "float"
 
     @staticmethod
     def serialize(value, **kwargs):
@@ -14,8 +14,8 @@ class StringType(Type):
 
     @staticmethod
     def deserialize(value, **kwargs):
-        """ Convert value to string """
+        """ Convert value to float """
         try:
-            return str(value)
+            return float(value)
         except:
-            raise TypeError("Unable to cast value to a string")
+            raise TypeError("Unable to cast value to float: {}".format(value))

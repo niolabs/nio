@@ -10,9 +10,9 @@ class Type:
         return ""
 
     @staticmethod
-    def serialize(value):
+    def serialize(value, **kwargs):
         return value
 
     @staticmethod
-    def deserialize(value):
+    def deserialize(value, **kwargs):
         return value

@@ -15,30 +15,27 @@ class PropertyValue:
 
     def _validate_value(self):
         # Check that the value is the correct type
-        if not self.is_expression():
-            # The value doesn't need to be vaildated if it's an expression
-            self._property.deserialize(self.value)
+        self._property.deserialize(self.value, **self._property.kwargs)
         # Check if we are setting None if that's now allowed
         if not self._property.kwargs["allow_none"] and self.value is None:
             raise AllowNoneViolation
 
-    def is_expression(self):
-        # TODO: this code should not be both here and in evaluator
-        try:
-            return "{{" in self.value and \
-                    "}}" in self.value
-        except:
-            return False
-
     def __call__(self, signal=None):
         """ Return value, evaluated if it is an expression """
+        from nio.metadata.properties.holder import PropertyHolder
         if isinstance(self.value, str):
+            # Evaluate and deserialize string since they might be expressions
             value = self.evaluator.evaluate(signal or Signal())
-            return self._property.deserialize(value)
+            return self._property.deserialize(value, **self._property.kwargs)
+        elif self.value is not None and isinstance(self.value, PropertyHolder):
+            # Return property holders as they are
+            return self.value
         elif self.value is not None:
-            return self._property.deserialize(self.value)
+            # Deserialize properties
+            return self._property.deserialize(self.value,
+                                            **self._property.kwargs)
         elif self.value is None and self._property.kwargs["allow_none"]:
+            # Return None if it is allowed
             return None
         else:
             raise Exception("Property value None is not allowed")
-

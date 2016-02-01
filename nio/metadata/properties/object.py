@@ -1,9 +1,11 @@
-from nio.metadata.properties.typed import TypedProperty
+from nio.metadata.properties.base import BaseProperty
 from nio.metadata.properties.holder import PropertyHolder
+from nio.metadata.types.object import ObjectType
 
 
-class ObjectProperty(TypedProperty):
+class ObjectProperty(BaseProperty):
     """ Defines a property for an object type.
+
     Object types contain properties themselves, and must inherit from
     PropertyHolder just like the parent class.
 
@@ -14,48 +16,49 @@ class ObjectProperty(TypedProperty):
 
         Args:
             obj_type (class): class type which is an instance of PropertyHolder
-
-        Keyword Args:
-            Property definitions
-
-        Raises:
-            TypeError: if the object type is not a PropertyHolder
-
         """
         # Validate that the object is a PropertyHolder
         if not issubclass(obj_type, PropertyHolder):
             raise TypeError("Specified object type %s is not a PropertyHolder"
                             % obj_type.__class__)
+        kwargs['obj_type'] = obj_type
+        super().__init__(ObjectType, **kwargs)
+        self.description = self._get_description(**kwargs)
 
-        super().__init__(obj_type, **kwargs)
+    def _get_description(self, **kwargs):
+        """ Description needs to be json serializable """
+        kwargs.update(self._prepare_default(**kwargs))
+        description = dict(type=self.type.data_type(), **kwargs)
+        description.update(self._prepare_template(**kwargs))
+        description['obj_type'] = str(kwargs['obj_type'])
+        return description
 
-    def serialize(self, instance):
-        value = self.__get__(instance, self.__class__)
-        if value is not None:
-            return value().to_dict()
+    def _prepare_template(self, **kwargs):
+        # add object description
+        try:
+            sub_description = self.kwargs["obj_type"]().get_description()
+        except:
+            try:
+                sub_description = self.kwargs["obj_type"].__name__
+            except:
+                sub_description = str(self.kwargs["obj_type"])
+        return {"template": sub_description}
 
-    def deserialize(self, value):
-        sub_instance = self._type()
-        sub_instance.from_dict(value)
-        return sub_instance
+    def _prepare_default(self, **kwargs):
+        """ default in description should be serializable """
+        default = kwargs.get('default', None)
+        if isinstance(default, PropertyHolder):
+            default = default.to_dict()
+        return {"default": default}
 
-    def get_description(self):
-        description = super().get_description()
+    def x_get_description(self):
         # add internal object description
         description.update({"template": self._type().get_description()})
         return description
 
     @property
-    def default(self):
+    def xdefault(self):
         if isinstance(self._default, PropertyHolder):
             return self._default.get_defaults()
         else:
             return super().default
-
-    def get_type_name(self):
-        """ Specifies the type name to return.
-
-        We want to return a type name of "object" rather than the individual
-        type's class name.
-        """
-        return "object"

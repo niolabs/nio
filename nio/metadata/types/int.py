@@ -8,12 +8,12 @@ class IntType(Type):
         return "int"
 
     @staticmethod
-    def serialize(value):
+    def serialize(value, **kwargs):
         """ Convert a value to a JSON serializable value """
         return value
 
     @staticmethod
-    def deserialize(value):
+    def deserialize(value, **kwargs):
         """ Convert value to int """
         try:
             return int(value)

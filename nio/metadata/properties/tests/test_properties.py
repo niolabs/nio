@@ -22,9 +22,9 @@ class ContainerClass(PropertyHolder):
     string_property = StringProperty(default='')
     int_property = IntProperty(default=0)
     float_property = FloatProperty(default=0.0)
-    object_property = ObjectProperty(ContainedClass)
-    list_property = ListProperty(ContainedClass)
-    td_property = TimeDeltaProperty()
+    object_property = ObjectProperty(ContainedClass, default=ContainedClass())
+    list_property = ListProperty(ContainedClass, default=[])
+    td_property = TimeDeltaProperty(default={"seconds":0})
 
     def __init__(self):
         super().__init__()
@@ -47,7 +47,7 @@ class TestProperties(NIOTestCase):
         with self.assertRaises(TypeError):
             container.validate_dict({'int_property': 'foo'})
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             container.validate_dict({'float_property': 'foo'})
 
         with self.assertRaises(TypeError):
@@ -62,7 +62,7 @@ class TestProperties(NIOTestCase):
                 }
             })
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             container.validate_dict({
                 'object_property': {
                     'float_property': 'bar'
@@ -136,7 +136,7 @@ class TestProperties(NIOTestCase):
             container.int_property = "string"
 
         with self.assertRaises(TypeError):
-            container.float_property = 1
+            container.float_property = "string"
 
         with self.assertRaises(TypeError):
             container.object_property = 1
@@ -238,7 +238,6 @@ class TestProperties(NIOTestCase):
         # assert that descriptions do not depend on instance values
         self.assertEqual(description, description1)
 
-        print(description)
         self.assertIn('string_property', description)
         self.assertIn('int_property', description)
         self.assertIn('float_property', description)

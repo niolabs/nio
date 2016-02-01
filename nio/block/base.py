@@ -28,7 +28,8 @@ class Block(PropertyHolder, CommandHolder):
     version = VersionProperty(version='0.0.0')
     type = StringProperty(visible=False, readonly=True)
     name = StringProperty(default=__name__, visible=False)
-    log_level = SelectProperty(LogLevel, title="Log Level", default="NOTSET")
+    log_level = SelectProperty(enum=LogLevel,
+                               title="Log Level", default="NOTSET")
 
     def __init__(self):
         """ Create a new block instance.

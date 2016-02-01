@@ -5,9 +5,12 @@ from nio.util.support.test_case import NIOTestCase
 
 class TestBaseProperty(NIOTestCase):
 
+    def _value_passthrough(self, value, **kwargs):
+        return value
+
     def test_set_and_get_value(self):
         type = MagicMock()
-        type.deserialize = lambda value: value
+        type.deserialize = self._value_passthrough
         instance = MagicMock()
         property = BaseProperty(type)
         set_values = ["", "string", 1, {}, []]
@@ -40,8 +43,8 @@ class TestBaseProperty(NIOTestCase):
 
     def test_serialize(self):
         type = MagicMock()
-        type.serialize = lambda value: value
-        type.deserialize = lambda value: value
+        type.deserialize = self._value_passthrough
+        type.serialize = self._value_passthrough
         instance = MagicMock()
         property = BaseProperty(type)
         value = 'value'
@@ -50,7 +53,7 @@ class TestBaseProperty(NIOTestCase):
 
     def test_deserialize(self):
         type = MagicMock()
-        type.deserialize = lambda value: value
+        type.deserialize = self._value_passthrough
         property = BaseProperty(type)
         value = 'value'
         self.assertEqual(value, property.deserialize(value))

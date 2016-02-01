@@ -1,68 +1,32 @@
 from enum import Enum
-from nio.metadata.properties.typed import TypedProperty
+from nio.metadata.properties.base import BaseProperty
+from nio.metadata.types.select import SelectType
 
 
-class SelectProperty(TypedProperty):
+class SelectProperty(BaseProperty):
 
-    """ Defines a property for an object type.
-    Object types contain properties themselves, and must inherit from
-    PropertyHolder just like the parent class.
+    def __init__(self, enum, **kwargs):
+        kwargs['enum'] = enum
+        super().__init__(SelectType, **kwargs)
+        self.description = self._get_description(**kwargs)
 
-    """
+    def _get_description(self, **kwargs):
+        """ Description needs to be json serializable """
+        kwargs.update(self._prepare_options(kwargs['enum']))
+        kwargs.update(self._prepare_default(**kwargs))
+        kwargs['enum'] = str(kwargs['enum'])
+        return dict(type=SelectType.data_type(), **kwargs)
 
-    def __init__(self, enum_type, **kwargs):
-        """ Initializes the property.
-
-        Args:
-            name (str): property name
-            options (dict): select options
-
-        Keyword Args:
-            Property definitions
-
-        """
-
-        # Looking for a default, try using index 1
-        default = kwargs.get("default")
-        if not default:
-            kwargs['default'] = enum_type(0)
-
-        super().__init__(Enum, **kwargs)
-        self.enum_type = enum_type
-
-    def serialize(self, instance):
-        value = self.__get__(instance, self.__class__)()
-        if value is not None and isinstance(value, Enum):
-            return value.name
-
-        return str(value)
-
-    def deserialize(self, value):
-        if isinstance(value, Enum):
-            return value
-
-        for name, member in self.enum_type.__members__.items():
-            if name == value or member.value == value:
-                return member
-
-        raise TypeError(
-            "{0} does not match enum type: {1}".format(value, self.enum_type))
-
-    def get_description(self):
-        description = super().get_description()
-        default = description['default']
-        if isinstance(default, Enum):
-            description['default'] = default.value
+    def _prepare_options(self, enum):
         # add internal object description
-        descr = {}
-        for val in list(self.enum_type):
-            descr[val.name] = val.value
-        description.update({"options": descr})
-        return description
+        options = {}
+        for val in list(enum):
+            options[val.name] = val.value
+        return {"options": options}
 
-    def get_type_name(self):
-        return "select"
-
-    @property
-    def default(self):
-        return self._default
+    def _prepare_default(self, **kwargs):
+        """ default in description should be serializable """
+        default = kwargs.get('default', None)
+        if isinstance(default, Enum):
+            default = default.value
+        return {"default": default}

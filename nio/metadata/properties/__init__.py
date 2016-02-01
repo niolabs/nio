@@ -8,5 +8,4 @@ from .select import SelectProperty
 from .string import StringProperty
 from .timedelta import TimeDeltaProperty
 from .version import VersionProperty
-from .var import VarProperty
 from .file import FileProperty

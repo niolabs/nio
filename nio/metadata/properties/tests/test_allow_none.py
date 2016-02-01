@@ -25,7 +25,6 @@ class TestAllowNone(NIOTestCase):
         # make sure valid definitions are in the class
         self.assertIsNotNone(properties.allow_none_property)
         self.assertIsNotNone(properties.not_allow_none_property)
-
         # make sure invalid definition does not make it to the class
         with self.assertRaises(AttributeError):
             properties.invalid_not_allow_none_property
@@ -36,16 +35,23 @@ class TestAllowNone(NIOTestCase):
         properties.allow_none_property = None
         with self.assertRaises(AllowNoneViolation):
             properties.not_allow_none_property = None
-
         # verify good assignments
         properties.allow_none_property = "Some String 1"
         properties.not_allow_none_property = "Some String 2"
 
-    def test_from_dict(self):
+    def test_from_dict_valid(self):
+        properties_to_set = {
+            "allow_none_property": None,
+            "not_allow_none_property": "str1"
+        }
+        properties = Properties()
+        properties.from_dict(properties_to_set)
+
+    def test_from_dict_invalid(self):
         properties_to_set = {
             "allow_none_property": "str1",
             "not_allow_none_property": None
         }
-
         properties = Properties()
-        properties.from_dict(properties_to_set)
+        with self.assertRaises(AllowNoneViolation):
+            properties.from_dict(properties_to_set)

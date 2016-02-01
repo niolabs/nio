@@ -14,8 +14,8 @@ class SampleEnum(Enum):
 class SampleClass(PropertyHolder):
 
     # Note, property name and receiving property have to match
-    select_property = SelectProperty(SampleEnum,
-                                     default=SampleEnum.option3)
+    select_property = \
+        SelectProperty(SampleEnum, default=SampleEnum.option3)
 
 
 class TestProperties(NIOBlockTestCase):
@@ -72,7 +72,7 @@ class TestProperties(NIOBlockTestCase):
         })
 
     def test_deserialize(self):
-        prop = SelectProperty(SampleEnum)
+        prop = SelectProperty(SampleEnum, default=SampleEnum.option1)
         self.assertEqual(prop.deserialize(prop.default), SampleEnum.option1)
         prop = SelectProperty(SampleEnum, default='option1')
         self.assertEqual(prop.deserialize(prop.default), SampleEnum.option1)

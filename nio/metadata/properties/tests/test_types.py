@@ -55,7 +55,8 @@ class ContainerClass(PropertyHolder):
     timedelta_property = TimeDeltaProperty(default={"seconds": 9})
     timedelta_property_no_default = TimeDeltaProperty()
 
-    select_property = SelectProperty(SampleEnum, default=SampleEnum.option2)
+    select_property = SelectProperty(
+        SampleEnum, default=SampleEnum.option2)
     select_property_default_env_variable = \
         SelectProperty(SampleEnum, default='[[ENV_VARIABLE]]')
 

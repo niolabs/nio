@@ -5,11 +5,11 @@ from nio.common.signal.base import Signal
 
 
 class ContainedClass(PropertyHolder):
-    sub_property = StringProperty()
+    sub_property = StringProperty(default='')
 
 
 class ContainerClass(PropertyHolder):
-    property = ObjectProperty(ContainedClass)
+    property = ObjectProperty(ContainedClass, default=ContainedClass())
 
 
 class TestObjectProperty(NIOTestCase):

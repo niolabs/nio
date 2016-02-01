@@ -1,4 +1,3 @@
-from nio.metadata.properties.typed import TypedProperty
 from nio.metadata.properties.base import BaseProperty
 from nio.metadata.properties.timedelta import TimeDeltaProperty
 from nio.common.versioning.check import compare_versions, \
@@ -79,12 +78,12 @@ class PropertyHolder(object):
                 # if it's an ObjectProperty, use the enclosed type and
                 # validate the incoming config.
                 if isinstance(prop, ObjectProperty):
-                    value = prop.type.validate_dict(value)
+                    value = prop.kwargs["obj_type"].validate_dict(value)
 
                 # if the property is a list, validate it's members only if they
                 # are PropertyHolders (i.e. ObjectProperty's)
                 elif isinstance(prop, ListProperty):
-                    list_obj_type = prop.list_obj_type
+                    list_obj_type = prop.kwargs["list_obj_type"]
                     if issubclass(list_obj_type, PropertyHolder):
                         for idx, item in enumerate(value):
                             value[idx] = list_obj_type.validate_dict(item)
@@ -138,8 +137,10 @@ class PropertyHolder(object):
             if property_name in properties:
                 # if the given property was included in the input dictionary,
                 # deserialize the dictionary's value and set it
-                value = prop.deserialize(properties[property_name])
-                setattr(self, property_name, value)
+                #value = prop.deserialize(properties[property_name])
+                #setattr(self, property_name, value)
+                # TODO: do we need to call deserialize first?
+                setattr(self, property_name, properties[property_name])
 
                 if hasattr(prop, "deprecated") and logger:
                     logger.info("Property: {0} is deprecated")
@@ -189,13 +190,14 @@ class PropertyHolder(object):
             (dict): The serializable default values for all properties, indexed
                 by name.
         """
-        props = dict()
-        for (name, prop) in cls.get_class_properties().items():
-            prop_desc = prop.get_description()
-            if 'default' in prop_desc:
-                props[name] = prop_desc['default']
-
-        return props
+        properties = cls.get_class_properties()
+        #TODO not calling serialzing on expressions and env_vars needs to
+        # be somewhere else
+        return {prop_name: prop.type.serialize(prop.default, **prop.kwargs)
+                for prop_name, prop in properties.items()
+                if prop.default and \
+                not prop.is_expression(prop.default) and \
+                not prop.is_env_var(prop.default)}
 
     @classmethod
     def get_class_properties(cls):
@@ -219,8 +221,7 @@ class PropertyHolder(object):
             classes = inspect.getmro(cls)
             for _class in classes:
                 for (prop_name, prop) in _class.__dict__.items():
-                    if ((isinstance(prop, TypedProperty) or
-                         isinstance(prop, BaseProperty)) and
+                    if (isinstance(prop, BaseProperty) and
                         prop_name not in properties):
                         properties[prop_name] = prop
 
