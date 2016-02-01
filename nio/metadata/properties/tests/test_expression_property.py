@@ -1,7 +1,7 @@
 from inspect import isclass
 from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.block.base import Block
-from nio.common.signal.base import Signal
+from nio.signal.base import Signal
 from nio.metadata.properties.expression import ExpressionProperty
 
 
