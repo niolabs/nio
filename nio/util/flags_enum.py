@@ -169,16 +169,13 @@ class FlagsEnum(object):
                 change_occurred = True
                 break
 
-        self._flags = flags
+        self._flags = copy.deepcopy(flags)
         if change_occurred and self._status_change_callback:
             self._status_change_callback(old_status, self)
 
     @property
     def name(self):
         """ Provides a string with all flags currently set
-
-        Args:
-            None
 
         Returns:
             strings with all flag names currently set
