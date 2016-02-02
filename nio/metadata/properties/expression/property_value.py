@@ -17,7 +17,7 @@ class PropertyValue:
         # Check that the value is the correct type
         self._property.deserialize(self.value, **self._property.kwargs)
         # Check if we are setting None if that's now allowed
-        if not self._property.kwargs["allow_none"] and self.value is None:
+        if not self._property.allow_none and self.value is None:
             raise AllowNoneViolation
 
     def __call__(self, signal=None):
@@ -34,7 +34,7 @@ class PropertyValue:
             # Deserialize properties
             return self._property.deserialize(self.value,
                                             **self._property.kwargs)
-        elif self.value is None and self._property.kwargs["allow_none"]:
+        elif self.value is None and self._property.allow_none:
             # Return None if it is allowed
             return None
         else:

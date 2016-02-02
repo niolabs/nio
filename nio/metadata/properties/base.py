@@ -14,12 +14,11 @@ class BaseProperty:
 
     def __init__(self, _type, title=None,
                  visible=True, allow_none=False, **kwargs):
-        kwargs["title"] = title
-        kwargs["visible"] = visible
-        kwargs["allow_none"] = allow_none
-        self.kwargs = kwargs
-
         self.type = _type
+        self.title = title
+        self.visible = visible
+        self.allow_none = allow_none
+        self.kwargs = kwargs
 
         # Default value info
         self._default = kwargs.get("default", None)
@@ -28,8 +27,11 @@ class BaseProperty:
             self, self._default, validate=False)
 
         self._values = WeakKeyDictionary()
-
-        self.description = dict(type=_type.__name__, **kwargs)
+        self.description = dict(type=self.type.__name__,
+                                title=self.title,
+                                visible=self.visible,
+                                allow_none=self.allow_none,
+                                **self.kwargs)
 
     @property
     def default(self):
