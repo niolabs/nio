@@ -3,19 +3,19 @@
 A block contains modular functionality to be used inside of Services. To create
 a custom block, extend this Block class and override the appropriate methods.
 """
-from nio.common.command import command
-from nio.common.command.holder import CommandHolder
-from nio.common.block.router import BlockRouter
-from nio.metadata.properties import PropertyHolder, StringProperty, \
-    VersionProperty, SelectProperty
-from nio.util.logging import get_nio_logger
-from nio.util.logging.levels import LogLevel
-from nio.modules.persistence import Persistence
 from nio.block.context import BlockContext
 from nio.block.terminals import Terminal, TerminalType, input, output
-from nio.util.flags_enum import FlagsEnum
 from nio.common import ComponentStatus
+from nio.common.block.router import BlockRouter
+from nio.common.command import command
+from nio.common.command.holder import CommandHolder
 from nio.common.signal.status import BlockStatusSignal
+from nio.modules.persistence import Persistence
+from nio.properties import PropertyHolder, StringProperty, \
+    VersionProperty, SelectProperty
+from nio.util.flags_enum import FlagsEnum
+from nio.util.logging import get_nio_logger
+from nio.util.logging.levels import LogLevel
 
 
 @input("default")

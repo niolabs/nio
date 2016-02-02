@@ -1,19 +1,19 @@
+from nio import discoverable
 from nio.common import ComponentStatus
 from nio.common.block.router.base import RouterStatus
 from nio.common.block.router.context import RouterContext
 from nio.common.command import command
-from nio.common.command.security import command_security
 from nio.common.command.holder import CommandHolder
-from nio import discoverable
+from nio.common.command.security import command_security
 from nio.common.versioning.dependency import DependsOn
-from nio.metadata.properties import PropertyHolder, VersionProperty, \
-    BoolProperty, ListProperty, StringProperty, SelectProperty
-from nio.metadata.properties.var import VarProperty
-from nio.util.logging import get_nio_logger
-from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
 from nio.modules.security.permissions.authorizer import has_permission
+from nio.properties import PropertyHolder, VersionProperty, \
+    BoolProperty, ListProperty, StringProperty, SelectProperty
+from nio.properties import VarProperty
 from nio.util.flags_enum import FlagsEnum
+from nio.util.logging import get_nio_logger
+from nio.util.logging.levels import LogLevel
 
 
 class BlockExecution(PropertyHolder):
