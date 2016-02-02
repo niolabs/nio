@@ -5,10 +5,6 @@ from nio.metadata.types.base import Type
 class TimeDeltaType(Type):
 
     @staticmethod
-    def data_type():
-        return "timedelta"
-
-    @staticmethod
     def serialize(value, **kwargs):
         """ Convert a value to a JSON serializable value """
         if isinstance(value, timedelta) or isinstance(value, dict):

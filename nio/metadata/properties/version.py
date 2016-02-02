@@ -34,6 +34,3 @@ class VersionProperty(StringProperty):
             raise InvalidVersionFormat("Version: {0} is invalid".format(value))
 
         super().__set__(instance, value)
-
-    def get_type_name(self):
-        return "version"

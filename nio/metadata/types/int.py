@@ -4,10 +4,6 @@ from nio.metadata.types.base import Type
 class IntType(Type):
 
     @staticmethod
-    def data_type():
-        return "int"
-
-    @staticmethod
     def serialize(value, **kwargs):
         """ Convert a value to a JSON serializable value """
         return value

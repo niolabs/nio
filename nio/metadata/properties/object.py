@@ -23,15 +23,14 @@ class ObjectProperty(BaseProperty):
                             % obj_type.__class__)
         kwargs['obj_type'] = obj_type
         super().__init__(ObjectType, **kwargs)
-        self.description = self._get_description(**kwargs)
+        self.description.update(self._get_description(**kwargs))
 
     def _get_description(self, **kwargs):
         """ Description needs to be json serializable """
         kwargs.update(self._prepare_default(**kwargs))
-        description = dict(type=self.type.data_type(), **kwargs)
-        description.update(self._prepare_template(**kwargs))
-        description['obj_type'] = str(kwargs['obj_type'])
-        return description
+        kwargs.update(self._prepare_template(**kwargs))
+        kwargs['obj_type'] = str(kwargs['obj_type'])
+        return kwargs
 
     def _prepare_template(self, **kwargs):
         # add object description

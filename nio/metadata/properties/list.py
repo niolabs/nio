@@ -22,15 +22,14 @@ class ListProperty(BaseProperty):
         """
         kwargs['list_obj_type'] = list_obj_type
         super().__init__(ListType, **kwargs)
-        self.description = self._get_description(**kwargs)
+        self.description.update(self._get_description(**kwargs))
 
     def _get_description(self, **kwargs):
         """ Description needs to be json serializable """
-        description = super().get_description()
-        description.update(self._prepare_template(**kwargs))
-        description.update(self._prepare_default(**kwargs))
-        description['list_obj_type'] = str(kwargs['list_obj_type'])
-        return description
+        kwargs.update(self._prepare_template(**kwargs))
+        kwargs.update(self._prepare_default(**kwargs))
+        kwargs['list_obj_type'] = str(kwargs['list_obj_type'])
+        return kwargs
 
     def _prepare_template(self, **kwargs):
         # add internal object description

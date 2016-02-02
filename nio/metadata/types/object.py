@@ -4,10 +4,6 @@ from nio.metadata.types.base import Type
 class ObjectType(Type):
 
     @staticmethod
-    def data_type():
-        return "object"
-
-    @staticmethod
     def serialize(value, **kwargs):
         """ Convert a value to a JSON serializable value """
         if value is not None:

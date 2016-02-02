@@ -6,10 +6,6 @@ from nio.metadata.types.base import Type
 class ListType(Type):
 
     @staticmethod
-    def data_type():
-        return "list"
-
-    @staticmethod
     def serialize(value, **kwargs):
         """ Convert a value to a JSON serializable value """
         serialized_list = []

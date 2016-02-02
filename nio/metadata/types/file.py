@@ -54,10 +54,6 @@ class FileHolder(object):
 class FileType(Type):
 
     @staticmethod
-    def data_type():
-        return "file"
-
-    @staticmethod
     def serialize(value, **kwargs):
         """ Convert a value to a JSON serializable value """
         return value

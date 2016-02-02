@@ -10,6 +10,7 @@ class TestBaseProperty(NIOTestCase):
 
     def test_set_and_get_value(self):
         type = MagicMock()
+        type.__name__ = MagicMock()
         type.deserialize = self._value_passthrough
         instance = MagicMock()
         property = BaseProperty(type)
@@ -23,6 +24,7 @@ class TestBaseProperty(NIOTestCase):
 
     def test_not_allow_none(self):
         type = MagicMock()
+        type.__name__ = MagicMock()
         instance = MagicMock()
         property = BaseProperty(type)
         set_value = None
@@ -34,6 +36,7 @@ class TestBaseProperty(NIOTestCase):
 
     def test_allow_none(self):
         type = MagicMock()
+        type.__name__ = MagicMock()
         instance = MagicMock()
         property = BaseProperty(type, allow_none=True)
         set_value = None
@@ -43,6 +46,7 @@ class TestBaseProperty(NIOTestCase):
 
     def test_serialize(self):
         type = MagicMock()
+        type.__name__ = MagicMock()
         type.deserialize = self._value_passthrough
         type.serialize = self._value_passthrough
         instance = MagicMock()
@@ -53,6 +57,7 @@ class TestBaseProperty(NIOTestCase):
 
     def test_deserialize(self):
         type = MagicMock()
+        type.__name__ = MagicMock()
         type.deserialize = self._value_passthrough
         property = BaseProperty(type)
         value = 'value'

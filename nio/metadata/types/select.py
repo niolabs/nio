@@ -5,10 +5,6 @@ from nio.metadata.types.base import Type
 class SelectType(Type):
 
     @staticmethod
-    def data_type():
-        return "select"
-
-    @staticmethod
     def serialize(value, **kwargs):
         """ Convert a value to a JSON serializable value """
         if value is not None and isinstance(value, Enum):

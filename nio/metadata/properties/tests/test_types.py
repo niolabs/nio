@@ -7,8 +7,16 @@ from nio.metadata.properties.list import ListProperty
 from nio.metadata.properties.object import ObjectProperty
 from nio.metadata.properties.holder import PropertyHolder
 from nio.metadata.properties.string import StringProperty
-from nio.util.support.test_case import NIOTestCase
 from nio.metadata.properties.timedelta import TimeDeltaProperty
+from nio.metadata.types.bool import BoolType
+from nio.metadata.types.string import StringType
+from nio.metadata.types.int import IntType
+from nio.metadata.types.float import FloatType
+from nio.metadata.types.object import ObjectType
+from nio.metadata.types.list import ListType
+from nio.metadata.types.select import SelectType
+from nio.metadata.types.timedelta import TimeDeltaType
+from nio.util.support.test_case import NIOTestCase
 
 
 class ContainedClass(PropertyHolder):
@@ -68,51 +76,51 @@ class TestTypes(NIOTestCase):
         description = ContainerClass.get_description()
 
         self.assertEqual(description['string_property']['type'],
-                         str.__name__)
+                         StringType.__name__)
         self.assertEqual(description['string_property_default_env_variable']
-                         ['type'], str.__name__)
+                         ['type'], StringType.__name__)
 
         self.assertEqual(description['expression_property']['type'],
-                         "str")
+                         StringType.__name__)
         self.assertEqual(
             description['expression_property_default_env_variable']
-            ['type'], "str")
+            ['type'], StringType.__name__)
 
         self.assertEqual(description['bool_property']['type'],
-                         bool.__name__)
+                         BoolType.__name__)
         self.assertEqual(description['bool_property_default_env_variable']
-                         ['type'], bool.__name__)
+                         ['type'], BoolType.__name__)
 
         self.assertEqual(description['int_property']['type'],
-                         int.__name__)
+                         IntType.__name__)
         self.assertEqual(description['int_property_default_env_variable']
-                         ['type'], int.__name__)
+                         ['type'], IntType.__name__)
 
         self.assertEqual(description['float_property']['type'],
-                         float.__name__)
+                         FloatType.__name__)
         self.assertEqual(description['float_property_default_env_variable']
-                         ['type'], float.__name__)
+                         ['type'], FloatType.__name__)
 
         self.assertEqual(description['object_property']['type'],
-                         object.__name__)
+                         ObjectType.__name__)
         self.assertEqual(description['object_property_default_env_variable']
-                         ['type'], object.__name__)
+                         ['type'], ObjectType.__name__)
 
         self.assertEqual(description['list_property1']['type'],
-                         list.__name__)
+                         ListType.__name__)
         self.assertEqual(description['list_property2']['type'],
-                         list.__name__)
+                         ListType.__name__)
         self.assertEqual(description['list_property3']['type'],
-                         list.__name__)
+                         ListType.__name__)
         self.assertEqual(description['list_property_default_env_variable']
-                         ['type'], list.__name__)
+                         ['type'], ListType.__name__)
 
         self.assertEqual(description['timedelta_property']['type'],
-                         timedelta.__name__)
+                         TimeDeltaType.__name__)
         self.assertEqual(description['timedelta_property_no_default']['type'],
-                         timedelta.__name__)
+                         TimeDeltaType.__name__)
 
         self.assertEqual(description['select_property']['type'],
-                         "select")
+                         SelectType.__name__)
         self.assertEqual(description['select_property_default_env_variable']
-                         ['type'], "select")
+                         ['type'], SelectType.__name__)

@@ -6,10 +6,6 @@ class Type:
         raise Exception
 
     @staticmethod
-    def data_type():
-        return ""
-
-    @staticmethod
     def serialize(value, **kwargs):
         return value
 

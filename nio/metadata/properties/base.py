@@ -20,23 +20,23 @@ class BaseProperty:
         self.kwargs = kwargs
 
         self.type = _type
-        if "default" in kwargs:
-            # Store default as the deserialized version
-            # TODO: comment this better. why deserialize this?
-            self.default = \
-                self.deserialize(kwargs.get("default", None), **kwargs)
-        else:
-            self.default = None
+
+        # Default value info
+        self._default = kwargs.get("default", None)
+        self._cached_default = None
         self._default_property_value = PropertyValue(
-            self, kwargs.get("default", None), validate=False)
+            self, self._default, validate=False)
 
         self._values = WeakKeyDictionary()
 
-        try:
-            self.description = dict(type=_type.data_type(), **kwargs)
-        except:
-            # Some types have not defined a data_type
-            self.description = dict(type=str(_type), **kwargs)
+        self.description = dict(type=_type.__name__, **kwargs)
+
+    @property
+    def default(self):
+        if not self._cached_default and self._default is not None:
+            self._cached_default = \
+                self.deserialize(self._default, **self.kwargs)
+        return self._cached_default
 
     def __get__(self, instance, owner):
         """ Return the PropertyValue
