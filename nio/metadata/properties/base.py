@@ -66,22 +66,50 @@ class BaseProperty:
                                              self.kwargs)
 
     def serialize(self, instance, **kwargs):
+        """ Serialze and return the value of an instance of this property
+
+        Serialize is defined by the Type associated with this Property.
+
+        Args:
+            instance (PropertyHolder): PropertyHolder that the property is on
+        Keyword Args:
+            Optionally override the kwargs of the property
+            TODO: give an example of when this is useful
+        Returns:
+            Serialized version of property value
+
+        """
+        # Allow property kwargs to be overriden by call to serialize
         merged_kwargs = self.kwargs.copy()
         merged_kwargs.update(**kwargs)
+        # Use the default value if the specified instance does not have a value
         value = self.__get__(instance, instance).value or \
             merged_kwargs["default"]
         # TODO: for non-string properties, this can return a string if it's an
         # expression
-        merged_kwargs = self.kwargs.copy()
-        merged_kwargs.update(**kwargs)
         return self.type.serialize(value, **merged_kwargs)
 
     def deserialize(self, value, **kwargs):
+        """ Deserialize a value of this property
+
+        Deserialize is defined by the Type associated with this Property.
+
+        Args:
+            value: value to be deserialized. Various data formats are accepted
+                based on the property Type.
+        Keyword Args:
+            Optionally override the kwargs of the property
+            TODO: give an example of when this is useful
+        Returns:
+            Deserialized version of property value
+
+        """
         if not self.is_expression(value) and not self.is_env_var(value):
+            # Allow property kwargs to be overriden by call to serialize
             merged_kwargs = self.kwargs.copy()
             merged_kwargs.update(**kwargs)
             return self.type.deserialize(value, **merged_kwargs)
-        # TODO: or raise exception?
+        # TODO: else raise exception?
         return value
 
     def get_description(self):
