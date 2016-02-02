@@ -191,13 +191,8 @@ class PropertyHolder(object):
                 by name.
         """
         properties = cls.get_class_properties()
-        #TODO not calling serialzing on expressions and env_vars needs to
-        # be somewhere else
-        return {prop_name: prop.type.serialize(prop.default, **prop.kwargs)
-                for prop_name, prop in properties.items()
-                if prop.default and \
-                not prop.is_expression(prop.default) and \
-                not prop.is_env_var(prop.default)}
+        return {prop_name: prop.serialize(instance=cls)
+                for prop_name, prop in properties.items()}
 
     @classmethod
     def get_class_properties(cls):

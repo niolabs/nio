@@ -83,11 +83,14 @@ class BaseProperty:
         merged_kwargs = self.kwargs.copy()
         merged_kwargs.update(**kwargs)
         # Use the default value if the specified instance does not have a value
-        value = self.__get__(instance, instance).value or \
-            merged_kwargs["default"]
-        # TODO: for non-string properties, this can return a string if it's an
-        # expression
-        return self.type.serialize(value, **merged_kwargs)
+        value = self.__get__(instance, instance).value or self.default
+        if value is not None and \
+                not self.is_expression(value) and not self.is_env_var(value):
+            return self.type.serialize(value, **merged_kwargs)
+        else:
+            # If the value is None of if it's an expression property,
+            # then don't try to serialize it
+            return value
 
     def deserialize(self, value, **kwargs):
         """ Deserialize a value of this property
