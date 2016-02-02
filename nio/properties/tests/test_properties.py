@@ -42,7 +42,7 @@ class TestProperties(NIOTestCase):
         self.assertIsNotNone(container.object_property)
         self.assertIsNotNone(container.list_property)
 
-    def test_validate_dict(self):
+    def test_validate_dict_when_invalid(self):
         container = ContainerClass
 
         with self.assertRaises(TypeError):
@@ -70,12 +70,34 @@ class TestProperties(NIOTestCase):
                 }
             })
 
-        # validation of timedelta property gets skipped
-        # bogus one will pass
+        with self.assertRaises(TypeError):
+            container.validate_dict({
+                'td_property': {'hectacres': 23}
+            })
+
+    def test_validate_dict_when_valid(self):
+        container = ContainerClass
+
+        container.validate_dict({'int_property': 1})
+        container.validate_dict({'float_property': 1.34})
         container.validate_dict({
-            'td_property': {'hectares': 23}
+            'list_property': [{'int_property': 2}]
+        })
+        container.validate_dict({
+            'object_property': {
+                'int_property': 1
+            }
+        })
+        container.validate_dict({
+            'object_property': {
+                'float_property': 1.34
+            }
+        })
+        container.validate_dict({
+            'td_property': {'seconds': 23}
         })
 
+        # validate object property
         legit_object = {
             'object_property': {
                 'int_property': "23",

@@ -72,39 +72,8 @@ class PropertyHolder(object):
         for (property_name, prop) in class_properties.items():
             if property_name in properties:
                 value = properties[property_name]
-
-                # if it's an ObjectProperty, use the enclosed type and
-                # validate the incoming config.
-                if isinstance(prop, ObjectProperty):
-                    value = prop.kwargs["obj_type"].validate_dict(value)
-
-                # if the property is a list, validate it's members only if they
-                # are PropertyHolders (i.e. ObjectProperty's)
-                elif isinstance(prop, ListProperty):
-                    list_obj_type = prop.kwargs["list_obj_type"]
-                    if issubclass(list_obj_type, PropertyHolder):
-                        for idx, item in enumerate(value):
-                            value[idx] = list_obj_type.validate_dict(item)
-
-                # ignore TimeDeltaProperty in order to avoid passing env
-                # variables to
-                elif isinstance(prop, TimeDeltaProperty):
-                    pass
-
-                # otherwise, unless the value is an environment variable,
-                # validate it against the corresponding property by
-                # de-serializing and serializing it.
-                elif not is_environment_var(value):
-                    # Let's make a fake property holder, to contain this
-                    # property. That way, we can assign the value and make
-                    # sure everything is good.
-                    #
-                    # TODO: Make it so we can serialize/deserialize at the
-                    # property class level
-                    tmp_inst = PropertyHolder()
-                    prop.__set__(tmp_inst, prop.deserialize(value))
-                    value = prop.serialize(tmp_inst)
-
+                deserialized_value = prop.deserialize(value)
+                value = prop.type.serialize(deserialized_value, **prop.kwargs)
                 properties[property_name] = value
 
         return properties
