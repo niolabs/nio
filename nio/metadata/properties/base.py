@@ -23,10 +23,16 @@ class BaseProperty:
         # Default value info
         self._default = kwargs.get("default", None)
         self._cached_default = None
+        # Skip value validation for default
         self._default_property_value = PropertyValue(
             self, self._default, validate=False)
 
+        # Set up a values dictionary to keep track of values per instance
+        # We want a WeakKeyDict so that instances aren't kept in memory
+        # based on this property
         self._values = WeakKeyDictionary()
+
+        # Description needs to be serializble so save type as __name__
         self.description = dict(type=self.type.__name__,
                                 title=self.title,
                                 visible=self.visible,
@@ -35,6 +41,7 @@ class BaseProperty:
 
     @property
     def default(self):
+        """ default deserialized value, not a callable PropertyValue """
         if self._cached_default is None and self._default is not None:
             self._cached_default = \
                 self.deserialize(self._default, **self.kwargs)
@@ -42,6 +49,9 @@ class BaseProperty:
 
     def __get__(self, instance, owner):
         """ Return the PropertyValue
+
+        Overriding __set__ and __get__ so values can be saved and retrieved
+        as callable PropertyValues instead of the raw value.
 
         Returns:
             PropertyValue: The value for the given instance
@@ -55,13 +65,16 @@ class BaseProperty:
             and allow_none is False.
 
         """
-        value = self._values.get(instance, None)
         return self._values.get(instance, self._default_property_value)
 
     def __set__(self, instance, value):
-        """ Save the value as a PropertyValue """
-        property_value = PropertyValue(self, value)
-        self._values[instance] = property_value
+        """ Save the value as a PropertyValue
+
+        Overriding __set__ and __get__ so values can be saved and retrieved
+        as callable PropertyValues instead of the raw value.
+
+        """
+        self._values[instance] = PropertyValue(self, value)
 
     def __str__(self):
         return "type is: %s, args are %s" % (self.type,

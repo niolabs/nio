@@ -4,7 +4,13 @@ from nio.metadata.properties.expression.evaluator import Evaluator
 
 
 class PropertyValue:
-    """ Returned when accessing properties on property holders """
+    """ Returned when accessing properties on property holders
+
+    PropertyValues are callable and return the deserialized value of the
+    property. If the value is a string that is a valied n.io expression, it
+    is first evaluated, optionally against a Signal.
+
+    """
 
     def __init__(self, property, value=None, validate=True):
         self._property = property
@@ -16,7 +22,7 @@ class PropertyValue:
     def _validate_value(self):
         # Check that the value is the correct type
         self._property.deserialize(self.value, **self._property.kwargs)
-        # Check if we are setting None if that's now allowed
+        # Check if we are setting None if that's not allowed
         if not self._property.allow_none and self.value is None:
             raise AllowNoneViolation
 
