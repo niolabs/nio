@@ -33,7 +33,7 @@ class BaseProperty:
 
     @property
     def default(self):
-        if not self._cached_default and self._default is not None:
+        if self._cached_default is None and self._default is not None:
             self._cached_default = \
                 self.deserialize(self._default, **self.kwargs)
         return self._cached_default
