@@ -19,3 +19,8 @@ class TestTypes(NIOTestCase):
         value = NotStringable()
         with self.assertRaises(Exception):
             StringType.deserialize(value)
+
+    def test_static_class(self):
+        """ A Type should never be instantiated """
+        with self.assertRaises(RuntimeError):
+            Type()

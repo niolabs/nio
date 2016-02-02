@@ -3,7 +3,7 @@ class Type:
 
     def __init__(self):
         # Type is a static class
-        raise Exception
+        raise RuntimeError("A Type should never be instantiated")
 
     @staticmethod
     def serialize(value, **kwargs):
