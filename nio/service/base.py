@@ -3,7 +3,7 @@ from nio.common.command import command
 from nio.common.command.security import command_security
 from nio.common.command.holder import CommandHolder
 from nio import discoverable
-from nio.common.versioning.dependency import DependsOn
+from nio.util.versioning.dependency import DependsOn
 from nio.metadata.properties import PropertyHolder, VersionProperty, \
     BoolProperty, ListProperty, StringProperty, VarProperty, SelectProperty
 from nio.util.logging import get_nio_logger

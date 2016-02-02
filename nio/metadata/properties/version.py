@@ -1,5 +1,5 @@
 from nio.metadata.properties import StringProperty
-from nio.common.versioning.check import is_version_valid, InvalidVersionFormat
+from nio.util.versioning.check import is_version_valid, InvalidVersionFormat
 
 
 class VersionProperty(StringProperty):
