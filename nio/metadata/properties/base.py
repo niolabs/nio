@@ -12,7 +12,7 @@ class BaseProperty:
         description (dict): Property settings.
     """
 
-    def __init__(self, _type=object, title=None,
+    def __init__(self, _type, title=None,
                  visible=True, allow_none=False, **kwargs):
         kwargs["title"] = title
         kwargs["visible"] = visible
