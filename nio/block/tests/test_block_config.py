@@ -10,7 +10,9 @@ CONFIG_VAL = "attr_1_val"
 
 class DummyBlock(Block):
     # Create a dummy block with my configurable attribute
-    attr_1 = StringProperty()
+    attr_1 = StringProperty(allow_none=True)
+    # For this test only, allow name to be None
+    name = StringProperty(allow_none=True)
 
 
 class TestBlockConfig(NIOTestCase):
@@ -49,4 +51,5 @@ class TestBlockConfig(NIOTestCase):
                                      None))
 
         self.assertTrue(hasattr(block, CONFIG_KEY))
-        self.assertNotEqual(getattr(block, CONFIG_KEY), CONFIG_VAL)
+        self.assertEqual(getattr(block, CONFIG_KEY)(), None)
+        self.assertNotEqual(getattr(block, CONFIG_KEY)(), CONFIG_VAL)
