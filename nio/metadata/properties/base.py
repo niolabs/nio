@@ -112,9 +112,6 @@ class BaseProperty:
         # TODO: else raise exception?
         return value
 
-    def get_description(self):
-        return self.description
-
     def is_expression(self, value):
         # TODO: this code should not be both here and in evaluator
         try:

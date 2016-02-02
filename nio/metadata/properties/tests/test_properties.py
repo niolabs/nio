@@ -258,7 +258,7 @@ class TestProperties(NIOTestCase):
                       description['list_property']['template'])
 
         alist = ListProperty(int)
-        self.assertEqual('int', alist.get_description()['template'])
+        self.assertEqual('int', alist.description['template'])
 
     def test_additional_property_description(self):
 

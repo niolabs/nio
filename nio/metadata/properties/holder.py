@@ -157,7 +157,7 @@ class PropertyHolder(object):
 
         """
         class_properties = cls.get_class_properties()
-        descriptions = {property_name: prop.get_description()
+        descriptions = {property_name: prop.description
                         for (property_name, prop) in class_properties.items()}
         if hasattr(cls, "__version__") and "version" not in descriptions:
             descriptions["version"] = cls.__version__
