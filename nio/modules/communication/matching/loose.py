@@ -1,7 +1,14 @@
 class LooseMatching(object):
     @classmethod
     def matches(cls, sub_topics, pub_topics):
-        """ For it to match, there should be a key where the publisher
+        """ Finds out if there is a match between subscriber and publisher
+        topics.
+
+        Args:
+            sub_topics: subscriber topics
+            pub_topics: publisher topics
+
+        For it to match, there should be a key where the publisher
         publishes something the subscriber cares about
         """
 
