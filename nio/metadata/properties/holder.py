@@ -1,6 +1,6 @@
 from nio.metadata.properties.typed import TypedProperty
 from nio.metadata.properties.timedelta import TimeDeltaProperty
-from nio.common.versioning.check import compare_versions, \
+from nio.util.versioning.check import compare_versions, \
     VersionCheckResult, InvalidVersionFormat, is_version_valid, \
     get_major_version
 from nio.metadata.environment import is_environment_var
@@ -282,8 +282,8 @@ class PropertyHolder(object):
 
         comparison_result = compare_versions(instance_version,
                                              class_version)
-        if comparison_result == VersionCheckResult.Equal \
-                or comparison_result == VersionCheckResult.Newer:
+        if comparison_result == VersionCheckResult.equal \
+                or comparison_result == VersionCheckResult.newer:
             # instance has a newer version, it is ok
             pass
         else:
@@ -299,8 +299,8 @@ class PropertyHolder(object):
 
             comparison_result = compare_versions(instance_version,
                                                  min_version)
-            if comparison_result == VersionCheckResult.Equal \
-                    or comparison_result == VersionCheckResult.Newer:
+            if comparison_result == VersionCheckResult.equal \
+                    or comparison_result == VersionCheckResult.newer:
                 # ok, got a version not older than minimum
                 pass
             else:

@@ -1,24 +1,24 @@
 from unittest.mock import patch
-from nio.common.versioning.check import get_major_version
-from nio.common.versioning.dependency import validate_version
-from nio.common.versioning.tests import module_version, \
+from nio.util.versioning.check import get_major_version
+from nio.util.versioning.dependency import validate_version
+from nio.util.versioning.tests import module_version, \
     block_b_module_version, block_a_module_version
 from nio.util.support.test_case import NIOTestCase
 
 
 class TestVersioning(NIOTestCase):
-    @patch('nio.common.versioning.dependency.validate_version')
+    @patch('nio.util.versioning.dependency.validate_version')
     def test_version_ok(self, mock_validate):
         mock_validate.return_value = True
-        from nio.common.versioning.tests.block_a import BlockA
+        from nio.util.versioning.tests.block_a import BlockA
 
         mock_validate.assert_called_once_with(module_version,
                                               block_a_module_version)
 
-    @patch('nio.common.versioning.dependency.validate_version')
+    @patch('nio.util.versioning.dependency.validate_version')
     def test_version_not_ok(self, mock_validate):
         mock_validate.return_value = False
-        from nio.common.versioning.tests.block_b import BlockB
+        from nio.util.versioning.tests.block_b import BlockB
         mock_validate.assert_called_once_with(module_version,
                                               block_b_module_version)
 

@@ -1,4 +1,4 @@
-from nio.common.versioning.check import is_version_valid, \
+from nio.util.versioning.check import is_version_valid, \
     compare_versions, VersionCheckResult
 from nio.util.support.test_case import NIOTestCaseNoModules
 
@@ -22,24 +22,28 @@ class TestVersionCheck(NIOTestCaseNoModules):
 
     def test_equal_comparisons(self):
         self.assertEqual(compare_versions('1.1.2', '1.1.2'),
-                         VersionCheckResult.Equal)
+                         VersionCheckResult.equal)
         self.assertEqual(compare_versions('1.1.2rc1', '1.1.2rc1'),
-                         VersionCheckResult.Equal)
+                         VersionCheckResult.equal)
         self.assertEqual(compare_versions('21.21.21', '21.21.21'),
-                         VersionCheckResult.Equal)
+                         VersionCheckResult.equal)
+        self.assertEqual(compare_versions('1.1.2.rc1', '1.1.2-rc1'),
+                         VersionCheckResult.equal)
 
     def test_newer_comparisons(self):
         self.assertEqual(compare_versions('2', '1.1.2'),
-                         VersionCheckResult.Newer)
+                         VersionCheckResult.newer)
         self.assertEqual(compare_versions('1.2.2', '1.1.2'),
-                         VersionCheckResult.Newer)
+                         VersionCheckResult.newer)
         self.assertEqual(compare_versions('1.2.2rc2', '1.2.2rc1'),
-                         VersionCheckResult.Newer)
+                         VersionCheckResult.newer)
 
     def test_lower_comparisons(self):
         self.assertEqual(compare_versions('1.2', '2'),
-                         VersionCheckResult.Older)
+                         VersionCheckResult.older)
         self.assertEqual(compare_versions('1.2.1', '1.2.2'),
-                         VersionCheckResult.Older)
+                         VersionCheckResult.older)
         self.assertEqual(compare_versions('1.2.2rc1', '1.2.2rc2'),
-                         VersionCheckResult.Older)
+                         VersionCheckResult.older)
+        self.assertEqual(compare_versions('1.2.2.rc1', '1.2.2-rc2'),
+                         VersionCheckResult.older)

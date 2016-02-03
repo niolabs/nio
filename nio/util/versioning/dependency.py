@@ -1,6 +1,6 @@
 from importlib import import_module
 from nio.util.logging import get_nio_logger
-from nio.common.versioning.check import compare_versions, VersionCheckResult
+from nio.util.versioning.check import compare_versions, VersionCheckResult
 
 
 class DependsOn(object):
@@ -58,10 +58,11 @@ def validate_version(component_version, dependency_version):
     Args:
         component_version (string): version of installed component.
         dependency_version (string): version required by dependency.
+
     Returns:
         bool: Returns True if valid, False if not.
 
-        """
+    """
 
     # Any version set to None is considered valid for comparison
     # purposes once it gets this far
@@ -69,7 +70,8 @@ def validate_version(component_version, dependency_version):
         return True
 
     return compare_versions(component_version,
-                            dependency_version) != VersionCheckResult.Older
+                            dependency_version).value >= \
+           VersionCheckResult.older.value
 
 
 def get_class_dependencies(cls):
@@ -80,7 +82,6 @@ def get_class_dependencies(cls):
 
     Args:
         cls (class type): the class.
-
 
     Returns:
         class dependencies defined using @DependsOn
