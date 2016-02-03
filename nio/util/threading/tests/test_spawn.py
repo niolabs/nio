@@ -28,6 +28,7 @@ class Target(object):
         self.kwargs.append(key2)
         self.event.set()
 
+        return "verify this"
 
 class TestSpawn(NIOTestCaseNoModules):
 
@@ -39,8 +40,8 @@ class TestSpawn(NIOTestCaseNoModules):
         """
         receiver_event = Event()
         target = Target(receiver_event)
-        spawn(target.receiver, "1", "2",
-              key1="key1_passed", key2="key2_passed")
+        thread = spawn(target.receiver, "1", "2",
+                       key1="key1_passed", key2="key2_passed")
 
         self.assertTrue(receiver_event.wait(1))
 
@@ -49,6 +50,10 @@ class TestSpawn(NIOTestCaseNoModules):
 
         self.assertEqual(target.kwargs[0], "key1_passed")
         self.assertEqual(target.kwargs[1], "key2_passed")
+
+        result = thread.join()
+        self.assertEqual(thread.nio_result, "verify this")
+        self.assertEqual(result, "verify this")
 
     def test_spawn_kw_defaults(self):
         """ Asserts that when keyword arguments are not specified,

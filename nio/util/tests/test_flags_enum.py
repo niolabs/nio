@@ -1,4 +1,6 @@
 from enum import Enum
+from unittest.mock import Mock
+
 from nio.util.flags_enum import FlagsEnum, InvalidFlag
 from nio.util.support.test_case import NIOTestCase
 
@@ -178,3 +180,31 @@ class TestFlagsEnum(NIOTestCase):
         self.assertFalse(cloned_twice_status.is_set(Status.stopped))
         self.assertFalse(
             cloned_twice_status.is_set(Status.deliver_signal_error))
+
+    def test_flags_assignment(self):
+        # assert that when flags are assigned, change callback is triggered
+        # as expected
+        status = FlagsEnum(Status,
+                           status_change_callback=Mock())
+
+        self.assertEqual(status._status_change_callback.call_count, 0)
+        status_to_assign = FlagsEnum(Status,
+                                     status_change_callback=Mock())
+        status_to_assign.add(Status.created)
+        status.flags = status_to_assign.flags
+        self.assertEqual(status._status_change_callback.call_count, 1)
+
+        # removing created, adding started
+        status_to_assign.remove(Status.created)
+        status_to_assign.add(Status.started)
+        status.flags = status_to_assign.flags
+        self.assertEqual(status._status_change_callback.call_count, 2)
+
+        # no change
+        status.flags = status_to_assign.flags
+        self.assertEqual(status._status_change_callback.call_count, 2)
+
+        # removing started
+        status_to_assign.remove(Status.started)
+        status.flags = status_to_assign.flags
+        self.assertEqual(status._status_change_callback.call_count, 3)
