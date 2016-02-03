@@ -49,15 +49,3 @@ class ObjectProperty(BaseProperty):
         if isinstance(default, PropertyHolder):
             default = default.to_dict()
         return {"default": default}
-
-    def x_get_description(self):
-        # add internal object description
-        description.update({"template": self._type().get_description()})
-        return description
-
-    @property
-    def xdefault(self):
-        if isinstance(self._default, PropertyHolder):
-            return self._default.get_defaults()
-        else:
-            return super().default
