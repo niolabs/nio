@@ -3,7 +3,7 @@ from datetime import timedelta
 from time import sleep
 
 from nio.util.support.test_case import NIOTestCase
-from nio.modules.scheduler import Job
+from nio.modules.scheduler.job import Job
 
 
 class Dummy(object):

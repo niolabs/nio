@@ -1,6 +1,6 @@
 from time import sleep
 
-from nio.modules.scheduler import Job
+from nio.modules.scheduler.job import Job
 from unittest.mock import MagicMock
 from datetime import timedelta
 from nio.util.support.modules.scheduler.tests.custom_base_test \
