@@ -3,8 +3,7 @@ from time import sleep
 from nio.modules.scheduler.job import Job
 from unittest.mock import MagicMock
 from datetime import timedelta
-from nio.util.support.modules.scheduler.tests.custom_base_test \
-    import CustomSchedulerTestCase
+from nio.util.support.test_case import NIOTestCase
 
 
 class Dummy(object):
@@ -16,7 +15,7 @@ class Dummy(object):
         self.foo_called += add
 
 
-class TestNIOScheduler(CustomSchedulerTestCase):
+class TestScheduler(NIOTestCase):
 
     def setUp(self):
         super().setUp()

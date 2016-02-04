@@ -1,8 +1,7 @@
 from datetime import timedelta
 from time import sleep
 from nio.modules.scheduler.job import Job
-from nio.util.support.modules.scheduler.tests.custom_base_test \
-    import CustomSchedulerTestCase
+from nio.util.support.test_case import NIOTestCase
 
 
 arg1_parameter = "8"
@@ -20,7 +19,7 @@ class Dummy(object):
         assert (kwarg1 == kwarg1_parameter)
 
 
-class TestScheduler(CustomSchedulerTestCase):
+class TestScheduler(NIOTestCase):
 
     def test_args(self):
         """ Asserts that scheduler accepts args and kwargs and they

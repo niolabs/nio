@@ -2,21 +2,20 @@ from datetime import timedelta
 from time import sleep
 from threading import RLock
 
-from nio.util.support.modules.scheduler.tests.custom_base_test \
-    import CustomSchedulerTestCase
-from nio.util.support.modules.scheduler import NIOScheduler
+from nio.util.scheduler.scheduler import Scheduler
 from nio.modules.scheduler.job import Job
 from nio.util.threading import spawn
+from nio.util.support.test_case import NIOTestCase
 
 
-class TestSchedulerCleanUp(CustomSchedulerTestCase):
+class TestSchedulerCleanUp(NIOTestCase):
 
     def test_scheduler_cleanup(self):
         """ Asserts that scheduler cleans up its list once a non-repeatable
         task is executed, and also when a repeatable task is cancelled
         """
 
-        scheduler = NIOScheduler._scheduler_thread._scheduler
+        scheduler = Scheduler._scheduler_thread._scheduler
         self.assertEqual(len(scheduler._events), 0)
         num_tasks = 2
         for i in range(num_tasks):
@@ -57,7 +56,7 @@ class TestSchedulerCleanUp(CustomSchedulerTestCase):
         """ Asserts that scheduler accepts callbacks that cancel jobs.
         """
 
-        scheduler = NIOScheduler._scheduler_thread._scheduler
+        scheduler = Scheduler._scheduler_thread._scheduler
 
         jobs = []
         num_jobs = 20

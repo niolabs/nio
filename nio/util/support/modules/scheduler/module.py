@@ -1,4 +1,5 @@
-from nio.util.support.modules.scheduler import Job, NIOScheduler
+from nio.util.scheduler.job import Job
+from nio.util.scheduler.scheduler import Scheduler
 from nio.modules.scheduler.module import SchedulerModule
 
 
@@ -8,9 +9,9 @@ class TestingSchedulerModule(SchedulerModule):
         super().initialize(context)
         self.proxy_job_class(Job)
 
-        NIOScheduler.configure(context)
-        NIOScheduler.start()
+        Scheduler.configure(context)
+        Scheduler.start()
 
     def finalize(self):
-        NIOScheduler.shutdown()
+        Scheduler.shutdown()
         super().finalize()
