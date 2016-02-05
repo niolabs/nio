@@ -1,4 +1,4 @@
-class Type:
+class Type(object):
     """ Base type for property and parameters """
 
     def __init__(self):

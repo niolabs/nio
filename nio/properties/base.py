@@ -3,7 +3,7 @@ from weakref import WeakKeyDictionary
 from nio.properties.util.property_value import PropertyValue
 
 
-class BaseProperty:
+class BaseProperty(object):
     """ Base class for metadata property definitions
 
     Used as a class attribute on property holders.
