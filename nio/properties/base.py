@@ -100,7 +100,8 @@ class BaseProperty:
         merged_kwargs = self.kwargs.copy()
         merged_kwargs.update(**kwargs)
         # Use the default value if the specified instance does not have a value
-        value = self.__get__(instance, instance).value or self.default
+        value = self.__get__(instance, instance.__class__).value or \
+            self.default
         if value is not None and \
                 not self.is_expression(value) and not self.is_env_var(value):
             return self.type.serialize(value, **merged_kwargs)
