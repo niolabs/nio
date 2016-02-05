@@ -14,7 +14,7 @@ class BaseProperty:
     """
 
     def __init__(self, _type, title=None,
-                 visible=True, allow_none=False, **kwargs):
+                 visible=True, allow_none=False, default=None, **kwargs):
         self.type = _type
         self.title = title
         self.visible = visible
@@ -22,7 +22,7 @@ class BaseProperty:
         self.kwargs = kwargs
 
         # Default value info
-        self._default = kwargs.get("default", None)
+        self._default = default
         self._cached_default = None
         # Skip value validation for default
         self._default_property_value = PropertyValue(
@@ -34,11 +34,12 @@ class BaseProperty:
         self._values = WeakKeyDictionary()
 
         # Description needs to be serializble so save type as __name__
-        self.description = dict(type=self.type.__name__,
-                                title=self.title,
-                                visible=self.visible,
-                                allow_none=self.allow_none,
-                                **self.kwargs)
+        self.description = dict(type=_type.__name__,
+                                title=title,
+                                visible=visible,
+                                allow_none=allow_none,
+                                default=default,
+                                **kwargs)
 
     @property
     def default(self):
