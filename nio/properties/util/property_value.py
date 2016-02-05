@@ -29,7 +29,7 @@ class PropertyValue:
     def __call__(self, signal=None):
         """ Return value, evaluated if it is an expression """
         from nio.properties import PropertyHolder
-        if isinstance(self.value, str):
+        if self._property.is_expression(self.value):
             # Evaluate and deserialize string since they might be expressions
             value = self.evaluator.evaluate(signal or Signal())
             return self._property.deserialize(value, **self._property.kwargs)

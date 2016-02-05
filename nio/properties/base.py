@@ -134,14 +134,56 @@ class BaseProperty(object):
         return value
 
     def is_expression(self, value):
-        # TODO: this code should not be both here and in evaluator
+        """ A property value is an expression if contatins expression syntax
+
+        An expression is identified by a pair of opening curly braces and then
+        later a pair of closing curly braces.
+
+        Returns:
+            bool: True if value is an expression
+
+        Examples:
+            >>> is_expression("{{ 1 + 2 }}")
+            True
+            >>> is_expression("1 + 2")
+            False
+            >>> is_expression("{{ 1 + 2")
+            False
+            >>> is_expression("{ { 1 + 2 } }")
+            False
+
+        """
+
         try:
+            # TODO: This check should actually check if the closing braces come
+            # after the opening ones.
             return "{{" in value and \
                     "}}" in value
         except:
             return False
 
     def is_env_var(self, value):
+        """ Determine if property value is an environment variable
+
+        Environment variables are identified by a pair of opening square braces
+        that are eventually followed by a pair of closing square braces.
+
+        It is significant to differently identify a value *containing* an env
+        var and a value that *is* an env var. If a value *is* an env var then
+        it is valid for that value to be string even if the proprety type can
+        not normally be represented as a string.
+
+        Returns:
+            bool: True if value is an environment variable
+
+        Examples:
+            >>> is_env_var("[[ENV_VAR]]")
+            True
+            >>> is_env_var("No an [[ENV_VAR]]")
+            False
+
+        """
+
         try:
             return value.startswith("[[") and \
                     value.endswith("]]")

@@ -32,12 +32,9 @@ class Evaluator:
         parsed = self.__class__.expression_cache.get(cache_key, None)
         if parsed is None:
             # Only parse the expression if we haven't already done it.
-            if self.is_expression():
-                tokens = self.tokenize(self.expression)
-                parser = Parser()
-                parsed = parser.parse(tokens)
-            else:
-                parsed = self.expression
+            tokens = self.tokenize(self.expression)
+            parser = Parser()
+            parsed = parser.parse(tokens)
             self.__class__.expression_cache[cache_key] = parsed
         try:
             result = self._eval(signal, parsed)
@@ -70,10 +67,3 @@ class Evaluator:
 
         # the split includes a bunch of None's and empty strings...
         return [t for t in tokens if t]
-
-    def is_expression(self):
-        return "{{" in self.expression and \
-                "}}" in self.expression
-
-    def depends_on_signal(self):
-        return "$" in self.expression and self.is_expression()
