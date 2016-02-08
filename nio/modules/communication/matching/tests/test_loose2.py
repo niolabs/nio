@@ -16,7 +16,7 @@ SUB_A_B_AND_TEST = {'type': ['A', 'B'], 'flag': ['test']}
 
 
 class TestLooseMatching(NIOTestCase):
-    def test_default_matching_scenario2(self):
+    def test_loose_matching_scenario2(self):
         # differ from default, expected
         self.assertTrue(LooseMatching.matches(SUB_A_ONLY, PUB_A_AND_B))
         # differ from default, expected

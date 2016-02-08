@@ -13,17 +13,25 @@ class Publisher(ModuleProxy):
     """
 
     def __init__(self, context=None, **topics):
-        """ Publisher constructor
-        Kwargs:
-            Arguments describing kind of signals to be published
+        """ Create a new publisher instance.
+
+        Args:
+            context: Information that can optionally be provided specific to
+                the communication implementation.
+
+                It can be used to customize a publisher by overriding settings
+                such as 'heartbeat_interval' and 'heartbeat_check_interval'.
+
+            topics: Key value pairs defining the kind of information to be
+                published.
         """
         super().__init__(context, **topics)
 
     def open(self):
         """ Opens publishing channel
 
-        This method delegates functionality to notify others the
-        publisher creation and its definitions via a management signal.
+        This method will setup the channel for sending, it is implementation
+        specific, for example in a tcp like implementation it will open a port.
 
         """
         raise NotImplementedError()
@@ -40,12 +48,13 @@ class Publisher(ModuleProxy):
     def close(self):
         """ Closes publisher.
 
-        This method delegates functionality to notify others the
-        publisher removal via a management signal.
+        No further signals will be sent after a publisher is closed.
 
         """
         raise NotImplementedError()
 
     def is_closed(self):
-        """ Finds out if publisher has been closed """
+        """ Finds out if publisher has been closed
+
+        """
         raise NotImplementedError()
