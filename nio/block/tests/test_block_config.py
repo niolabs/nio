@@ -1,6 +1,6 @@
 from nio.block.base import Block
 from nio.block.context import BlockContext
-from nio.common.block.router import BlockRouter
+from nio.router.base import BlockRouter
 from nio.properties import StringProperty
 from nio.util.support.test_case import NIOTestCase
 
@@ -16,6 +16,7 @@ class DummyBlock(Block):
 
 
 class TestBlockConfig(NIOTestCase):
+
     def setupModules(self):
         # Not using functionality modules
         pass
@@ -27,7 +28,7 @@ class TestBlockConfig(NIOTestCase):
     def setUp(self):
         # Build some sample configuration (don't actually load anything)
         super().setUp()
-        self._config = {"name":"dummy_block"}
+        self._config = {"name": "dummy_block"}
         self._config[CONFIG_KEY] = CONFIG_VAL
 
     def test_load_config(self):

@@ -6,15 +6,17 @@ import logging.config
 import multiprocessing
 from unittest import TestCase
 
-from nio.modules.scheduler import Job as SchedulerModuleJob
-from nio.modules.security.auth \
-    import Authenticator as SecurityModuleAuthenticator
-from nio.modules.security.roles import RolesProvider as SecurityModuleRoles
-from nio.modules.security.permissions \
-    import PermissionsProvider as SecurityModulePermissions
+from nio.modules.context import ModuleContext
+from nio.modules.initializer import ModuleInitializer
 
-from nio.modules.communication.publisher import Publisher
-from nio.modules.communication.subscriber import Subscriber
+# Testing module implementations
+from nio.util.support.modules.scheduler.module import TestingSchedulerModule
+from nio.util.support.modules.persistence.module \
+    import TestingPersistenceModule
+from nio.util.support.modules.communication.module \
+    import TestingCommunicationModule
+from nio.util.support.modules.security.module import TestingSecurityModule
+from nio.util.support.modules.web.module import TestingWebModule
 
 
 class NIOTestCase(TestCase):
@@ -26,72 +28,58 @@ class NIOTestCase(TestCase):
 
     """
 
-    def __init__(self, methodName='runTests'):
-        super().__init__(methodName)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         logging.config.dictConfig(self.get_logging_config())
-        self.module_proxies = []
 
-    def get_scheduler_module_implementation(self):
-        return 'nio.util.support.modules.scheduler'
+    def get_persistence_module_context(self):
+        return ModuleContext()
 
-    def get_security_module_implementation(self):
-        return 'nio.util.support.modules.security'
+    def get_scheduler_module_context(self):
+        return ModuleContext()
 
-    def get_communication_module_implementation(self):
-        return 'nio.util.support.modules.communication'
+    def get_security_module_context(self):
+        return ModuleContext()
+
+    def get_communication_module_context(self):
+        return ModuleContext()
+
+    def get_web_module_context(self):
+        return ModuleContext()
 
     def setupModules(self):
-        if 'scheduler' in self.get_test_modules():
-            self.module_proxies.append((
-                SchedulerModuleJob,
-                self.get_scheduler_module_implementation()))
+        self._module_initializer = ModuleInitializer()
+        for module_name in self.get_test_modules():
+            self._module_initializer.register_module(
+                self.get_module(module_name),
+                getattr(self, 'get_{}_module_context'.format(module_name))())
 
-        if 'security' in self.get_test_modules():
-            self.module_proxies.append((
-                SecurityModuleRoles,
-                "{}.roles".format(self.get_security_module_implementation())))
-            self.module_proxies.append(
-                (SecurityModulePermissions,
-                 "{}.permissions".format(
-                     self.get_security_module_implementation())))
-            self.module_proxies.append((
-                SecurityModuleAuthenticator,
-                "{}.auth".format(self.get_security_module_implementation())))
+        # Perform a safe initialization in case a proxy never got cleaned up
+        self._module_initializer.initialize(safe=True)
 
-        if 'communication' in self.get_test_modules():
-            self.module_proxies.append((
-                Publisher,
-                "{}.publisher".format(
-                    self.get_communication_module_implementation())))
-
-            self.module_proxies.append((
-                Subscriber,
-                "{}.subscriber".format(
-                    self.get_communication_module_implementation())))
-
-        for module_proxy, module_implementation in self.module_proxies:
-            module_proxy.initialize_from_package(module_implementation)
-
-        if 'security' in self.get_test_modules():
-            # TODO: Remove once security module is refactored
-            from niocore.modules.security import SecurityModule
-            SecurityModule._reset({})
+    def get_module(self, module_name):
+        known_modules = {
+            'scheduler': TestingSchedulerModule,
+            'persistence': TestingPersistenceModule,
+            'security': TestingSecurityModule,
+            'communication': TestingCommunicationModule,
+            'web': TestingWebModule
+        }
+        if module_name not in known_modules:
+            raise ValueError("{} is not a valid module".format(module_name))
+        return known_modules.get(module_name)()
 
     def tearDownModules(self):
-        for module_proxy, _ in reversed(self.module_proxies):
-            module_proxy.finalize()
+        # Perform a safe finalization in case anything wasn't proxied first
+        self._module_initializer.finalize(safe=True)
 
     def get_test_modules(self):
         """ Returns set of modules to load during test
         Override this method to customize which modules you want to load
         during a test
         """
-        return {'scheduler', 'security'}
-
-    def setUpSettings(self):
-        """ Sets Settings before running a unit test """
-        pass
+        return {'scheduler', 'persistence'}
 
     def get_logging_config(self):
         return {
@@ -133,20 +121,12 @@ class NIOTestCase(TestCase):
             else:
                 print('Setting multiprocess start method, details: {0}'.
                       format(str(e)))
-        # Initialize settings
-        self.setUpSettings()
         # setup Modules
         self.setupModules()
 
     def tearDown(self):
         super().tearDown()
         self.tearDownModules()
-
-    def get_provider_settings(self):
-        """ Override this method for specifying settings
-        for the config provider
-        """
-        return {}
 
 
 class NIOTestCaseNoModules(NIOTestCase):

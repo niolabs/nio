@@ -2,9 +2,9 @@ from inspect import isclass
 from unittest import skip
 
 from nio.block.base import Block
-from nio.common.signal.base import Signal
-from nio.properties import StringProperty
 from nio.util.support.block_test_case import NIOBlockTestCase
+from nio.signal.base import Signal
+from nio.properties import StringProperty
 
 
 class ValueSignal(Signal):

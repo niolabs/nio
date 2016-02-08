@@ -1,11 +1,10 @@
-from nio.util.support.modules.communication import PubSubManager
+from nio.util.support.modules.communication.manager import PubSubManager
 
 
 class Subscriber(object):
 
-    """ This class encapsulates the user-facing interface to NIO's
-    subscriber.
-    """
+    """ A version of a Subscriber useful for unit-testing """
+
     def __init__(self, handler, matching_provider=None, **topics):
         self.handler = handler
         self.topics = topics

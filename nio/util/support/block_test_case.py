@@ -3,11 +3,11 @@
 
 """
 from collections import defaultdict
-from nio.common.block.router.base import InvalidBlockOutput
+from nio.router.base import InvalidBlockOutput
 from nio.util.support.test_case import NIOTestCase
-from nio.common.block.router import BlockRouter
+from nio.router.base import BlockRouter
 from nio.block.context import BlockContext
-from nio.common.signal.status import StatusSignal
+from nio.signal.status import StatusSignal
 
 
 class TestBlockRouter(BlockRouter):
@@ -94,7 +94,6 @@ class NIOBlockTestCase(NIOTestCase):
         block.configure(BlockContext(
             self._router,
             block_properties,
-            dict(),
             'TestSuite',
             ''))
 

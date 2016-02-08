@@ -18,7 +18,7 @@ Sub_F = {'type': ['A'], 'non_pub_key': ['C']}
 
 class TestLooseMatching(NIOTestCase):
 
-    def test_default_matching_scenario1(self):
+    def test_loose_matching_scenario1(self):
         self.assertTrue(LooseMatching.matches(Sub_A, Pub_A))
         self.assertTrue(LooseMatching.matches(Sub_A, Pub_B))
         self.assertFalse(LooseMatching.matches(Sub_A, Pub_C))

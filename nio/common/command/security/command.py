@@ -3,6 +3,7 @@
   Secure Command
 
 """
+from nio.modules.security.authorizer import Authorizer, Unauthorized
 from nio.common.command import Command
 
 
@@ -15,14 +16,15 @@ class SecureCommand(Command):
 
     """
 
-    def __init__(self, name, condition, title=None):
+    def __init__(self, name, *tasks, title=None, meet_all=True):
         """
 
         Args:
-            condition (SecureCondition) : condition(s) to evaluate
+            tasks (list) : task(s) to evaluate
         """
         super().__init__(name, title)
-        self._condition = condition
+        self._tasks = tasks
+        self._meet_all = meet_all
 
     def can_invoke(self, user):
         """ Returns if the user specified meets the conditions contained in
@@ -31,4 +33,9 @@ class SecureCommand(Command):
         """
         if user is None:
             return False
-        return self._condition.evaluate(user)
+        try:
+            Authorizer.authorize_multiple(
+                user, *self._tasks, meet_all=self._meet_all)
+            return True
+        except Unauthorized:
+            return False

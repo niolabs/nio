@@ -1,16 +1,10 @@
 from logging import LogRecord
 import logging
 from nio.util.logging.filter import NIOFilter
-from nio.util.support.test_case import NIOTestCase
+from nio.util.support.test_case import NIOTestCaseNoModules
 
 
-class TestFilter(NIOTestCase):
-
-    def setupModules(self):
-        pass
-
-    def tearDownModules(self):
-        pass
+class TestFilter(NIOTestCaseNoModules):
 
     def test_filter_withniotime(self):
         "Tests filter works fine when record has niotime"

@@ -3,7 +3,7 @@ from datetime import timedelta
 from enum import Enum
 
 from nio.block.base import Block
-from nio.common.service.base import Service
+from nio.service.base import Service
 from nio.properties import FloatProperty, BoolProperty, SelectProperty
 from nio.properties import IntProperty
 from nio.properties import ListProperty

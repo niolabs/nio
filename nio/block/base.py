@@ -5,23 +5,22 @@ a custom block, extend this Block class and override the appropriate methods.
 """
 from nio.block.context import BlockContext
 from nio.block.terminals import Terminal, TerminalType, input, output
-from nio.common import ComponentStatus
-from nio.common.block.router import BlockRouter
 from nio.common.command import command
 from nio.common.command.holder import CommandHolder
-from nio.common.signal.status import BlockStatusSignal
-from nio.modules.persistence import Persistence
+from nio.router.base import BlockRouter
 from nio.properties import PropertyHolder, StringProperty, \
     VersionProperty, SelectProperty
-from nio.util.flags_enum import FlagsEnum
 from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
+from nio.modules.persistence import Persistence
+from nio.util.runner import Runner
+from nio.signal.status import BlockStatusSignal
 
 
 @input("default")
 @output("default")
 @command('properties')
-class Block(PropertyHolder, CommandHolder):
+class Block(PropertyHolder, CommandHolder, Runner):
 
     """The base class for blocks to inherit from."""
 
@@ -31,7 +30,7 @@ class Block(PropertyHolder, CommandHolder):
     log_level = SelectProperty(enum=LogLevel,
                                title="Log Level", default="NOTSET")
 
-    def __init__(self):
+    def __init__(self, status_change_callback=None):
         """ Create a new block instance.
 
         Take care of setting up instance variables in your block's constructor.
@@ -42,17 +41,17 @@ class Block(PropertyHolder, CommandHolder):
         block. Any data the block requires will be passed through the
         BlockContext when the block is configured.
         """
-        super().__init__()
 
-        self._status = FlagsEnum(ComponentStatus)
+        # We will replace the block's logger with its own name once we learn
+        # what that name is during configure()
+        self._logger = get_nio_logger('default')
+
+        super().__init__(status_change_callback=status_change_callback)
 
         # store block type so that it gets serialized
         self.type = self.__class__.__name__
 
         self._block_router = None
-        # We will replace the block's logger with its own name once we learn
-        # what that name is during configure()
-        self._logger = get_nio_logger('default')
         self.persistence = None
         self._service_name = None
 
@@ -122,6 +121,9 @@ class Block(PropertyHolder, CommandHolder):
     def notify_management_signal(self, signal):
         """Notify a management signal to router.
 
+        Args:
+            signal: signal to notify
+
         This is a special type of signal notification that does not actually
         propogate signals in the service. Instead, it is used to communicate
         some information to the block router about the block. For example,
@@ -131,7 +133,7 @@ class Block(PropertyHolder, CommandHolder):
         if isinstance(signal, BlockStatusSignal):
             # set service block is part of
             signal.service_name = self._service_name
-            signal.name = self.name
+            signal.block_name = self.name
             self.status.add(signal.status)
         self._block_router.notify_management_signal(self, signal)
 
@@ -207,17 +209,7 @@ class Block(PropertyHolder, CommandHolder):
         """
         return output_id in self.outputs
 
-    @property
-    def status(self):
-        return self._status
-
-    @status.setter
-    def status(self, status):
-        """ Block Status
-
-        Possible values are based on ComponentStatus
-
+    def get_logger(self):
+        """ Provides block logger
         """
-        self._logger.info("Block: {} (type: {}) status is {}".format(
-            self.name, self.__class__.__name__, status.name))
-        self._status.set(status)
+        return self._logger

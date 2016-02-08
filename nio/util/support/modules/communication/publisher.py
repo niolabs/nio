@@ -1,11 +1,10 @@
-from nio.util.support.modules.communication import PubSubManager
+from nio.util.support.modules.communication.manager import PubSubManager
 
 
 class Publisher(object):
 
-    """ This class encapsulates the user-facing interface to NIO's
-    publisher.
-    """
+    """ A version of a Publisher useful for unit-testing """
+
     def __init__(self, context=None, **topics):
         self.topics = topics
 
@@ -36,6 +35,5 @@ class Publisher(object):
         PubSubManager.remove_publisher(self)
 
     def is_closed(self):
-        """ Finds out if publisher has been closed
-        """
+        """ Finds out if publisher has been closed """
         return self in PubSubManager.publishers

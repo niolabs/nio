@@ -1,7 +1,7 @@
 from datetime import timedelta
 from threading import RLock
 
-from nio.modules.scheduler import Job
+from nio.modules.scheduler.job import Job
 
 
 class Cache(object):

@@ -1,7 +1,6 @@
 from nio.common.versioning.check import compare_versions, \
     VersionCheckResult, InvalidVersionFormat, is_version_valid, \
     get_major_version
-from nio.metadata.environment import is_environment_var
 from nio.properties import BaseProperty
 
 
@@ -64,9 +63,6 @@ class PropertyHolder(object):
             properties (dict): validated and serialized
 
         """
-        from nio.properties import ListProperty, ObjectProperty, \
-            TimeDeltaProperty
-
         class_properties = cls.get_class_properties()
 
         for (property_name, prop) in class_properties.items():
@@ -104,8 +100,8 @@ class PropertyHolder(object):
             if property_name in properties:
                 # if the given property was included in the input dictionary,
                 # deserialize the dictionary's value and set it
-                #value = prop.deserialize(properties[property_name])
-                #setattr(self, property_name, value)
+                # value = prop.deserialize(properties[property_name])
+                # setattr(self, property_name, value)
                 # TODO: do we need to call deserialize first?
                 setattr(self, property_name, properties[property_name])
 
@@ -184,7 +180,7 @@ class PropertyHolder(object):
             for _class in classes:
                 for (prop_name, prop) in _class.__dict__.items():
                     if (isinstance(prop, BaseProperty) and
-                        prop_name not in properties):
+                            prop_name not in properties):
                         properties[prop_name] = prop
 
             # cache properties
@@ -247,8 +243,8 @@ class PropertyHolder(object):
 
         comparison_result = compare_versions(instance_version,
                                              class_version)
-        if comparison_result == VersionCheckResult.Equal \
-                or comparison_result == VersionCheckResult.Newer:
+        if comparison_result == VersionCheckResult.equal \
+                or comparison_result == VersionCheckResult.newer:
             # instance has a newer version, it is ok
             pass
         else:
@@ -264,8 +260,8 @@ class PropertyHolder(object):
 
             comparison_result = compare_versions(instance_version,
                                                  min_version)
-            if comparison_result == VersionCheckResult.Equal \
-                    or comparison_result == VersionCheckResult.Newer:
+            if comparison_result == VersionCheckResult.equal \
+                    or comparison_result == VersionCheckResult.newer:
                 # ok, got a version not older than minimum
                 pass
             else:

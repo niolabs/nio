@@ -1,8 +1,9 @@
-from nio.common.versioning.check import is_version_valid, InvalidVersionFormat
+from nio.util.versioning.check import is_version_valid, InvalidVersionFormat
 from nio.properties import StringProperty
 
 
 class VersionProperty(StringProperty):
+
     """ Defines a Version property.
     Version property permits saving version information with
     (mayor.minor.build) format
