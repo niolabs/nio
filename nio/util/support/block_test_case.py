@@ -89,6 +89,8 @@ class NIOBlockTestCase(NIOTestCase):
         super().tearDown()
 
     def configure_block(self, block, block_properties, hooks=None):
+        # Blocks should always have a 'name', but we'll let it pass in tests
+        block_properties["name"] = block_properties.get("name", "default")
         block.configure(BlockContext(
             self._router,
             block_properties,
