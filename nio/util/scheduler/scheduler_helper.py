@@ -11,7 +11,7 @@ from collections import namedtuple
 QueueEvent = namedtuple('Event', 'time, id, target, frequency, args, kwargs')
 
 
-class Scheduler():
+class SchedulerHelper(object):
 
     def __init__(self, resolution, min_delta):
         """ Initializes scheduler.
@@ -21,8 +21,9 @@ class Scheduler():
                 is used during sleeping operations when it is determined
                 a wait is needed before determining the next event to be
                 executed
+            min_delta: minimum value to consider when scheduling a task
         """
-        super(Scheduler, self).__init__()
+        super().__init__()
 
         self._resolution = resolution
         self._min_delta = min_delta

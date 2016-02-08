@@ -1,8 +1,7 @@
 from datetime import timedelta
 from time import sleep
 from nio.modules.scheduler.job import Job
-from nio.util.support.modules.scheduler.tests.custom_base_test \
-    import CustomSchedulerTestCase
+from nio.util.support.test_case import NIOTestCase
 
 
 class Dummy(object):
@@ -19,7 +18,7 @@ class Dummy(object):
         self.foo2_called = True
 
 
-class TestScheduler(CustomSchedulerTestCase):
+class TestScheduler(NIOTestCase):
 
     def test_two_jobs(self):
         """ Asserts that independently of the order, the right task is

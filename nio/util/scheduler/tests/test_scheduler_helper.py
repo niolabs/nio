@@ -2,18 +2,17 @@ from threading import RLock
 
 from unittest.mock import patch
 from datetime import timedelta
-from nio.util.support.modules.scheduler.scheduler_thread import SchedulerThread
-from nio.util.support.modules.scheduler.scheduler import Scheduler
+from nio.util.scheduler.scheduler_thread import SchedulerThread
+from nio.util.scheduler.scheduler_helper import SchedulerHelper
 from time import sleep
-from nio.util.support.modules.scheduler.tests.custom_base_test \
-    import CustomSchedulerTestCase
+from nio.util.support.test_case import NIOTestCase
 
 
-class TestScheduler(CustomSchedulerTestCase):
+class TestSchedulerHelper(NIOTestCase):
 
     def setUp(self):
         super().setUp()
-        self._scheduler = Scheduler(0.1, 0.1)
+        self._scheduler = SchedulerHelper(0.1, 0.1)
         self._thread_scheduler = SchedulerThread(self._scheduler)
         self._thread_scheduler.start()
         self._fired_times_lock = RLock()
