@@ -5,7 +5,7 @@ from threading import RLock
 from nio.util.support.modules.scheduler.tests.custom_base_test \
     import CustomSchedulerTestCase
 from nio.util.support.modules.scheduler import NIOScheduler
-from nio.modules.scheduler import Job
+from nio.modules.scheduler.job import Job
 from nio.util.threading import spawn
 
 
