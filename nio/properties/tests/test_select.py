@@ -33,7 +33,17 @@ class TestProperties(NIOBlockTestCase):
 
         # assert that it takes values
         instance.select_property = SampleEnum.option2
+        # assert that the values matched when reading them
+        self.assertEqual(instance.select_property(), SampleEnum.option2)
 
+    def test_accept_strings(self):
+        """ Make sure the select property can take string names of values """
+        instance = SampleClass()
+
+        self.assertEqual(instance.select_property(), SampleEnum.option3)
+
+        # assert that it takes values
+        instance.select_property = "option2"
         # assert that the values matched when reading them
         self.assertEqual(instance.select_property(), SampleEnum.option2)
 

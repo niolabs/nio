@@ -1,4 +1,4 @@
-from nio.common.versioning.check import compare_versions, \
+from nio.util.versioning.check import compare_versions, \
     VersionCheckResult, InvalidVersionFormat, is_version_valid, \
     get_major_version
 from nio.properties import BaseProperty
