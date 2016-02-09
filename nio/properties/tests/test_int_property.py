@@ -1,4 +1,4 @@
-from nio.common.signal.base import Signal
+from nio.signal.base import Signal
 from nio.properties import IntProperty, PropertyHolder
 from nio.util.support.test_case import NIOTestCase
 

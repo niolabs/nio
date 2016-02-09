@@ -1,4 +1,4 @@
-from nio.common.signal.base import Signal
+from nio.signal.base import Signal
 from nio.properties import IntProperty
 from nio.properties import ListProperty
 from nio.properties import PropertyHolder

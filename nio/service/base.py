@@ -63,8 +63,8 @@ class Service(PropertyHolder, CommandHolder, Runner):
     log_level = SelectProperty(LogLevel, default="NOTSET")
 
     # properties defining the service execution
-    execution = ListProperty(BlockExecution)
-    mappings = ListProperty(BlockMapping)
+    execution = ListProperty(BlockExecution, default=[])
+    mappings = ListProperty(BlockMapping, default=[])
 
     # System Metadata that can be used by API clients, which is serialized
     # along with any other service properties
@@ -140,7 +140,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
         # reset logger after modules initialization
         # and properties setting
         self._logger = get_nio_logger("service")
-        self._logger.setLevel(self.log_level)
+        self._logger.setLevel(self.log_level())
 
         # configure the Persistence module with the service name
         Persistence.configure(self.name)
@@ -164,7 +164,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
             self._blocks[block.name] = block
 
         # populate router context and configure block router
-        router_context = RouterContext(self.execution,
+        router_context = RouterContext(self.execution(),
                                        self._blocks,
                                        context.router_settings,
                                        context.mgmt_signal_handler)
