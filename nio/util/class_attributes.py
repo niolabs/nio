@@ -4,16 +4,20 @@ from types import BuiltinMethodType, MethodType, FunctionType
 class ClassAttributes(object):
 
     @classmethod
-    def is_attr(cls, attr):
-        """ Determine from a class attribute if it is a 'data' attribute
+    def is_attr(cls, attr_value):
+        """ Determine if an attribute value obtained using 'getattr'
+        is a 'data' attribute.
 
         Args:
-            attr: Attribute to check against
+            attr_value: Attribute value to check against
+
+        Returns:
+            True if value is a 'data' attribute, False otherwise
         """
-        if (attr is BuiltinMethodType or
-                isinstance(attr, BuiltinMethodType) or
-                isinstance(attr, type(object().__hash__)) or
-                isinstance(attr, MethodType) or
-                isinstance(attr, FunctionType)):
+        if (attr_value is BuiltinMethodType or
+                isinstance(attr_value, BuiltinMethodType) or
+                isinstance(attr_value, type(object().__hash__)) or
+                isinstance(attr_value, MethodType) or
+                isinstance(attr_value, FunctionType)):
             return False
         return True

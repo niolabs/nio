@@ -5,15 +5,19 @@ from nio.modules.scheduler.job import Job
 
 
 class Cache(object):
-    """ Cache utility class to cache and expire items given a certain duration
+    """ Utility class to cache and expire items given a certain duration
 
+    There is no distinction as to what kind of items can be cached in a
+    given instance, therefore, items of different types can be combined within
+    the same cache.
     """
 
     def __init__(self, duration):
-        """ Cache initialization
+        """ Create a new Cache instance.
 
         Args:
-            duration: default duration
+            duration: default duration in seconds to use for items,
+                it can be overriden when adding an item
         """
         self._duration = duration
         self._cache = dict()
@@ -22,11 +26,14 @@ class Cache(object):
     def add(self, key, item, duration=None):
         """ Adds an item to the cache
 
+        When an item is added with a positive duration, a job is scheduled
+        for its removal at given duration in seconds
+
         Args:
             key: item key
             item: item value
-            duration: if specified item will be kept for this duration,
-                otherwise instance-wide duration is used
+            duration: if specified item will be kept for this duration in
+                seconds, otherwise instance-wide duration is used
         """
         if duration is None:
             # use instance-wide duration when specific duration is not provided
@@ -44,6 +51,7 @@ class Cache(object):
                 job = Job(self._remove_item, timedelta(seconds=duration),
                           False, key)
 
+                # save item in cache
                 self._cache[key] = (item, job)
 
     def get(self, key, default=None):
@@ -64,7 +72,10 @@ class Cache(object):
                 return default
 
     def _remove_item(self, key):
-        """ Item expiration callback
+        """ Removes item from cache
+
+        This method is triggered when item expires while being called from
+        system scheduler.
 
         Args:
             key: item key
