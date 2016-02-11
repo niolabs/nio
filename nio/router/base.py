@@ -98,15 +98,15 @@ class BlockRouter(Runner):
         self._receivers = {}
         for block_execution in context.execution:
             # block_execution should be an instance of BlockExecution
-            sender_block_name = block_execution.name
+            sender_block_name = block_execution.name()
             sender_block = context.blocks[sender_block_name]
             self._receivers[sender_block_name] = []
 
             # check if receivers have the {output_id: [receivers]} format
-            if isinstance(block_execution.receivers, dict):
+            if isinstance(block_execution.receivers(), dict):
 
                 for output_id, block_receivers in \
-                        block_execution.receivers.items():
+                        block_execution.receivers().items():
 
                     # validate that output_id is valid for sender
                     if not sender_block.is_output_valid(output_id):
@@ -123,7 +123,7 @@ class BlockRouter(Runner):
             else:
                 # receivers have the simple list format, i.e. [receivers]
                 parsed_receivers = self._process_receivers_list(
-                    block_execution.receivers,
+                    block_execution.receivers(),
                     context.blocks,
                     'default')
                 self._receivers[sender_block_name].extend(parsed_receivers)
