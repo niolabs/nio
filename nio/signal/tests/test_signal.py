@@ -48,10 +48,12 @@ class TestSignal(NIOTestCase):
         """ Ensure that hidden attributes are not returned by default """
         sig = Signal({
             'not_hidden': 'yes',
-            '_hidden': 'no'
+            '_hidden': 'no',
+            '__double_hidden': 'no'
         })
         self.assertIn('not_hidden', sig.to_dict())
         self.assertNotIn('_hidden', sig.to_dict())
+        self.assertNotIn('__double_hidden', sig.to_dict())
 
     def test_to_dict_with_type(self):
         """ Ensure we can get the teyp of a signal """
@@ -87,12 +89,14 @@ class TestSignal(NIOTestCase):
         attributes = copy.deepcopy(self.attrs)
         attributes["_hidden1"] = "hidden1"
         attributes["_hidden2"] = "hidden2"
+        attributes["__double_hidden"] = "double_hidden"
         sig = Signal(attributes)
         signal_dict = sig.to_dict(include_hidden=True)
         for key, value in self.attrs.items():
             self.assertEqual(signal_dict[key], value)
         self.assertEqual(signal_dict['_hidden1'], attributes["_hidden1"])
         self.assertEqual(signal_dict['_hidden2'], attributes["_hidden2"])
+        self.assertNotIn('__double_hidden', signal_dict)
 
         # use default
         signal_dict = sig.to_dict()
@@ -100,3 +104,4 @@ class TestSignal(NIOTestCase):
             self.assertEqual(signal_dict[key], value)
         self.assertNotIn('_hidden1', signal_dict)
         self.assertNotIn('_hidden2', signal_dict)
+        self.assertNotIn('__double_hidden', signal_dict)
