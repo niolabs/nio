@@ -19,22 +19,25 @@ class FlagsEnum(object):
         status = FlagsEnum(Status)
         status.add(Status.started)
         ....
-        # an error_1 occurred
+        # an 'error_1' occurred
         status.add(Status.error_1)
-        # Note that started is still set
+        # Note that 'started' is still set
         ....
         # system recovered
         status.remove(Status.error_1)
-        # Note: started still remains, back to normal
+        # Note: 'started' still remains, back to normal
 
     """
 
     def __init__(self, enum, default_flag=None,
                  status_change_callback=None):
-        """ Initializes a FlagsEnum instance
+        """ Create a new FlagsEnum instance.
 
         Args:
             enum (Enum): the enum from which flags are accepted
+            default_flag (Enum): optional initial flag
+            status_change_callback (callable): Method to call when
+                detected a change in the flags value.
 
         Returns:
             None
@@ -50,7 +53,7 @@ class FlagsEnum(object):
             self.add(default_flag)
 
     def _validate_flag(self, flag):
-        """ Validates if a flag is allowed
+        """ Validates if given flag is within the range of the enum values
 
         Args:
             flag (value within the enum): the flag to check against
@@ -78,7 +81,11 @@ class FlagsEnum(object):
             status.add(Status.created)
         """
         self._validate_flag(flag)
+
+        # make sure flag is not already set
         if not self._flags[flag.name]:
+
+            # save old status to send along with changed status
             old_status = copy.deepcopy(self)
             self._flags[flag.name] = True
             if self._status_change_callback:
@@ -98,7 +105,11 @@ class FlagsEnum(object):
             status.remove(Status.created)
         """
         self._validate_flag(flag)
+
+        # make sure flag is set
         if self._flags[flag.name]:
+
+            # save old status to send along with changed status
             old_status = copy.deepcopy(self)
             self._flags[flag.name] = False
             if self._status_change_callback:
@@ -115,19 +126,25 @@ class FlagsEnum(object):
 
         Example:
             status = FlagsEnum(Status)
+            # set status to be 'created'
             status.set(Status.created)
+            # set status to be 'created, error'
+            status.add(Status.error)
+            # override previous status, set it to 'configured'
+            status.set(Status.configured)
         """
         self._validate_flag(flag)
 
+        # save old status to send along with changed status
         old_status = copy.deepcopy(self)
         change_occurred = False
-        # set all flags but intended to False
+        # set all flags but intended flag to False
         for key in self._flags.keys():
             if self._flags[key] and key is not flag.name:
                 self._flags[key] = False
                 change_occurred = True
 
-        # set intended flag
+        # set intended flag if not already set
         if not self._flags[flag.name]:
             self._flags[flag.name] = True
             change_occurred = True
@@ -142,26 +159,45 @@ class FlagsEnum(object):
             flag (value within the enum): the flag to check against
 
         Returns:
-            None
+            True if flag is set, False otherwise
 
-        Example:
-            status = FlagsEnum(Status)
-            status.is_set(Status.created)
         """
         self._validate_flag(flag)
         return self._flags[flag.name]
 
     def clear(self):
+        """ Resets all possible flag values
+
+        Returns:
+            None
+
+        """
         for value in self._enum:
             self._flags[value.name] = False
 
     @property
     def flags(self):
+        """ Provides flag values
+
+        Returns:
+            Flag values
+
+        """
         return self._flags
 
     @flags.setter
     def flags(self, flags):
+        """ Allows to set more than one flag at the same time
 
+        Args:
+            flags: flags to set
+
+        Returns:
+            None
+
+        """
+
+        # save old status to send along with changed status
         old_status = copy.deepcopy(self)
         change_occurred = False
         for key in flags.keys():
