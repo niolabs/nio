@@ -82,6 +82,12 @@ class Signal(object):
         """
         sig_dict = dict()
         for attr_name in dir(self):
+
+            # We don't want to include attributes starting with two underscores
+            # under any circumstance
+            if attr_name.startswith('__'):
+                continue
+
             attr_value = getattr(self, attr_name)
 
             # We don't want to include methods or functions in the dictionary
