@@ -3,6 +3,8 @@
 A block contains modular functionality to be used inside of Services. To create
 a custom block, extend this Block class and override the appropriate methods.
 """
+import collections
+
 from nio.block.context import BlockContext
 from nio.block.terminals import Terminal, TerminalType, input, output
 from nio.common.command import command
@@ -117,7 +119,34 @@ class Block(PropertyHolder, CommandHolder, Runner):
             signals (list): A list of signals to notify to the router
             output_id: The identifier of the output terminal to notify the
                 signals on
+
+        The signals argument is handled as follows:
+            - every signal notified has to be an instance of 'Signal'
+            - an empty list or something evaluating to False is discarded
+            - if a single signal is notified not as a list, it will get
+            wrapped inside a list when notifying.
+
+        Raises:
+            TypeError: when signals are not instances of class Signal
         """
+
+        if isinstance(signals, dict):
+            raise TypeError("Signals cannot be a dictionary")
+
+        if not signals:
+            # discard an empty list or something that evaluates to False
+            return
+
+        # make sure we can iterate
+        if not isinstance(signals, collections.Iterable):
+            signals = [signals]
+
+        # make sure container has signals only, quit iterating as soon as a
+        # not-complying signal is found.
+        from nio import Signal
+        if any(not isinstance(signal, Signal) for signal in signals):
+            raise TypeError("All instances are expected to be of Signal type")
+
         self._block_router.notify_signals(self, signals, output_id)
 
     def notify_management_signal(self, signal):
