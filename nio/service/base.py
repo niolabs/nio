@@ -1,7 +1,7 @@
 from nio.router.context import RouterContext
-from nio.common.command import command
-from nio.common.command.security import command_security
-from nio.common.command.holder import CommandHolder
+from nio.command import command
+from nio.command.security import command_security
+from nio.command.holder import CommandHolder
 from nio import discoverable
 from nio.util.versioning.dependency import DependsOn
 from nio.properties import PropertyHolder, VersionProperty, \

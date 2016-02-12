@@ -2,7 +2,7 @@
     NIO Typed Parameter class
 
 """
-from nio.common.command.params import Parameter
+from nio.command.params import Parameter
 
 
 class TypedParameter(Parameter):

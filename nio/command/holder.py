@@ -2,7 +2,7 @@
     NIO Command Holder class
 
 """
-from nio.common.command.base import Command, InvalidCommandArg
+from nio.command.base import Command, InvalidCommandArg
 
 
 class CommandHolder(object):

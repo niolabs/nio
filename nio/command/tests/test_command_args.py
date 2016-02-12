@@ -1,9 +1,9 @@
 from nio.block.base import Block
-from nio.common.command import command
-from nio.common.command.base import InvalidCommandArg
-from nio.common.command.params.int import IntParameter
-from nio.common.command.params.float import FloatParameter
-from nio.common.command.params.string import StringParameter
+from nio.command import command
+from nio.command.base import InvalidCommandArg
+from nio.command.params.int import IntParameter
+from nio.command.params.float import FloatParameter
+from nio.command.params.string import StringParameter
 from nio.util.support.block_test_case import NIOBlockTestCase
 
 

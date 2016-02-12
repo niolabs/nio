@@ -2,7 +2,7 @@
     NIO Float Parameter class
 
 """
-from nio.common.command.params.typed import TypedParameter
+from nio.command.params.typed import TypedParameter
 
 
 class FloatParameter(TypedParameter):

@@ -1,8 +1,8 @@
 from unittest.mock import MagicMock
 from nio.block.base import Block
-from nio.common.command import command
-from nio.common.command.params.string import StringParameter
-from nio.common.command.params.int import IntParameter
+from nio.command import command
+from nio.command.params.string import StringParameter
+from nio.command.params.int import IntParameter
 from nio.util.support.block_test_case import NIOBlockTestCase
 
 

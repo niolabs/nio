@@ -2,7 +2,7 @@
     NIO Dictionary Parameter class
 
 """
-from nio.common.command.params.typed import TypedParameter
+from nio.command.params.typed import TypedParameter
 
 
 class DictParameter(TypedParameter):

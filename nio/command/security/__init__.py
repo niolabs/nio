@@ -3,8 +3,8 @@
   Command Security decorator
 
 """
-from nio.common.command.security.command import SecureCommand
-from nio.common.command.holder import CommandHolder
+from nio.command.security.command import SecureCommand
+from nio.command.holder import CommandHolder
 
 
 def command_security(name, *tasks, meet_all=True):

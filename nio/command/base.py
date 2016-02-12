@@ -2,8 +2,8 @@
     Base Command class
 
 """
-from nio.common.command.params.string import StringParameter
-from nio.common.command.params.typed import TypedParameter
+from nio.command.params.string import StringParameter
+from nio.command.params.typed import TypedParameter
 
 
 class InvalidCommandArg(Exception):

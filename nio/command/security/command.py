@@ -4,7 +4,7 @@
 
 """
 from nio.modules.security.authorizer import Authorizer, Unauthorized
-from nio.common.command import Command
+from nio.command import Command
 
 
 class SecureCommand(Command):
