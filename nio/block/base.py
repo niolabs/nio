@@ -84,7 +84,9 @@ class Block(PropertyHolder, CommandHolder, Runner):
         self._logger = get_nio_logger(self.name())
         self._logger.setLevel(self.log_level())
 
-        self.persistence = Persistence(self.name)
+        # TODO: create unit test for this. the following passes tests:
+        # self.persistence = Persistence(self.name)
+        self.persistence = Persistence(self.name())
         self._service_name = context.service_name
 
     def start(self):
@@ -133,7 +135,9 @@ class Block(PropertyHolder, CommandHolder, Runner):
         if isinstance(signal, BlockStatusSignal):
             # set service block is part of
             signal.service_name = self._service_name
-            signal.block_name = self.name
+            # TODO: create unit test for this. the following passes tests:
+            # signal.block_name = self.name
+            signal.block_name = self.name()
             self.status.add(signal.status)
         self._block_router.notify_management_signal(self, signal)
 
