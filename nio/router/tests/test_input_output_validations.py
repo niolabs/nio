@@ -4,6 +4,7 @@ from nio.block.context import BlockContext
 from nio.router.base import BlockRouter, InvalidBlockOutput, \
     InvalidBlockInput
 from nio.router.context import RouterContext
+from nio.service.base import BlockExecution
 from nio.util.support.test_case import NIOTestCaseNoModules
 from nio.block.terminals import input, output
 
@@ -46,7 +47,7 @@ class SecondInputBlock(InputBlock):
     pass
 
 
-class TestBlockExecution(object):
+class BlockExecutionTest(BlockExecution):
 
     def __init__(self, name, receivers):
         self.name = name
@@ -71,7 +72,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
 
         input_id1 = "first"
         execution = [
-            TestBlockExecution(
+            BlockExecutionTest(
                 name="FirstOutputBlock".lower(),
                 receivers={
                     "first": [
@@ -111,7 +112,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
                       firstoutputblock=sender_block)
 
         execution = [
-            TestBlockExecution(name="FirstOutputBlock".lower(),
+            BlockExecutionTest(name="FirstOutputBlock".lower(),
                                receivers={"second": [
                                    {"name": "FirstInputBlock".lower(),
                                     "input": "first"}]})]
@@ -137,7 +138,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
                       firstoutputblock=sender_block)
 
         execution = [
-            TestBlockExecution(name="FirstOutputBlock".lower(),
+            BlockExecutionTest(name="FirstOutputBlock".lower(),
                                receivers={"first": [
                                    {"name": "SecondInputBlock".lower(),
                                     "input": "second"}]})]
@@ -162,7 +163,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
                       firstoutputblock=sender_block)
 
         execution = [
-            TestBlockExecution(name="FirstOutputBlock".lower(),
+            BlockExecutionTest(name="FirstOutputBlock".lower(),
                                receivers={"first": [
                                    {"name": "SecondInputBlock".lower(),
                                     "input": "first"}]})]
@@ -196,7 +197,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
                       outputblock=sender_block)
 
         execution = [
-            TestBlockExecution(name="OutputBlock".lower(),
+            BlockExecutionTest(name="OutputBlock".lower(),
                                receivers=["FirstInputBlock".lower()])]
         router_context = RouterContext(execution, blocks)
 

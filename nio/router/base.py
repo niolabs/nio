@@ -98,15 +98,15 @@ class BlockRouter(Runner):
         self._receivers = {}
         for block_execution in context.execution:
             # block_execution should be an instance of BlockExecution
-            sender_block_name = block_execution.name
+            sender_block_name = block_execution.name()
             sender_block = context.blocks[sender_block_name]
             self._receivers[sender_block_name] = []
 
             # check if receivers have the {output_id: [receivers]} format
-            if isinstance(block_execution.receivers, dict):
+            if isinstance(block_execution.receivers(), dict):
 
                 for output_id, block_receivers in \
-                        block_execution.receivers.items():
+                        block_execution.receivers().items():
 
                     # validate that output_id is valid for sender
                     if not sender_block.is_output_valid(output_id):
@@ -123,7 +123,7 @@ class BlockRouter(Runner):
             else:
                 # receivers have the simple list format, i.e. [receivers]
                 parsed_receivers = self._process_receivers_list(
-                    block_execution.receivers,
+                    block_execution.receivers(),
                     context.blocks,
                     'default')
                 self._receivers[sender_block_name].extend(parsed_receivers)
@@ -231,9 +231,9 @@ class BlockRouter(Runner):
 
             # determine if signals are to be cloned.
             clone_signals = \
-                self._clone_signals and len(self._receivers[block.name]) > 1
+                self._clone_signals and len(self._receivers[block.name()]) > 1
 
-            for receiver_data in self._receivers[block.name]:
+            for receiver_data in self._receivers[block.name()]:
                 if receiver_data.block.status.is_set(RunnerStatus.error):
                     self._logger.debug(
                         "Block '{0}' has status 'error'. Not delivering "

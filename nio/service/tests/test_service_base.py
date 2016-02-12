@@ -17,7 +17,7 @@ class TestBaseService(NIOTestCaseNoModules):
             block_router_type=BlockRouter
         ))
         # Make sure the name property got set properly
-        self.assertEqual(service.name, "ServiceName")
+        self.assertEqual(service.name(), "ServiceName")
 
     def test_notify_management_signal(self):
         """Test the service can notify management signals properly"""

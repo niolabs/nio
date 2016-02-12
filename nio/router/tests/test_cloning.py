@@ -4,6 +4,7 @@ from nio.block.base import Block
 from nio.block.context import BlockContext
 from nio.router.base import BlockRouter
 from nio.router.context import RouterContext
+from nio.service.base import BlockExecution
 from nio.signal.base import Signal
 from nio.util.support.test_case import NIOTestCase
 
@@ -51,7 +52,7 @@ class ReceiverBlock2(Block):
         self.signal_cache = None
 
 
-class TestBlockExecution(object):
+class BlockExecutionTest(BlockExecution):
 
     def __init__(self, name, receivers):
         self.name = name
@@ -81,7 +82,7 @@ class TestCloningSignals(NIOTestCase):
         blocks = dict(receiverblock1=receiver_block1,
                       receiverblock2=receiver_block2,
                       senderblock=sender_block)
-        execution = [TestBlockExecution(name="senderblock",
+        execution = [BlockExecutionTest(name="senderblock",
                                         receivers=["receiverblock1",
                                                    "receiverblock2"])]
 
@@ -145,7 +146,7 @@ class TestCloningSignals(NIOTestCase):
         blocks = dict(receiverblock1=receiver_block1,
                       receiverblock2=receiver_block2,
                       senderblock=sender_block)
-        execution = [TestBlockExecution(name="senderblock",
+        execution = [BlockExecutionTest(name="senderblock",
                                         receivers=["receiverblock1",
                                                    "receiverblock2"])]
 

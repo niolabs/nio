@@ -3,16 +3,16 @@
 A block contains modular functionality to be used inside of Services. To create
 a custom block, extend this Block class and override the appropriate methods.
 """
+from nio.block.context import BlockContext
+from nio.block.terminals import Terminal, TerminalType, input, output
 from nio.common.command import command
 from nio.common.command.holder import CommandHolder
 from nio.router.base import BlockRouter
-from nio.metadata.properties import PropertyHolder, StringProperty, \
+from nio.properties import PropertyHolder, StringProperty, \
     VersionProperty, SelectProperty
 from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
-from nio.block.context import BlockContext
-from nio.block.terminals import Terminal, TerminalType, input, output
 from nio.util.runner import Runner
 from nio.signal.status import BlockStatusSignal
 
@@ -27,7 +27,8 @@ class Block(PropertyHolder, CommandHolder, Runner):
     version = VersionProperty(version='0.0.0')
     type = StringProperty(visible=False, readonly=True)
     name = StringProperty(visible=False)
-    log_level = SelectProperty(LogLevel, title="Log Level", default="NOTSET")
+    log_level = SelectProperty(enum=LogLevel,
+                               title="Log Level", default="NOTSET")
 
     def __init__(self, status_change_callback=None):
         """ Create a new block instance.
@@ -80,10 +81,12 @@ class Block(PropertyHolder, CommandHolder, Runner):
         # load the configuration as class variables
         self.from_dict(context.properties, self._logger)
 
-        self._logger = get_nio_logger(self.name)
-        self._logger.setLevel(self.log_level)
+        self._logger = get_nio_logger(self.name())
+        self._logger.setLevel(self.log_level())
 
-        self.persistence = Persistence(self.name)
+        # TODO: create unit test for this. the following passes tests:
+        # self.persistence = Persistence(self.name)
+        self.persistence = Persistence(self.name())
         self._service_name = context.service_name
 
     def start(self):
@@ -132,7 +135,9 @@ class Block(PropertyHolder, CommandHolder, Runner):
         if isinstance(signal, BlockStatusSignal):
             # set service block is part of
             signal.service_name = self._service_name
-            signal.block_name = self.name
+            # TODO: create unit test for this. the following passes tests:
+            # signal.block_name = self.name
+            signal.block_name = self.name()
             self.status.add(signal.status)
         self._block_router.notify_management_signal(self, signal)
 

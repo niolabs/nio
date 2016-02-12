@@ -4,7 +4,7 @@ from nio.common.command.security import command_security
 from nio.common.command.holder import CommandHolder
 from nio import discoverable
 from nio.util.versioning.dependency import DependsOn
-from nio.metadata.properties import PropertyHolder, VersionProperty, \
+from nio.properties import PropertyHolder, VersionProperty, \
     BoolProperty, ListProperty, StringProperty, VarProperty, SelectProperty
 from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
@@ -63,8 +63,8 @@ class Service(PropertyHolder, CommandHolder, Runner):
     log_level = SelectProperty(LogLevel, default="NOTSET")
 
     # properties defining the service execution
-    execution = ListProperty(BlockExecution)
-    mappings = ListProperty(BlockMapping)
+    execution = ListProperty(BlockExecution, default=[])
+    mappings = ListProperty(BlockMapping, default=[])
 
     # System Metadata that can be used by API clients, which is serialized
     # along with any other service properties
@@ -140,10 +140,12 @@ class Service(PropertyHolder, CommandHolder, Runner):
         # reset logger after modules initialization
         # and properties setting
         self._logger = get_nio_logger("service")
-        self._logger.setLevel(self.log_level)
+        self._logger.setLevel(self.log_level())
 
         # configure the Persistence module with the service name
-        Persistence.configure(self.name)
+        # TODO: unit test for the following
+        # Persistence.configure(self.name)
+        Persistence.configure(self.name())
 
         # instantiate block router
         self._logger.debug("Instantiating block router: {0}.{1}".
@@ -161,10 +163,12 @@ class Service(PropertyHolder, CommandHolder, Runner):
                 block_definition['type'],
                 block_context)
 
-            self._blocks[block.name] = block
+            # TODO: write a unit test for this. they also pass with:
+            # self._blocks[block.name] = block
+            self._blocks[block.name()] = block
 
         # populate router context and configure block router
-        router_context = RouterContext(self.execution,
+        router_context = RouterContext(self.execution(),
                                        self._blocks,
                                        context.router_settings,
                                        context.mgmt_signal_handler)

@@ -1,7 +1,7 @@
-from nio.block.context import BlockContext
 from nio.block.base import Block
+from nio.block.context import BlockContext
 from nio.router.base import BlockRouter
-from nio.metadata.properties.string import StringProperty
+from nio.properties import StringProperty
 from nio.util.support.test_case import NIOTestCase
 
 CONFIG_KEY = "attr_1"
@@ -10,10 +10,13 @@ CONFIG_VAL = "attr_1_val"
 
 class DummyBlock(Block):
     # Create a dummy block with my configurable attribute
-    attr_1 = StringProperty()
+    attr_1 = StringProperty(allow_none=True)
+    # For this test only, allow name to be None
+    name = StringProperty(allow_none=True)
 
 
 class TestBlockConfig(NIOTestCase):
+
     def setupModules(self):
         # Not using functionality modules
         pass
@@ -25,7 +28,7 @@ class TestBlockConfig(NIOTestCase):
     def setUp(self):
         # Build some sample configuration (don't actually load anything)
         super().setUp()
-        self._config = {"name":"dummy_block"}
+        self._config = {"name": "dummy_block"}
         self._config[CONFIG_KEY] = CONFIG_VAL
 
     def test_load_config(self):
@@ -36,7 +39,7 @@ class TestBlockConfig(NIOTestCase):
                                      dict(),
                                      None))
 
-        self.assertEqual(getattr(block, CONFIG_KEY), CONFIG_VAL)
+        self.assertEqual(getattr(block, CONFIG_KEY)(), CONFIG_VAL)
 
     def test_no_load_config(self):
         """Test that with no configuration the attribute exists,
@@ -49,4 +52,5 @@ class TestBlockConfig(NIOTestCase):
                                      None))
 
         self.assertTrue(hasattr(block, CONFIG_KEY))
-        self.assertNotEqual(getattr(block, CONFIG_KEY), CONFIG_VAL)
+        self.assertEqual(getattr(block, CONFIG_KEY)(), None)
+        self.assertNotEqual(getattr(block, CONFIG_KEY)(), CONFIG_VAL)

@@ -1,5 +1,6 @@
 from nio.block.base import Block
 from nio.block.context import BlockContext
+from nio.service.base import BlockExecution
 from nio.router.context import RouterContext
 from nio.util.support.test_case import NIOTestCase
 
@@ -28,7 +29,7 @@ class ReceiverBlock(Block):
         self.signal_cache = None
 
 
-class TestBlockExecution(object):
+class BlockExecutionTest(BlockExecution):
 
     def __init__(self, name, receivers):
         self.name = name
@@ -57,7 +58,7 @@ class TestBlockRouter(NIOTestCase):
         # create context initialization data
         blocks = dict(receiverblock=receiver_block,
                       senderblock=sender_block)
-        execution = [TestBlockExecution(name="senderblock",
+        execution = [BlockExecutionTest(name="senderblock",
                                         receivers=["receiverblock"])]
 
         router_context = RouterContext(execution, blocks, {"max_workers": 3})

@@ -17,7 +17,7 @@ class TestBaseBlock(NIOTestCaseNoModules):
             {"name": "BlockName", "log_level": "WARNING"},
             {}))
         # Make sure the name property got set properly
-        self.assertEqual(blk.name, "BlockName")
+        self.assertEqual(blk.name(), "BlockName")
 
     def test_invalid_configure(self):
         """Make sure a block is configured with valid information"""

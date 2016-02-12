@@ -3,6 +3,7 @@ from nio.block.base import Block
 from nio.block.context import BlockContext
 from nio.router.base import BlockRouter
 from nio.router.context import RouterContext
+from nio.service.base import BlockExecution
 from nio.util.support.test_case import NIOTestCaseNoModules
 
 # CONFIGURATION to follow for unittests understanding
@@ -153,7 +154,7 @@ class State(Block):
             self.signal_cache_input1.append(signals)
 
 
-class TestBlockExecution(object):
+class BlockExecutionTest(BlockExecution):
 
     def __init__(self, name, receivers):
         self.name = name
@@ -182,7 +183,7 @@ class TestInputOutput(NIOTestCaseNoModules):
         input_id1 = 0
         input_id2 = 1
         execution = [
-            TestBlockExecution(name="two_outputs",
+            BlockExecutionTest(name="two_outputs",
                                receivers={0: ["log1"],
                                           1: ["log2"]})]
 
@@ -240,7 +241,7 @@ class TestInputOutput(NIOTestCaseNoModules):
         input_id0 = 0
         input_id1 = 1
         input_id2 = 2
-        execution = [TestBlockExecution(
+        execution = [BlockExecutionTest(
             name="three_outputs",
             receivers={0: [{"name": "state", "input": input_id0}, "log1"],
                        1: [{"name": "state", "input": input_id1}],
