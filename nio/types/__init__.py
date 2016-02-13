@@ -1,5 +1,6 @@
 from .base import Type
 from .bool import BoolType
+from .dict import DictType
 from .file import FileType
 from .float import FloatType
 from .int import IntType

@@ -1,16 +1,11 @@
-"""
-    NIO Float Parameter class
-
-"""
-from nio.command.params.typed import TypedParameter
+from nio.command.params.base import Parameter
+from nio.types import FloatType
 
 
-class FloatParameter(TypedParameter):
-    """ Typed parameter which expects a float value.
+class FloatParameter(Parameter):
 
-    """
-    def __init__(self, name, title=None, default=None, allow_none=False):
-        super().__init__(name, title, default, allow_none, float)
+    def __init__(self, name, **kwargs):
+        super().__init__(FloatType, name, **kwargs)
 
     def get_description(self):
         description = super().get_description()

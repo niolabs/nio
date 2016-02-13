@@ -1,16 +1,11 @@
-"""
-    NIO Integer Parameter class
-
-"""
-from nio.command.params.typed import TypedParameter
+from nio.command.params.base import Parameter
+from nio.types import IntType
 
 
-class IntParameter(TypedParameter):
-    """ Typed parameter which expects an integer value.
+class IntParameter(Parameter):
 
-    """
-    def __init__(self, name, title=None, default=None, allow_none=False):
-        super().__init__(name, title, default, allow_none, int)
+    def __init__(self, name, **kwargs):
+        super().__init__(IntType, name, **kwargs)
 
     def get_description(self):
         description = super().get_description()

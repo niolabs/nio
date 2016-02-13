@@ -1,16 +1,11 @@
-"""
-    NIO String Parameter class
-
-"""
-from nio.command.params.typed import TypedParameter
+from nio.command.params.base import Parameter
+from nio.types import StringType
 
 
-class StringParameter(TypedParameter):
-    """ A command parameter expecting a string
+class StringParameter(Parameter):
 
-    """
-    def __init__(self, name, title=None, default=None, allow_none=False):
-        super().__init__(name, title, default, allow_none, str)
+    def __init__(self, name, **kwargs):
+        super().__init__(StringType, name, **kwargs)
 
     def get_description(self):
         description = super().get_description()

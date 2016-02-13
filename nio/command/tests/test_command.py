@@ -8,6 +8,7 @@ from nio.command.params.int import IntParameter
 from nio.command.params.float import FloatParameter
 from nio.command.params.dict import DictParameter
 from nio.command.params.list import ListParameter
+from nio.types import DictType
 from nio.util.support.block_test_case import NIOBlockTestCase
 
 
@@ -17,12 +18,13 @@ from nio.util.support.block_test_case import NIOBlockTestCase
 @command('walk', IntParameter("steps"))
 @command('eat', StringParameter("food"))
 @command('make_signal', DictParameter("sig"))
-@command('make_multi', ListParameter("sigs"))
+@command('make_multi', ListParameter(DictType, "sigs"))
 @command('sing', StringParameter("song"), method="real_sing")
 @command('fake_sing', StringParameter("song"), method="none_existent")
 @command('lip_sing', StringParameter("song"), method="real_sing")
 class CommandBlock(Block):
 
+    # TODO: shouldn't this have phrase, times and ftimes?
     def talk(self, phrase, times):
         for i in range(times):
             print(phrase)
@@ -34,6 +36,7 @@ class CommandBlock(Block):
         print("i'm eating %s food" % food)
 
     def make_signal(self, sig):
+        """ Command parameter is a dict """
         Signal(sig)
 
     def sing(self, song):
@@ -83,9 +86,9 @@ class TestCommand(NIOBlockTestCase):
         self.blk.invoke('make_signal', {'sig': '{"key": "value"}'})
         self.blk.make_signal.assert_called_with({'key': 'value'})
 
-        # pass an invalid string, assert that ValueError is raised
+        # pass an invalid string, assert that TypeError is raised
         # when converter kicks in
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             self.blk.invoke('make_signal', {'sig': '{"key": value}'})
 
     def test_invoke_one_arg(self):
@@ -112,7 +115,7 @@ class TestCommand(NIOBlockTestCase):
         ])
 
     def test_bad_argument(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             self.blk.invoke('talk', {'phrase': 'foobar', 'times': 'baz',
                                      'ftimes': 'qux'})
         with self.assertRaises(MissingCommandArg):

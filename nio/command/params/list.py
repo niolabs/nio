@@ -1,16 +1,12 @@
-"""
-    NIO List Parameter class
-
-"""
-from nio.command.params.typed import TypedParameter
+from nio.command.params.base import Parameter
+from nio.types import ListType
 
 
-class ListParameter(TypedParameter):
-    """ A command parameter expecting a list
+class ListParameter(Parameter):
 
-    """
-    def __init__(self, name, title=None, default=[], allow_none=False):
-        super().__init__(name, title, default, allow_none, lambda x: x)
+    def __init__(self, list_obj_type, name, **kwargs):
+        kwargs['list_obj_type'] = list_obj_type
+        super().__init__(ListType, name, **kwargs)
 
     def get_description(self):
         description = super().get_description()
