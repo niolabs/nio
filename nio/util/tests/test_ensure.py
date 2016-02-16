@@ -1,8 +1,8 @@
 from nio.util.ensure_types import ensure_is, ensure_list
-from niocore.util.support.test_case import NIOCoreTestCase
+from nio.util.support.test_case import NIOTestCase
 
 
-class TestEnsure(NIOCoreTestCase):
+class TestEnsure(NIOTestCase):
 
     def test_ensure_list(self):
         some_string = 'astring'
