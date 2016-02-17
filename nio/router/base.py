@@ -3,6 +3,7 @@ from copy import deepcopy
 from nio.common import RunnerStatus
 from nio.util.logging import get_nio_logger
 from nio.util.runner import Runner
+from nio.block.terminals import DEFAULT_TERMINAL
 
 
 class BlockRouterNotStarted(Exception):
@@ -125,7 +126,7 @@ class BlockRouter(Runner):
                 parsed_receivers = self._process_receivers_list(
                     block_execution.receivers(),
                     context.blocks,
-                    'default')
+                    DEFAULT_TERMINAL)
                 self._receivers[sender_block_name].extend(parsed_receivers)
 
     def _process_receivers_list(self, receivers, blocks, output_id):
@@ -177,7 +178,8 @@ class BlockRouter(Runner):
             # which most likely will be 'default'
             inputs = blocks[receiver].inputs
             # get element from set without removing it
-            input_id = next(iter(inputs))
+            # TODO: Grab the default input
+            input_id = next(i.id for i in inputs)
             receiver_name = receiver
 
         try:

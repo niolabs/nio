@@ -6,7 +6,7 @@ from nio.router.base import BlockRouter, InvalidBlockOutput, \
 from nio.router.context import RouterContext
 from nio.service.base import BlockExecution
 from nio.util.support.test_case import NIOTestCaseNoModules
-from nio.block.terminals import input, output
+from nio.block.terminals import input, output, DEFAULT_TERMINAL
 
 
 class OutputBlock(Block):
@@ -33,7 +33,7 @@ class InputBlock(Block):
         self.name = self.__class__.__name__.lower()
         self.signal_cache = []
 
-    def process_signals(self, signals, input_id='default'):
+    def process_signals(self, signals, input_id=DEFAULT_TERMINAL):
         self.signal_cache.append(signals)
 
 
@@ -208,7 +208,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
         # make sure nothing has been delivered
         self.assertEqual(len(receiver_block.signal_cache), 0)
 
-        sender_block.notify_signals(signals, 'default')
+        sender_block.notify_signals(signals)
         # checking results
         self.assertIn(signals, receiver_block.signal_cache)
         # clean up

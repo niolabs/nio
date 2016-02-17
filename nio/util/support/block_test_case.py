@@ -7,6 +7,7 @@ from nio.router.base import InvalidBlockOutput
 from nio.util.support.test_case import NIOTestCase
 from nio.router.base import BlockRouter
 from nio.block.context import BlockContext
+from nio.block.terminals import DEFAULT_TERMINAL
 from nio.signal.status import StatusSignal
 
 
@@ -22,7 +23,7 @@ class TestBlockRouter(BlockRouter):
     def configure(self, test_case):
         self._test_case = test_case
 
-    def notify_signals(self, block, signals, output_id='default'):
+    def notify_signals(self, block, signals, output_id=DEFAULT_TERMINAL):
 
         if not block.is_output_valid(output_id):
             msg = "Invalid output: '{0}' for block: {1}".format(
@@ -41,7 +42,7 @@ class TestBlockRouter(BlockRouter):
         self._block_mgmt_signal_counts[block] += 1
         self._test_case.management_signal_notified(signal)
 
-    def get_signals_from_block(self, block=None, output_id='default'):
+    def get_signals_from_block(self, block=None, output_id=DEFAULT_TERMINAL):
         """Returns the number of signals a block has notified.
 
         If block is None, return the total number of signals notified.
@@ -97,7 +98,7 @@ class NIOBlockTestCase(NIOTestCase):
             'TestSuite',
             ''))
 
-    def signals_notified(self, signals, output_id='default'):
+    def signals_notified(self, signals, output_id=DEFAULT_TERMINAL):
         """Method to be overridden by sub-classed tests.
 
         This method will get called with the signals that the block notifies.
@@ -113,7 +114,7 @@ class NIOBlockTestCase(NIOTestCase):
         pass
 
     def assert_num_signals_notified(self, num, block=None,
-                                    output_id='default'):
+                                    output_id=DEFAULT_TERMINAL):
         """Assert that the number of signals notified is a certain number.
 
         Keyword Args:
