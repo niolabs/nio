@@ -6,8 +6,3 @@ class IntParameter(Parameter):
 
     def __init__(self, name, **kwargs):
         super().__init__(IntType, name, **kwargs)
-
-    def get_description(self):
-        description = super().get_description()
-        description['type'] = 'int'
-        return description

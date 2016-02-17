@@ -6,8 +6,3 @@ class StringParameter(Parameter):
 
     def __init__(self, name, **kwargs):
         super().__init__(StringType, name, **kwargs)
-
-    def get_description(self):
-        description = super().get_description()
-        description['type'] = 'string'
-        return description
