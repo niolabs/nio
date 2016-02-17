@@ -81,6 +81,18 @@ class Terminal(object):
         attributes.append(self)
         return cls
 
+    def get_description(self):
+        """ Return a dictionary containing the description of this terminal """
+        return {
+            'type': self._type.value,
+            'id': self.id,
+            'label': self.label,
+            'description': self.description,
+            'default': self.default,
+            'visible': self.visible,
+            'order': self.order
+        }
+
     @classmethod
     def get_terminals_on_class(cls, class_to_inspect, terminal_type):
         """ Get a list of the unique terminals on a class of a certain type

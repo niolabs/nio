@@ -184,7 +184,7 @@ class BlockRouter(Runner):
                 raise MissingBlock()
             # handling old format, get a defined input,
             # which most likely will be 'default'
-            inputs = blocks[receiver].inputs
+            inputs = blocks[receiver].__class__.inputs()
             # get element from set without removing it
             # TODO: Grab the default input
             input_id = next(i.id for i in inputs)

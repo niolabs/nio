@@ -38,6 +38,16 @@ class TestInputOutput(NIOTestCaseNoModules):
         self.assertEqual(parent_out2.order, 10)
         self.assertFalse(parent_out2.default)
         self.assertTrue(parent_out2.visible)
+        # Make sure the dictionary description is correct too
+        self.assertDictEqual(parent_out2.get_description(), {
+            'type': 'output',
+            'id': 'o2',
+            'label': 'parent',
+            'description': 'desc',
+            'default': False,
+            'visible': True,
+            'order': 10
+        })
 
     def test_terminal_default_attributes(self):
         """Asserts that default terminal attributes are saved and accessible"""
@@ -47,9 +57,20 @@ class TestInputOutput(NIOTestCaseNoModules):
         self.assertEqual(parent_out1.id, "o1")
         # The label should be the ID if not set
         self.assertEqual(parent_out1.label, "o1")
+        self.assertEqual(parent_out1.order, 5)
         self.assertEqual(parent_out1.description, "")
         self.assertFalse(parent_out1.default)
         self.assertTrue(parent_out1.visible)
+        # Make sure the dictionary description is correct too
+        self.assertDictEqual(parent_out1.get_description(), {
+            'type': 'output',
+            'id': 'o1',
+            'label': 'o1',
+            'description': '',
+            'default': False,
+            'visible': True,
+            'order': 5
+        })
 
     def test_terminal_inheritance(self):
         """Asserts that terminal definitions are inherited by subclasses."""

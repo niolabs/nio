@@ -167,30 +167,24 @@ class Block(PropertyHolder, CommandHolder, Runner):
         properties = super().get_description()
         commands = cls.get_command_description()
 
-        return {'properties': properties,
-                'commands': commands}
+        return {
+            'properties': properties,
+            'commands': commands
+        }
 
     def properties(self):
         """ Returns block runtime properties """
         return self.to_dict()
 
-    @property
-    def inputs(self):
-        """ A list of the block's input terminals
+    @classmethod
+    def inputs(cls):
+        """ A list of the block's input terminals """
+        return Terminal.get_terminals_on_class(cls, TerminalType.input)
 
-        This is a read-only property
-        """
-        return Terminal.get_terminals_on_class(
-            self.__class__, TerminalType.input)
-
-    @property
-    def outputs(self):
-        """ A list of the block's output terminals
-
-        This is a read-only property
-        """
-        return Terminal.get_terminals_on_class(
-            self.__class__, TerminalType.output)
+    @classmethod
+    def outputs(cls):
+        """ A list of the block's output terminals """
+        return Terminal.get_terminals_on_class(cls, TerminalType.output)
 
     def is_input_valid(self, input_id):
         """ Find out if input is valid
@@ -201,7 +195,7 @@ class Block(PropertyHolder, CommandHolder, Runner):
         Returns:
             bool: True if the input ID exists on this block
         """
-        return input_id in [i.id for i in self.inputs]
+        return input_id in [i.id for i in self.__class__.inputs()]
 
     def is_output_valid(self, output_id):
         """ Find out if output is valid
@@ -212,7 +206,7 @@ class Block(PropertyHolder, CommandHolder, Runner):
         Returns:
             bool: True if the output ID exists on this block
         """
-        return output_id in [o.id for o in self.outputs]
+        return output_id in [o.id for o in self.__class__.outputs()]
 
     def get_logger(self):
         """ Provides block logger
