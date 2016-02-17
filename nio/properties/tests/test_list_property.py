@@ -74,7 +74,6 @@ class TestListProperties(NIOTestCase):
         container.holder_list = self.holder_list_to_use
 
         # Now make sure getting the list gets the same one
-        self.maxDiff = None
         self.assertEqual(self.holder_list_to_use, container.holder_list())
 
     def test_to_from_dict(self):

@@ -1,6 +1,6 @@
 from nio.properties import BaseProperty
 from nio.properties import PropertyHolder
-from nio.types import ObjectType
+from nio.properties.util.object_type import ObjectType
 
 
 class ObjectProperty(BaseProperty):
