@@ -1,46 +1,72 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from .cache import LogCache
-from .log_signal import LogSignal
-from .proxy import PublisherProxy
+from nio.util.logging.handlers.publisher.log_signal import LogSignal
+from nio.util.logging.handlers.publisher.proxy import PublisherProxy
 
 
 class PublisherHandler(logging.Handler):
 
-    def __init__(self, cache_expire_interval=1, topics={"type": ["logging"]}):
+    """ Publisher handler for logging.
+
+    Publishers log events using the nio Publisher interface therefore
+    allowing reception of log events through the network through the
+    instantiation of Subscribers
+
+    Instances of this class will be registered with the base Logger on an
+    as-needed basis.
+
+    Users of this handler should be aware of the potential risk of issuing
+    logging statements within the Subscriber catching signals published through
+    this handler, therefore, logging within the subscriber 'handler' is
+    not recommended.
+
+    """
+
+    def __init__(self, topics={"type": ["logging"]}):
+        """  Create a new PublisherHandler instance.
+
+        Args:
+            topics: topics to use when publishing log messages
+
+        """
         super().__init__()
+
+        # Initialize unique proxy for all publisher handlers.
         PublisherProxy.init(topics)
-        # a cache creation will eliminate a potential infinite loop that
-        # can be created when a subscriber logs a message that is in turn
-        # published through this handler
-        self._log_cache = LogCache(timedelta(seconds=cache_expire_interval)) \
-            if cache_expire_interval else None
 
     def emit(self, record):
+        """ Method called from within Python's infrastructure whenever a
+        log record is to be 'logged'
+
+        Args:
+            record (LogRecord): record to be logged.
+
+        Returns:
+
+        """
         try:
-            publish_record = True
-            if self._log_cache:
-                # if determined to be in cache, record is not published
-                publish_record = not self._log_cache.process_record(record)
-            if publish_record:
-                # publish it as a signal
-                signal = LogSignal(datetime.utcfromtimestamp(record.created),
-                                   record.context,
-                                   record.levelname,
-                                   record.msg,
-                                   record.filename,
-                                   record.funcName,
-                                   record.lineno)
-                PublisherProxy.publish([signal])
+            # publishing it as a signal
+            signal = LogSignal(datetime.utcfromtimestamp(record.created),
+                               record.context,
+                               record.levelname,
+                               record.msg,
+                               record.filename,
+                               record.funcName,
+                               record.lineno)
+            PublisherProxy.publish([signal])
         except (KeyboardInterrupt, SystemExit):
             raise
         except:
             pass
 
     def close(self):
+        """ Closes handler
+
+        Releases/Closes any resources used by handler
+
+        """
         # close all dependencies
         PublisherProxy.close()
-        if self._log_cache:
-            self._log_cache.close()
+
         super().close()
