@@ -106,21 +106,6 @@ class TestBaseBlock(NIOTestCaseNoModules):
         with self.assertRaises(TypeError):
             blk.notify_signals(dict_signal, "default")
 
-        # a list containing a dictionary raises TypeError
-        dict_signal = {"key": "val"}
-        with self.assertRaises(TypeError):
-            blk.notify_signals([dict_signal], "default")
-
-        # test that an empty list is discarded
-        with patch.object(blk, '_block_router') as router_patch:
-            blk.notify_signals([], "default")
-            self.assertEqual(router_patch.notify_signals.call_count, 0)
-
-        # test that all items in a list need to be a Signal instance
-        with patch.object(blk, '_block_router') as router_patch:
-            with self.assertRaises(TypeError):
-                blk.notify_signals([Signal(), object(), Signal()], "default")
-
     def test_import_locations(self):
         """Make sure the block can be imported from the nio root"""
         from nio import Block as nioBlock

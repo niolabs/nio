@@ -1,8 +1,10 @@
 from copy import deepcopy
+from collections import Iterable
 
 from nio.common import RunnerStatus
 from nio.util.logging import get_nio_logger
 from nio.util.runner import Runner
+from nio.signal.base import Signal
 
 
 class BlockRouterNotStarted(Exception):
@@ -68,6 +70,7 @@ class BlockRouter(Runner):
 
         self._receivers = None
         self._clone_signals = False
+        self._check_signal_type = True
         self._mgmt_signal_handler = None
 
     def configure(self, context):
@@ -86,6 +89,8 @@ class BlockRouter(Runner):
             context.settings.get("clone_signals", False)
         if self._clone_signals:
             self._logger.info('Set to clone signals for multiple receivers')
+        self._check_signal_type = \
+            context.settings.get("check_signal_type", True)
 
         """ Go through list of receivers for a given block as
         defined in "execution" entry, and parses out needed information
@@ -226,8 +231,31 @@ class BlockRouter(Runner):
             block (Block): The block that is notifying
             signals (list): The signals that the block is notifying
             output_id: output identifier
+
+        The signals argument is handled as follows:
+            - every signal notified has to be an instance of 'Signal' by
+                default, although it is configurable
+            - an empty list or something evaluating to False is discarded
+
         """
         if self.status.is_set(RunnerStatus.started):
+
+            if not signals:
+                # discard an empty list or something that evaluates to False
+                return
+
+            # make sure we can iterate
+            if not isinstance(signals, Iterable):
+                raise TypeError("Block Router must be able to iterate "
+                                "through signals")
+
+            # if checking Signal type (default) then
+            # make sure container has signals only, quit iterating as soon as a
+            # not-complying signal is found.
+            if self._check_signal_type and \
+               any(not isinstance(signal, Signal) for signal in signals):
+                raise \
+                    TypeError("All signals must be instances of Signal")
 
             # determine if signals are to be cloned.
             clone_signals = \

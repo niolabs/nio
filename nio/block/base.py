@@ -17,6 +17,7 @@ from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
 from nio.util.runner import Runner
 from nio.signal.status import BlockStatusSignal
+from nio.signal.base import Signal
 
 
 @input("default")
@@ -121,10 +122,9 @@ class Block(PropertyHolder, CommandHolder, Runner):
                 signals on
 
         The signals argument is handled as follows:
-            - every signal notified has to be an instance of 'Signal'
-            - an empty list or something evaluating to False is discarded
-            - if a single signal is notified not as a list, it will get
-            wrapped inside a list when notifying.
+            - a dictionary is not allowed
+            - if a single signal is notified not as an iterable, it will get
+            wrapped inside a list before forwarding to block router.
 
         Raises:
             TypeError: when signals are not instances of class Signal
@@ -133,19 +133,9 @@ class Block(PropertyHolder, CommandHolder, Runner):
         if isinstance(signals, dict):
             raise TypeError("Signals cannot be a dictionary")
 
-        if not signals:
-            # discard an empty list or something that evaluates to False
-            return
-
-        # make sure we can iterate
-        if not isinstance(signals, collections.Iterable):
+        # if a single Signal is being notified, make it a list
+        if isinstance(signals, Signal):
             signals = [signals]
-
-        # make sure container has signals only, quit iterating as soon as a
-        # not-complying signal is found.
-        from nio import Signal
-        if any(not isinstance(signal, Signal) for signal in signals):
-            raise TypeError("All instances are expected to be of Signal type")
 
         self._block_router.notify_signals(self, signals, output_id)
 
