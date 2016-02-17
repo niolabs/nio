@@ -11,6 +11,7 @@ from nio.properties import ObjectProperty
 from nio.properties import PropertyHolder
 from nio.properties import StringProperty
 from nio.properties import TimeDeltaProperty
+from nio.types import IntType
 from nio.util.support.test_case import NIOTestCase
 
 
@@ -51,7 +52,7 @@ class ContainerClass(PropertyHolder):
 
     list_property1 = ListProperty(ContainedClass, default=[ContainedClass()])
     list_property2 = ListProperty(ContainedClass)
-    list_property3 = ListProperty(int, default=[1])
+    list_property3 = ListProperty(IntType, default=[1])
     list_property_default_env_variable = \
         ListProperty(ContainedClass, default='[[ENV_VARIABLE]]')
 

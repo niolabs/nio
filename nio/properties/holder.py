@@ -1,7 +1,7 @@
 from nio.util.versioning.check import compare_versions, \
     VersionCheckResult, InvalidVersionFormat, is_version_valid, \
     get_major_version
-from nio.properties import BaseProperty
+from nio.properties.base import BaseProperty
 
 
 class NoClassVersion(Exception):

@@ -70,9 +70,9 @@ class ContainerClass(PropertyHolder):
 
 
 class TestTypes(NIOTestCase):
+
     def test_types(self):
-        """ Testing that defaults are retrieved and are serializable
-        """
+        """ Testing that defaults are retrieved and are serializable """
         description = ContainerClass.get_description()
 
         self.assertEqual(description['string_property']['type'],
