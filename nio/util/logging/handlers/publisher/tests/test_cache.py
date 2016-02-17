@@ -1,9 +1,8 @@
 import inspect
-from datetime import timedelta
 from time import sleep
 
-from ..cache import LogCache
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.util.logging.handlers.publisher.cache import LogCache
+from nio.util.support.test_case import NIOTestCase
 
 
 class LogRecord(object):
@@ -19,13 +18,13 @@ def lineno():
     return inspect.currentframe().f_back.f_lineno
 
 
-class TestCache(NIOTestCaseNoModules):
+class TestCache(NIOTestCase):
 
     def test_cache(self):
         """ Asserts that cache from different lines removes elements
         as expected
         """
-        log_cache = LogCache(timedelta(seconds=0.1))
+        log_cache = LogCache(expire_interval=0.1)
 
         # when logging from different lines, message text is not relevant
         record1 = LogRecord(__file__, lineno(), "1")
@@ -46,13 +45,11 @@ class TestCache(NIOTestCaseNoModules):
         # assert that record2 was put back in
         self.assertTrue(log_cache.process_record(record2))
 
-        log_cache.close()
-
     def test_cache_same_line(self):
         """ Asserts that cache from same line removes/updates elements
         as expected
         """
-        log_cache = LogCache(timedelta(seconds=0.1))
+        log_cache = LogCache(expire_interval=0.1)
 
         record1 = self._get_log_record("1")
         record2 = self._get_log_record("2")
@@ -68,8 +65,6 @@ class TestCache(NIOTestCaseNoModules):
         # give it time, and assert that it is gone
         sleep(0.11)
         self.assertFalse(log_cache.process_record(record2))
-
-        log_cache.close()
 
     def _get_log_record(self, msg):
         return LogRecord(__file__, lineno(), msg)

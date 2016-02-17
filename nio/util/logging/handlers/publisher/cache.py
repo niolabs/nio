@@ -1,36 +1,29 @@
-from datetime import datetime
 
-
-class LogRecord(object):
-
-    """ Keeps track of last record logged for a given code source line
-    """
-
-    def __init__(self, time, msg):
-        self.last_time = time
-        self.msg = msg
-
-    def __str__(self):
-        return "last time: {0}, msg: {1}".format(self.last_time, self.msg)
+from nio.util.cache import Cache
 
 
 class LogCache(object):
 
-    """ Maintains logging instructions per code source line
-            expire_time: determines how long a log entry is maintained to
+    """ Maintains logging instructions per code source line helping
+    avoid potential infinite loops when logging from a logging handler
+    subscriber.
 
+    The criteria consists of determining if a log record from the same
+    source code line and with the same message is in the Cache.
     """
 
     def __init__(self, expire_interval):
-        # dictionary where the key is formed combining file path and
-        # line number
-        self._logs = dict()
-        # determines how long to keep an entry as "present"
-        self._expire_interval = expire_interval
+        """ Create a new LogCache instance.
+
+        Args:
+            expire_interval (seconds): how long an entry is kept in cache
+
+        """
+        self._cache = Cache(expire_interval)
 
     def process_record(self, record):
-        """ Processes a record determining if is present, when not, record
-        is added automatically to the cache
+        """ Processes a record determining if it is present, in addition,
+        it takes care of adding the record to the cache
 
         Args:
             record: log record as incoming from logging module
@@ -39,41 +32,22 @@ class LogCache(object):
             True: if record is present in cache
         """
 
-        # determine current time
-        now = datetime.utcnow()
-
-        # erase from cache expired logs before considering received record
-        self._process_logs_expiration(now)
-
-        # is it in the cache?
         present = False
+
+        # determine key and attempt to get record
         key = "{0}-{1}".format(record.filename, record.lineno)
-        log_record = self._logs.get(key, None)
-        if log_record:
-            if log_record.msg == record.msg:
-                present = True
-            else:
-                # update message for this entry
-                self._logs[key].msg = record.msg
-            # update time
-            self._logs[key].last_time = now
-        else:
-            # from now on, it is present
-            self._logs[key] = LogRecord(now, record.msg)
+        log_record = self._cache.get(key)
+
+        # determine if item with same message is present
+        if log_record and log_record.msg == record.msg:
+            present = True
+
+        # record is always added or updated in cache under given key
+        try:
+            self._cache.add(key, record)
+        except NotImplementedError:
+            # catch any potential errors arising from the fact that
+            # logging module starts before any other, i.e., scheduling
+            pass
 
         return present
-
-    def close(self):
-        # erase cache
-        self._logs = dict()
-
-    def _process_logs_expiration(self, now):
-        """ Remove expired logs
-        Args:
-            now: logs present after this time will be removed
-        """
-        keys_to_delete = [key for key in self._logs
-                          if now >=
-                          self._logs[key].last_time + self._expire_interval]
-        for key in keys_to_delete:
-            del self._logs[key]

@@ -1,5 +1,6 @@
 import logging
 from nio.modules.communication.subscriber import Subscriber
+from nio.util.logging.handlers.publisher.cache_filter import CacheFilter
 from nio.util.logging.handlers.publisher.handler import PublisherHandler
 from nio.util.logging.filter import NIOFilter
 
@@ -8,17 +9,27 @@ from nio.util.support.test_case import NIOTestCase
 
 class TestPublisherBase(NIOTestCase):
 
+    """ Base class for logging publisher tests
+
+    """
+
     def get_test_modules(self):
         return super().get_test_modules() | {'communication'}
+
+    def add_cache_filter(self):
+        """ Allows inheriting tests to decide on the use of the CacheFilter """
+        return True
 
     def setUp(self):
         self._received_messages = []
         # Set up our publisher logger with the proper filters and handlers
         self._publisher_logger = logging.getLogger("service_name")
-        self._handler = PublisherHandler(
-            cache_expire_interval=self.get_cache_interval())
+        self._handler = PublisherHandler()
         self._handler.setLevel(logging.INFO)
         self._handler.addFilter(NIOFilter())
+        if self.add_cache_filter():
+            self._handler.addFilter(
+                CacheFilter(expire_interval=self.get_cache_interval()))
         self._publisher_logger.addHandler(self._handler)
 
         # Want to create our PublisherHandler before we call super setup,
@@ -48,6 +59,9 @@ class TestPublisherBase(NIOTestCase):
 class TestPublisher(TestPublisherBase):
 
     def test_log_to_publisher(self):
+        """ Asserts that logged messages at different levels are received or
+        not (debug level) as expected """
+
         debug_messages = ["debug message1", "debug message2"]
         warning_messages = ["warning message1", "warning message2"]
         error_messages = ["error message1", "error message2"]

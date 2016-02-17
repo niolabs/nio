@@ -16,27 +16,40 @@ class PublisherProxy(object):
 
     @classmethod
     def init(cls, topics):
+        """ Initializes the proxy
+
+        Args:
+            topics: topics to use when publishing signals
+
+        """
         if not cls._initialized:
             # proxy initialization happens only once
             cls._topics = topics
             cls._initialized = True
 
     @classmethod
-    def finalize(cls):
-        cls._initialized = False
-
-    @classmethod
     def publish(cls, signals):
+        """ Publishes logging signals.
+
+        This method ensures that publisher is ready to send signals, it
+        might happen that a call to publish 'logging' signals might come before
+        publisher is ready since logging is initialized before communication
+
+
+        Args:
+            signals: signals to publish
+
+        """
         cls._ensure_publisher_ready()
-        # if all conditions to publish are met
+        # publish when all conditions are met
         if cls._publisher_ready:
             with cls._publisher_lock:
                 cls._publisher.send(signals)
-            return
 
     @classmethod
     def close(cls):
-        # reset publisher
+        """ Closes publisher by releasing all resources """
+
         if cls._publisher:
             try:
                 cls._publisher.close()
@@ -45,12 +58,13 @@ class PublisherProxy(object):
             finally:
                 cls._publisher = None
                 cls._publisher_ready = False
-        cls.finalize()
+        cls._initialized = False
 
     @classmethod
     def _ensure_publisher_ready(cls):
-        # attempts to create Publisher, which will happen successfully when
-        # interface gets proxy applied
+        """ Ensures publisher is ready by attempting to create Publisher,
+        which will happen successfully once communication module is initialized
+        """
         if not cls._publisher_ready:
             try:
                 cls._publisher = Publisher(**cls._topics)
