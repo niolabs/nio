@@ -1,3 +1,4 @@
+import inspect
 from copy import deepcopy
 
 from nio.common import RunnerStatus
@@ -22,6 +23,10 @@ class MissingBlock(Exception):
     pass
 
 
+class InvalidProcessSignalsSignature(Exception):
+    pass
+
+
 class BlockReceiverData(object):
 
     """ A class that defines block receiver information,
@@ -34,21 +39,24 @@ class BlockReceiverData(object):
 
         Take care of setting up instance variables.
         """
-        self._block = block
-        self._input_id = input_id
-        self._output_id = output_id
+        self.block = block
+        self.input_id = input_id
+        self.output_id = output_id
+        self.include_input_id = self._block_defines_input_id(block)
 
-    @property
-    def block(self):
-        return self._block
-
-    @property
-    def input_id(self):
-        return self._input_id
-
-    @property
-    def output_id(self):
-        return self._output_id
+    def _block_defines_input_id(self, block):
+        """ Returns True if the block developer can receive the input ID """
+        args_spec = inspect.getargspec(block.process_signals)
+        if len(args_spec.args) == 2:
+            # method signature assumed to be (self, signals)
+            # ==> disregard input_id even when present
+            return False
+        elif len(args_spec.args) == 3:
+            # method signature assumed to be (self, signals, input_id)
+            return True
+        else:
+            raise InvalidProcessSignalsSignature(
+                "Block {0} signature is invalid".format(block.name))
 
 
 class BlockRouter(Runner):
@@ -262,9 +270,7 @@ class BlockRouter(Runner):
                                           "block: {0}".format(block.name),
                                           exc_info=True)
 
-                    self.deliver_signals(receiver_data.block,
-                                         signals_to_send,
-                                         receiver_data.input_id)
+                    self.deliver_signals(receiver_data, signals_to_send)
 
         elif self.status.is_set(RunnerStatus.stopped):
             self._logger.info("Block Router is stopped, discarding signal"
@@ -280,14 +286,32 @@ class BlockRouter(Runner):
                                  format(block.name))
             raise BlockRouterNotStarted()
 
-    def deliver_signals(self, block, signals, input_id):
-        """ This method can be overridden by routers to
-        put in place their own way of delivering signals to
-        blocks
+    def deliver_signals(self, block_receiver, signals):
+        """ Overridable method to deliver signals to a block
+
+        Other block routers can override this method to perform special actions
+        when delivering signals to a block. It is recommended to call the
+        block router's notify_signals_to_block method from this method though,
+        as that takes care of handling different formats of blocks.
 
         Args:
-            block (Block): Receiving block
-            signals (list): The signals that the block will receive
-            input_id (string): The input identifier
+            block_receiver (BlockReceiverData): The data about the block that
+                will be receiving the signals
+            signals (Iterable): The signals that the block will receive
         """
-        block.process_signals(signals, input_id)
+        self.notify_signals_to_block(block_receiver, signals)
+
+    def notify_signals_to_block(self, block_receiver, signals):
+        """ Call process signals on a block with the proper signature.
+
+        Block developers are not required to include an input_id in their
+        block's process_signals function definition. This method will
+        """
+        # Check if the block has defined the input_id in its process_signals
+        if block_receiver.include_input_id:
+            # Pass the block_receiver's input_id to the process_signals method
+            block_receiver.block.process_signals(
+                signals, block_receiver.input_id)
+        else:
+            # Only send the signals to the block, no input_id
+            block_receiver.block.process_signals(signals)

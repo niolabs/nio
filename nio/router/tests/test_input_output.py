@@ -1,7 +1,8 @@
 from nio.block.terminals import input, output
 from nio.block.base import Block
 from nio.block.context import BlockContext
-from nio.router.base import BlockRouter
+from nio.router.base import BlockRouter, BlockReceiverData, \
+    InvalidProcessSignalsSignature
 from nio.router.context import RouterContext
 from nio.service.base import BlockExecution
 from nio.util.support.test_case import NIOTestCaseNoModules
@@ -114,8 +115,17 @@ class Log2(Block):
         self.name = self.__class__.__name__.lower()
         self.signal_cache = []
 
-    def process_signals(self, signals, input_id='default'):
+    # Don't have to define an input_id
+    def process_signals(self, signals):
         self.signal_cache.append(signals)
+
+
+class InvalidProcessSignals(Block):
+
+    # This process signals signature is invalid and should throw an exception
+
+    def process_signals(self, signals, input_id, what_am_i):
+        pass
 
 
 @output(0)
@@ -292,3 +302,20 @@ class TestInputOutput(NIOTestCaseNoModules):
         self.assertEqual(len(log2.signal_cache), 1)
 
         block_router.do_stop()
+
+    def test_input_id_required(self):
+        """ Assert that different process_signals signatures are supported """
+        # If the block defines input_id in process_signals (like Log1 does),
+        # then our include_input_id attribute should be true
+        with_input_id = BlockReceiverData(Log1(), 'input', 'output')
+        self.assertTrue(with_input_id.include_input_id)
+
+        # If the block does not define input_id in process_signals (like Log2),
+        # then our include_input_id attribute should be false
+        without_input_id = BlockReceiverData(Log2(), 'input', 'output')
+        self.assertFalse(without_input_id.include_input_id)
+
+        # We shouldn't be able to create block receiver data for a block
+        # with an invalid process_signals signature
+        with self.assertRaises(InvalidProcessSignalsSignature):
+            BlockReceiverData(InvalidProcessSignals(), 'input', 'output')

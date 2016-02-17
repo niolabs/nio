@@ -3,25 +3,18 @@ from nio.common import RunnerStatus
 from nio.util.threading import spawn
 
 
-class ThreadedBaseBlockRouter(BlockRouter):
+class ThreadedBlockRouter(BlockRouter):
 
     """A router that delivers signals asynchronously"""
 
-    def deliver_signals(self, block, signals, input_id):
-        """ Delivers signals to given block
+    def deliver_signals(self, block_receiver, signals):
+        """ Delivers signals to given block in a new thread """
+        spawn(self._safe_process_signals, block_receiver, signals)
 
-        Args:
-            block: receiving block
-            signals: signals to deliver
-            input_id: receiving input
-
-        """
-        spawn(self._safe_process_signals, block, signals, input_id)
-
-    def _safe_process_signals(self, block, signals, input_id):
+    def _safe_process_signals(self, block_receiver, signals):
         try:
-            block.process_signals(signals, input_id)
+            self.notify_signals_to_block(block_receiver, signals)
         except:
             self.status.add(RunnerStatus.error)
             self._logger.exception(
-                "{0}.process_signals failed".format(block.name))
+                "{0}.process_signals failed".format(block_receiver.block.name))
