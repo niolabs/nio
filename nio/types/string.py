@@ -11,6 +11,9 @@ class StringType(Type):
     @staticmethod
     def deserialize(value, **kwargs):
         """ Convert value to string """
+        if value is None:
+            # It doesn't make sense for None to deserialize to "None"
+            return None
         try:
             return str(value)
         except:

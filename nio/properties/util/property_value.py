@@ -24,7 +24,12 @@ class PropertyValue:
             # Evaluate and deserialize string since they might be expressions
             value = self.evaluator.evaluate(signal or Signal())
             # TODO: why pass kwargs? shouldn't the property already know?
-            return self._property.deserialize(value, **self._property.kwargs)
+            deserialized_value = \
+                self._property.deserialize(value, **self._property.kwargs)
+            if deserialized_value is None and not self._property.allow_none:
+                raise AllowNoneViolation("Property value None is not allowed")
+            else:
+                return deserialized_value
         elif self.value is not None and isinstance(self.value, PropertyHolder):
             # Return property holders as they are
             return self.value
@@ -37,4 +42,4 @@ class PropertyValue:
             # Return None if it is allowed
             return None
         else:
-            raise Exception("Property value None is not allowed")
+            raise AllowNoneViolation("Property value None is not allowed")
