@@ -154,7 +154,7 @@ class TestProperties(NIOTestCase):
         container.int_property = "string"
         container.float_property = "string"
         container.object_property = 1
-        container.object_property = ObjectProperty(int)
+        container.object_property = ObjectProperty(ContainedClass)
         container.list_property = "string"
 
     def test_delete_property(self):

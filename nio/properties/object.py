@@ -17,6 +17,10 @@ class ObjectProperty(BaseProperty):
         Args:
             obj_type (class): class type which is an instance of PropertyHolder
         """
+        # Validate that the object is a PropertyHolder
+        if not issubclass(obj_type, PropertyHolder):
+            raise TypeError("Specified object type %s is not a PropertyHolder"
+                            % obj_type.__class__)
         kwargs['obj_type'] = obj_type
         super().__init__(ObjectType, **kwargs)
         self.description.update(self._get_description(**kwargs))
