@@ -1,3 +1,4 @@
+from nio import Signal
 from nio.block.base import Block
 from nio.block.context import BlockContext
 from nio.service.base import BlockExecution
@@ -66,7 +67,10 @@ class TestBlockRouter(NIOTestCase):
         block_router.do_configure(router_context)
         block_router.do_start()
 
-        signals = [1, 2, 3, 4]
+        signals = [Signal({"1": 1}),
+                   Signal({"2": 2}),
+                   Signal({"3": 3}),
+                   Signal({"4": 4})]
 
         # make sure nothing has been delivered
         self.assertIsNone(receiver_block.signal_cache)
