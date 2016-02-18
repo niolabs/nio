@@ -1,3 +1,4 @@
+from nio.block.terminals import DEFAULT_TERMINAL
 from nio.router.base import InvalidBlockOutput
 from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.block.base import Block
@@ -10,7 +11,7 @@ class TestBlockTestCase(NIOBlockTestCase):
 
     """ Tests that the BlockTestCase handles roter methods properly. """
 
-    def signals_notified(self, signals, output_id='default'):
+    def signals_notified(self, signals, output_id=DEFAULT_TERMINAL):
         """ Override a signal notification handler """
         self._signals_notified = True
 

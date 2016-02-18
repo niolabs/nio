@@ -1,6 +1,7 @@
 from nio import Signal
 from nio.block.base import Block
 from nio.block.context import BlockContext
+from nio.block.terminals import DEFAULT_TERMINAL
 from nio.service.base import BlockExecution
 from nio.router.context import RouterContext
 from nio.util.support.test_case import NIOTestCase
@@ -12,7 +13,7 @@ class SenderBlock(Block):
         super().__init__()
         self.name = self.__class__.__name__.lower()
 
-    def process_signals(self, signals, input_id='default'):
+    def process_signals(self, signals, input_id=DEFAULT_TERMINAL):
         self.notify_signals(signals)
 
 
@@ -23,7 +24,7 @@ class ReceiverBlock(Block):
         self.name = self.__class__.__name__.lower()
         self.signal_cache = None
 
-    def process_signals(self, signals, input_id='default'):
+    def process_signals(self, signals, input_id=DEFAULT_TERMINAL):
         self.signal_cache = signals
 
     def reset_signals(self):

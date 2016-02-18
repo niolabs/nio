@@ -35,9 +35,7 @@ class TestBlockConfig(NIOTestCase):
         """Test that a configuration can get loaded into the block"""
         block = DummyBlock()
         block.configure(BlockContext(BlockRouter(),
-                                     self._config,
-                                     dict(),
-                                     None))
+                                     self._config))
 
         self.assertEqual(getattr(block, CONFIG_KEY)(), CONFIG_VAL)
 
@@ -47,9 +45,7 @@ class TestBlockConfig(NIOTestCase):
         """
         block = DummyBlock()
         block.configure(BlockContext(BlockRouter(),
-                                     dict(),
-                                     dict(),
-                                     None))
+                                     dict()))
 
         self.assertTrue(hasattr(block, CONFIG_KEY))
         self.assertEqual(getattr(block, CONFIG_KEY)(), None)

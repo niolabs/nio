@@ -1,5 +1,5 @@
 from nio import Signal
-from nio.block.terminals import input, output
+from nio.block.terminals import input, output, DEFAULT_TERMINAL
 from nio.block.base import Block
 from nio.block.context import BlockContext
 from nio.router.base import BlockRouter, BlockReceiverData, \
@@ -94,7 +94,7 @@ class Sim(Block):
         super().__init__()
         self.name = self.__class__.__name__.lower()
 
-    def process_signals(self, signals, input_id='default'):
+    def process_signals(self, signals, input_id=DEFAULT_TERMINAL):
         self.notify_signals(signals)
 
 
@@ -105,7 +105,7 @@ class Log1(Block):
         self.name = self.__class__.__name__.lower()
         self.signal_cache = []
 
-    def process_signals(self, signals, input_id='default'):
+    def process_signals(self, signals, input_id=DEFAULT_TERMINAL):
         self.signal_cache.append(signals)
 
 
@@ -158,7 +158,7 @@ class State(Block):
         self.signal_cache_input0 = []
         self.signal_cache_input1 = []
 
-    def process_signals(self, signals, input_id='default'):
+    def process_signals(self, signals, input_id=DEFAULT_TERMINAL):
         if input_id == 0:
             self.signal_cache_input0.append(signals)
         else:
@@ -176,7 +176,7 @@ class TestInputOutput(NIOTestCaseNoModules):
 
     def test_two_outputs_default_input(self):
         block_router = BlockRouter()
-        context = BlockContext(block_router, dict(), dict())
+        context = BlockContext(block_router, dict())
 
         # create blocks
         two_outputs = Two_Outputs()
@@ -234,7 +234,7 @@ class TestInputOutput(NIOTestCaseNoModules):
 
     def test_three_outputs_mix_inputs(self):
         block_router = BlockRouter()
-        context = BlockContext(block_router, dict(), dict())
+        context = BlockContext(block_router, dict())
 
         # create blocks
         three_outputs = Three_Outputs()

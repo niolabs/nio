@@ -14,7 +14,7 @@ class Subscriber(ModuleProxy):
             handler: Specifies where signals will be received. A signature
                 definition sample is provided below.
 
-                def process_signals(self, signals, input_id='default')
+                def process_signals(self, signals)
 
             matching_provider: Matching provider which could optionally be
                 specified to override system-wide setting.
