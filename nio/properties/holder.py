@@ -68,6 +68,11 @@ class PropertyHolder(object):
         for (property_name, prop) in class_properties.items():
             if property_name in properties:
                 value = properties[property_name]
+                # Check value
+                # TODO: all this needs to be made more clear
+                from nio.properties.util.property_value import PropertyValue
+                value = PropertyValue(prop, value)()
+                # Deserialize and then serialize the value to format it
                 deserialized_value = prop.deserialize(value)
                 value = prop.type.serialize(deserialized_value, **prop.kwargs)
                 properties[property_name] = value

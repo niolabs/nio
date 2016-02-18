@@ -47,12 +47,11 @@ class TestListProperties(NIOTestCase):
 
     def test_native_type_invalid_value(self):
         """Test when a list has a native python type with invalid values"""
-
         container = ContainerClass()
-
+        # Set the invalid list
+        container.type_list = self.invalid_type_list_to_use
         with self.assertRaises(TypeError):
-            # Set the invalid list
-            container.type_list = self.invalid_type_list_to_use
+            container.type_list()
 
     def test_native_type(self):
         """Test when a list has a native python type"""
@@ -99,9 +98,11 @@ class TestListProperties(NIOTestCase):
             "type_list": "not a list"
         }
         container_1 = ContainerClass()
-
+        # You can set invalid props
+        container_1.from_dict(invalid_props)
         with self.assertRaises(TypeError):
-            container_1.from_dict(invalid_props)
+            # But deserializing in validate_dict is not ok
+            container_1.validate_dict(invalid_props)
 
     def test_expression(self):
         container = ContainerClass()
