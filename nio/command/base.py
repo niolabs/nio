@@ -2,8 +2,8 @@
     Base Command class
 
 """
-from nio.common.command.params.string import StringParameter
-from nio.common.command.params.typed import TypedParameter
+from nio.command.params.string import StringParameter
+from nio.command.params.base import Parameter
 
 
 class InvalidCommandArg(Exception):
@@ -84,13 +84,13 @@ class Command(object):
         in the order they appear in the corresponding method prototype.
 
         Args:
-            param (TypedParameter): The parameter to add.
+            param (Parameter): The parameter to add.
 
         Returns:
             None
 
         """
-        if isinstance(param, TypedParameter):
+        if isinstance(param, Parameter):
             self._parameters.append(param)
         else:
             raise RuntimeError(
@@ -121,8 +121,9 @@ class Command(object):
 
             # Find and convert each param needed
             for p in self._parameters:
-                val = p.convert(args.get(p.name))
-                if val is not None or p._allow_none:
+                raw_val = args.get(p.name) or p.default
+                if raw_val is not None or p.allow_none:
+                    val = p.deserialize(raw_val)
                     result.append(val)
                 else:
                     raise MissingCommandArg(

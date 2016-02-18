@@ -5,8 +5,8 @@ a custom block, extend this Block class and override the appropriate methods.
 """
 from nio.block.context import BlockContext
 from nio.block.terminals import Terminal, TerminalType, input, output
-from nio.common.command import command
-from nio.common.command.holder import CommandHolder
+from nio.command import command
+from nio.command.holder import CommandHolder
 from nio.router.base import BlockRouter
 from nio.properties import PropertyHolder, StringProperty, \
     VersionProperty, SelectProperty

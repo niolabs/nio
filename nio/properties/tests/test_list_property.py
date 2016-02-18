@@ -3,6 +3,7 @@ from nio.properties import IntProperty
 from nio.properties import ListProperty
 from nio.properties import PropertyHolder
 from nio.properties import StringProperty
+from nio.types import IntType
 from nio.util.support.test_case import NIOTestCase
 
 
@@ -14,16 +15,16 @@ class ContainedClass(PropertyHolder):
 
 
 class ContainerClass(PropertyHolder):
-    native_list = ListProperty(int, default=[1])
+    type_list = ListProperty(IntType, default=[1])
     holder_list = ListProperty(ContainedClass, default=[ContainedClass()])
-    property_list = ListProperty(IntProperty, default=[IntProperty(default=2)])
 
 
 class TestListProperties(NIOTestCase):
     def setUp(self):
         super().setUp()
         # Set up a native object list
-        self.native_list_to_use = [1, 2, 3, 4, 5]
+        self.type_list_to_use = [1, 2, 3, 4, 5]
+        self.invalid_type_list_to_use = ['not an int type']
 
         # Set up a holder object list
         contained_a = ContainedClass()
@@ -44,16 +45,25 @@ class TestListProperties(NIOTestCase):
 
         self.prop_list_to_use = [prop_a, prop_b, IntProperty(default=3)]
 
+    def test_native_type_invalid_value(self):
+        """Test when a list has a native python type with invalid values"""
+
+        container = ContainerClass()
+
+        with self.assertRaises(TypeError):
+            # Set the invalid list
+            container.type_list = self.invalid_type_list_to_use
+
     def test_native_type(self):
         """Test when a list has a native python type"""
 
         container = ContainerClass()
 
         # Set the list
-        container.native_list = self.native_list_to_use
+        container.type_list = self.type_list_to_use
 
         # Now make sure getting the list gets the same one
-        self.assertEqual(self.native_list_to_use, container.native_list())
+        self.assertEqual(self.type_list_to_use, container.type_list())
 
     def test_holder_type(self):
         """Test when a list has a native python type"""
@@ -64,27 +74,14 @@ class TestListProperties(NIOTestCase):
         container.holder_list = self.holder_list_to_use
 
         # Now make sure getting the list gets the same one
-        self.maxDiff = None
         self.assertEqual(self.holder_list_to_use, container.holder_list())
-
-    def test_property_type(self):
-        """Test when a list has a native python type"""
-
-        container = ContainerClass()
-
-        # Set the list
-        container.property_list = self.prop_list_to_use
-
-        # Now make sure getting the list gets the same one
-        self.assertEqual(self.prop_list_to_use, container.property_list())
 
     def test_to_from_dict(self):
         """Make sure the serialize/deserialze hold"""
 
         container_1 = ContainerClass()
-        container_1.native_list = self.native_list_to_use
+        container_1.type_list = self.type_list_to_use
         container_1.holder_list = self.holder_list_to_use
-        container_1.property_list = self.prop_list_to_use
 
         # Load container 2 with the dictionary of container 1
         container_2 = ContainerClass()
@@ -99,7 +96,7 @@ class TestListProperties(NIOTestCase):
         raises a TypeError"""
 
         invalid_props = {
-            "native_list": "not a list"
+            "type_list": "not a list"
         }
         container_1 = ContainerClass()
 
@@ -125,10 +122,8 @@ class TestListProperties(NIOTestCase):
 
     def test_defaults(self):
         defaults = ContainerClass.get_serializable_defaults()
-        # TODO: test these other list types
-        #self.assertEqual(defaults["native_list"], {})
+        self.assertEqual(defaults["type_list"], [1])
         self.assertEqual(defaults["holder_list"],
                          [{'string_property': 'str',
                            'int_property': 5,
                            'expression_property' : '{{ $value }}'}])
-        #self.assertEqual(defaults["property_list"], {})

@@ -1,4 +1,5 @@
 from nio.types.base import Type
+from nio.properties.holder import PropertyHolder
 
 
 class ObjectType(Type):
@@ -19,13 +20,14 @@ class ObjectType(Type):
     def deserialize(value, **kwargs):
         """ Convert value to object """
         try:
-            sub_instance = kwargs["obj_type"]()
             if isinstance(value, dict):
-                # Object types supports deserializing dicationaries
-                sub_instance.from_dict(value)
+                # Object types supports deserializing dictionaries
+                sub_instance = kwargs["obj_type"]()
+                return sub_instance.from_dict(value)
+            elif isinstance(value, PropertyHolder):
+                # And object types also work when value is already a holder
+                return value
             else:
-                # and also supports deserializing PropertyHolders
-                sub_instance.from_dict(value.to_dict())
-            return sub_instance
+                raise Exception
         except:
             raise TypeError("Unable to cast value to object: {}".format(value))

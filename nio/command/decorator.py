@@ -1,10 +1,5 @@
-"""
-
- Command decorator
-
-"""
 import inspect
-from nio.common.command.base import Command
+from nio.command.base import Command
 
 
 def command(name, *params, title=None, method=None):

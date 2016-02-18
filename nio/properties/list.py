@@ -1,5 +1,6 @@
 from nio.properties import BaseProperty
 from nio.properties import PropertyHolder
+from nio.properties.util.object_type import ObjectType
 from nio.types import ListType
 
 
@@ -14,11 +15,17 @@ class ListProperty(BaseProperty):
         """ Initializes the property.
 
         Args:
-            list_obj_type (object): type of the elements to be contained
-                in the list. This can be a Property, PropertyHolder, or
-                any other Python type
+            list_obj_type (Type): type of the elements to be contained
+                in the list. Needs to be a subclass of nio.base.Type
+        Keywords Args:
+            obj_type (PropertyHolder): Used by ObjectType for serialize and
+                deserialize.
         """
-        kwargs['list_obj_type'] = list_obj_type
+        if issubclass(list_obj_type, PropertyHolder):
+            kwargs['list_obj_type'] = ObjectType
+        else:
+            kwargs['list_obj_type'] = list_obj_type
+        kwargs['obj_type'] = list_obj_type
         super().__init__(ListType, **kwargs)
         self.description.update(self._get_description(**kwargs))
 
@@ -27,17 +34,18 @@ class ListProperty(BaseProperty):
         kwargs.update(self._prepare_template(**kwargs))
         kwargs.update(self._prepare_default(**kwargs))
         kwargs['list_obj_type'] = str(kwargs['list_obj_type'])
+        kwargs['obj_type'] = str(kwargs['obj_type'])
         return kwargs
 
     def _prepare_template(self, **kwargs):
         # add internal object description
         try:
-            sub_description = self.kwargs["list_obj_type"]().get_description()
+            sub_description = self.kwargs["obj_type"]().get_description()
         except:
             try:
-                sub_description = self.kwargs["list_obj_type"].__name__
+                sub_description = self.kwargs["obj_type"].__name__
             except:
-                sub_description = str(self.kwargs["list_obj_type"])
+                sub_description = str(self.kwargs["obj_type"])
         return {"template": sub_description}
 
     def _prepare_default(self, **kwargs):
