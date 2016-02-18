@@ -8,11 +8,11 @@ from nio.properties import ObjectProperty
 from nio.properties import PropertyHolder
 from nio.properties import StringProperty
 from nio.properties import TimeDeltaProperty
+from nio.properties.util.object_type import ObjectType
 from nio.types import BoolType
 from nio.types import FloatType
 from nio.types import IntType
 from nio.types import ListType
-from nio.types import ObjectType
 from nio.types import SelectType
 from nio.types import StringType
 from nio.types import TimeDeltaType
@@ -70,9 +70,9 @@ class ContainerClass(PropertyHolder):
 
 
 class TestTypes(NIOTestCase):
+
     def test_types(self):
-        """ Testing that defaults are retrieved and are serializable
-        """
+        """ Testing that defaults are retrieved and are serializable """
         description = ContainerClass.get_description()
 
         self.assertEqual(description['string_property']['type'],

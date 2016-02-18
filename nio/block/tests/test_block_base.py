@@ -65,13 +65,46 @@ class TestBaseBlock(NIOTestCaseNoModules):
 
     def test_notify_signals(self):
         """Test the block can notify signals properly"""
-        # TODO: Once NIO-768 is done, this test should be greatly expanded
         blk = Block()
         my_sigs = [Signal({"key": "val"})]
         with patch.object(blk, '_block_router') as router_patch:
             blk.notify_signals(my_sigs)
             router_patch.notify_signals.assert_called_once_with(
                 blk, my_sigs, DEFAULT_TERMINAL)
+
+        # test sending more than one Signal
+        with patch.object(blk, '_block_router') as router_patch:
+            signals = [Signal(), Signal()]
+            blk.notify_signals(signals, "default")
+            router_patch.notify_signals.assert_called_one_with(
+                blk, signals, "default")
+
+        # test that sending signals as a set is allowed
+        with patch.object(blk, '_block_router') as router_patch:
+            signals = set()
+            signals.add(Signal())
+            signals.add(Signal())
+            blk.notify_signals(signals, "default")
+            router_patch.notify_signals.assert_called_one_with(
+                blk, signals, "default")
+
+        # test that a Signal as a non-iterable is accepted and
+        # propagated as a list
+        with patch.object(blk, '_block_router') as router_patch:
+            single_signal = Signal()
+            blk.notify_signals(single_signal, "default")
+            router_patch.notify_signals.assert_called_one_with(
+                blk, [single_signal], "default")
+
+        # test that a dictionary, empty or not, is not accepted and
+        # TypeError is raised
+        dict_signal = {}
+        with self.assertRaises(TypeError):
+            blk.notify_signals(dict_signal, "default")
+
+        dict_signal = {"key": "val"}
+        with self.assertRaises(TypeError):
+            blk.notify_signals(dict_signal, "default")
 
     def test_import_locations(self):
         """Make sure the block can be imported from the nio root"""

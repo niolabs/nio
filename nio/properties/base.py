@@ -99,14 +99,15 @@ class BaseProperty(object):
         # Allow property kwargs to be overriden by call to serialize
         merged_kwargs = self.kwargs.copy()
         merged_kwargs.update(**kwargs)
-        # Use the default value if the specified instance does not have a value
-        value = self.__get__(instance, instance.__class__).value or \
-            self.default
+        value = self.__get__(instance, instance.__class__).value
+        if value is None:
+            # No value was set for this instance, use the property's default
+            value = self.default
         if value is not None and \
                 not self.is_expression(value) and not self.is_env_var(value):
             return self.type.serialize(value, **merged_kwargs)
         else:
-            # If the value is None of if it's an expression property,
+            # If the value is None or if it's an expression property,
             # then don't try to serialize it
             return value
 

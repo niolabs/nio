@@ -1,9 +1,9 @@
 from unittest.mock import patch
-from nio.common.command import command, Command
-from nio.common.command.holder import CommandHolder
-from nio.common.command.params.int import IntParameter
-from nio.common.command.params.string import StringParameter
-from nio.common.command.security import command_security, SecureCommand
+from nio.command import command, Command
+from nio.command.holder import CommandHolder
+from nio.command.params.int import IntParameter
+from nio.command.params.string import StringParameter
+from nio.command.security import command_security, SecureCommand
 from nio.modules.security.authorizer import Authorizer, Unauthorized
 from nio.modules.security.task import SecureTask
 from nio.modules.security.user import User
