@@ -3,8 +3,6 @@
 A block contains modular functionality to be used inside of Services. To create
 a custom block, extend this Block class and override the appropriate methods.
 """
-import collections
-
 from nio.block.context import BlockContext
 from nio.block.terminals import Terminal, TerminalType, input, output
 from nio.common.command import command
