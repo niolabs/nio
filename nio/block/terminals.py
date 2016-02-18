@@ -14,6 +14,9 @@ it wants.
 
 from enum import Enum
 
+# The ID that will be used to define the original default terminal
+DEFAULT_TERMINAL = "__default_terminal_value"
+
 
 class TerminalType(Enum):
 
@@ -27,12 +30,24 @@ class Terminal(object):
 
     """Decorator for declaring an input or output terminal on a block"""
 
-    def __init__(self, terminal_type, terminal_name):
-        """ Create a terminal with a given type and name
+    def __init__(self, terminal_type, terminal_id, default=False, label=None,
+                 description=None, visible=True, order=0):
+        """ Create a terminal with a given type and id
 
         Args:
             terminal_type (TerminalType): What type of terminal should this be
-            terminal_name (str): The name of the terminal
+            terminal_id (str): The id of the terminal
+            default (bool): Whether or not this terminal is the default
+                terminal on the block
+            label (str): The label to use for this terminal on a UI. Defaults
+                to the terminal_id
+            description (str): An optional, extended description for the
+                terminal that can be used on a UI
+            visible (bool): Whether or not the terminal should be visible on
+                the UI. Defaults to True
+            order (float): A numeric value used to determine the order this
+                terminal should appear on the UI. Terminals will be ordered in
+                ascending order
 
         Raises:
             TypeError: If terminal_type is not a valid TerminalType enum
@@ -41,7 +56,12 @@ class Terminal(object):
         if not isinstance(terminal_type, TerminalType):
             raise TypeError("Terminal type must be a TerminalType")
         self._type = terminal_type
-        self._name = terminal_name
+        self.id = terminal_id
+        self.default = default
+        self.label = label if label is not None else terminal_id
+        self.description = description if description is not None else ''
+        self.visible = visible
+        self.order = order
 
     def __call__(self, cls):
         """The decorator method to be called on the class object.
@@ -53,20 +73,35 @@ class Terminal(object):
         # find out what entry we are saving on the class
         class_entry = self._get_terminals_entry(cls, self._type)
 
-        # Get the attributes already on the class (or a new set, if not present
-        # yet), and add our current terminal name to the set.
+        # Get the attributes already on the class (or a new list, if not
+        # present yet), and add our current terminal to the list.
         if not hasattr(cls, class_entry):
-            setattr(cls, class_entry, set())
+            setattr(cls, class_entry, list())
         attributes = getattr(cls, class_entry)
-        attributes.add(self._name)
+        attributes.append(self)
         return cls
+
+    def get_description(self):
+        """ Return a dictionary containing the description of this terminal """
+        return {
+            'type': self._type.value,
+            'id': self.id,
+            'label': self.label,
+            'description': self.description,
+            'default': self.default,
+            'visible': self.visible,
+            'order': self.order
+        }
 
     @classmethod
     def get_terminals_on_class(cls, class_to_inspect, terminal_type):
-        """ Get a set of the terminals on a class of a certain type
+        """ Get a list of the unique terminals on a class of a certain type
 
-        This method will recurse up the base classes and return the union
-        of all of the terminals.
+        This method will recurse up the base classes and return all of the
+        unique terminals that exist on it. Unique means that only one terminal
+        will be included for each terminal_id. Duplicate IDs will be given to
+        the class further down the MRO chain. This allows blocks to override
+        certain properties on their parent blocks' terminals.
 
         Args:
             class_to_inspect (Block): A class that is a sub-class of Block that
@@ -74,7 +109,8 @@ class Terminal(object):
             terminal_type (TerminalType): What type of terminals to look for
 
         Returns:
-            set: A list of strings of the terminal names that match the type
+            list: A list of unique terminals on this block, sorted in order
+                according to the terminal's order attribute
 
         Raises:
             TypeError: If class_to_inspect is not a subclass of Block
@@ -84,15 +120,25 @@ class Terminal(object):
             raise TypeError("Terminal type must be a TerminalType")
 
         # Start off our terminals set with our class's terminals
-        terminals = getattr(
-            class_to_inspect,
-            cls._get_terminals_entry(class_to_inspect, terminal_type),
-            set())
-        # We also want to include the terminals of all super classes
-        for _class in class_to_inspect.__bases__:
-            terminals |= cls.get_terminals_on_class(_class, terminal_type)
+        class_entry = cls._get_terminals_entry(class_to_inspect, terminal_type)
+        terminals = getattr(class_to_inspect, class_entry, list())
 
-        return terminals
+        # We also want to include the terminals of all super classes if they
+        # don't already exist in ours
+        for _class in class_to_inspect.__bases__:
+            parent_terms = cls.get_terminals_on_class(_class, terminal_type)
+            for parent_term in parent_terms:
+                # If we don't already have a record of the parent terminal's
+                # ID, then add the parent terminal to our output list
+                if parent_term.id not in [term.id for term in terminals]:
+                    terminals.append(parent_term)
+
+        # Remove the DEFAULT_TERMINAL if it has other terminals defined
+        if len(terminals) > 1:
+            terminals = [t for t in terminals if t.id != DEFAULT_TERMINAL]
+
+        # Return the terminals sorted by their order
+        return sorted(terminals, key=lambda t: t.order)
 
     @classmethod
     def _get_terminals_entry(cls, _class, terminal_type):
@@ -120,15 +166,15 @@ class input(Terminal):
 
     """A decorator for an input terminal on a block"""
 
-    def __init__(self, input_name):
-        """Create an input terminal with a given name."""
-        super().__init__(TerminalType.input, input_name)
+    def __init__(self, input_id, **kwargs):
+        """Create an input terminal with a given id."""
+        super().__init__(TerminalType.input, input_id, **kwargs)
 
 
 class output(Terminal):
 
     """A decorator for an output terminal on a block"""
 
-    def __init__(self, output_name):
-        """Create an output terminal with a given name."""
-        super().__init__(TerminalType.output, output_name)
+    def __init__(self, output_id, **kwargs):
+        """Create an output terminal with a given id."""
+        super().__init__(TerminalType.output, output_id, **kwargs)

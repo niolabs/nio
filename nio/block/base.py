@@ -4,7 +4,8 @@ A block contains modular functionality to be used inside of Services. To create
 a custom block, extend this Block class and override the appropriate methods.
 """
 from nio.block.context import BlockContext
-from nio.block.terminals import Terminal, TerminalType, input, output
+from nio.block.terminals import Terminal, TerminalType, input, output, \
+    DEFAULT_TERMINAL
 from nio.command import command
 from nio.command.holder import CommandHolder
 from nio.router.base import BlockRouter
@@ -18,8 +19,8 @@ from nio.signal.status import BlockStatusSignal
 from nio.signal.base import Signal
 
 
-@input("default")
-@output("default")
+@input(DEFAULT_TERMINAL, default=True, label="default")
+@output(DEFAULT_TERMINAL, default=True, label="default")
 @command('properties')
 class Block(PropertyHolder, CommandHolder, Runner):
 
@@ -108,7 +109,7 @@ class Block(PropertyHolder, CommandHolder, Runner):
         """
         pass  # pragma: no cover
 
-    def notify_signals(self, signals, output_id='default'):
+    def notify_signals(self, signals, output_id=DEFAULT_TERMINAL):
         """Notify signals to router.
 
         This is the method the block should call whenever it would like
@@ -158,7 +159,7 @@ class Block(PropertyHolder, CommandHolder, Runner):
             self.status.add(signal.status)
         self._block_router.notify_management_signal(self, signal)
 
-    def process_signals(self, signals, input_id='default'):
+    def process_signals(self, signals, input_id=DEFAULT_TERMINAL):
         """Overrideable method to be called when signals are delivered.
 
         This method will be called by the block router whenever signals
@@ -183,30 +184,24 @@ class Block(PropertyHolder, CommandHolder, Runner):
         properties = super().get_description()
         commands = cls.get_command_description()
 
-        return {'properties': properties,
-                'commands': commands}
+        return {
+            'properties': properties,
+            'commands': commands
+        }
 
     def properties(self):
         """ Returns block runtime properties """
         return self.to_dict()
 
-    @property
-    def inputs(self):
-        """ A list of the block's input terminals
+    @classmethod
+    def inputs(cls):
+        """ A list of the block's input terminals """
+        return Terminal.get_terminals_on_class(cls, TerminalType.input)
 
-        This is a read-only property
-        """
-        return list(Terminal.get_terminals_on_class(
-            self.__class__, TerminalType.input))
-
-    @property
-    def outputs(self):
-        """ A list of the block's output terminals
-
-        This is a read-only property
-        """
-        return list(Terminal.get_terminals_on_class(
-            self.__class__, TerminalType.output))
+    @classmethod
+    def outputs(cls):
+        """ A list of the block's output terminals """
+        return Terminal.get_terminals_on_class(cls, TerminalType.output)
 
     def is_input_valid(self, input_id):
         """ Find out if input is valid
@@ -217,7 +212,7 @@ class Block(PropertyHolder, CommandHolder, Runner):
         Returns:
             bool: True if the input ID exists on this block
         """
-        return input_id in self.inputs
+        return input_id in [i.id for i in self.__class__.inputs()]
 
     def is_output_valid(self, output_id):
         """ Find out if output is valid
@@ -228,7 +223,7 @@ class Block(PropertyHolder, CommandHolder, Runner):
         Returns:
             bool: True if the output ID exists on this block
         """
-        return output_id in self.outputs
+        return output_id in [o.id for o in self.__class__.outputs()]
 
     def get_logger(self):
         """ Provides block logger

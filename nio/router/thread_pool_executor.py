@@ -22,13 +22,7 @@ class ThreadedPoolExecutorRouter(BlockRouter):
         max_workers = context.settings.get("max_workers", 50)
         self._executor = ThreadPoolExecutor(max_workers=max_workers)
 
-    def deliver_signals(self, block, signals, input_id):
-        """ Delivers signals to given block
-
-        Args:
-            block: receiving block
-            signals: signals to deliver
-            input_id: receiving input
-
-        """
-        self._executor.submit(block.process_signals, signals, input_id)
+    def deliver_signals(self, block_receiver, signals):
+        """ Deliver the signals inside of the thread executor """
+        self._executor.submit(
+            self.notify_signals_to_block, block_receiver, signals)

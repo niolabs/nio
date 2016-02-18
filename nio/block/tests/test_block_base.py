@@ -1,6 +1,7 @@
 from unittest.mock import patch, Mock
 from nio.block.base import Block
 from nio.block.context import BlockContext
+from nio.block.terminals import DEFAULT_TERMINAL
 from nio.signal.base import Signal
 from nio.router.base import BlockRouter
 from nio.router.context import RouterContext
@@ -34,7 +35,6 @@ class TestBaseBlock(NIOTestCaseNoModules):
         """Test the block can notify management signals properly to
         block router"""
         blk = Block()
-        service_mgmt_signal_handler = Mock()
         blk.configure(BlockContext(
             BlockRouter(),
             {"name": "BlockName", "log_level": "WARNING"},
@@ -68,9 +68,9 @@ class TestBaseBlock(NIOTestCaseNoModules):
         blk = Block()
         my_sigs = [Signal({"key": "val"})]
         with patch.object(blk, '_block_router') as router_patch:
-            blk.notify_signals(my_sigs, "default")
+            blk.notify_signals(my_sigs)
             router_patch.notify_signals.assert_called_once_with(
-                blk, my_sigs, "default")
+                blk, my_sigs, DEFAULT_TERMINAL)
 
         # test sending more than one Signal
         with patch.object(blk, '_block_router') as router_patch:
@@ -130,7 +130,7 @@ class TestBaseBlock(NIOTestCaseNoModules):
     def test_default_block_terminals(self):
         """Make sure the block has its default terminals"""
         blk = Block()
-        self.assertTrue(blk.is_input_valid('default'))
-        self.assertTrue(blk.is_output_valid('default'))
+        self.assertTrue(blk.is_input_valid(DEFAULT_TERMINAL))
+        self.assertTrue(blk.is_output_valid(DEFAULT_TERMINAL))
         self.assertFalse(blk.is_input_valid('fake input'))
         self.assertFalse(blk.is_output_valid('fake output'))
