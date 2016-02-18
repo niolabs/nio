@@ -60,7 +60,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
 
     def test_valid_input_output(self):
         block_router = BlockRouter()
-        context = BlockContext(block_router, dict(), dict())
+        context = BlockContext(block_router, dict())
 
         # create blocks
         sender_block = FirstOutputBlock()
@@ -104,7 +104,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
 
     def test_valid_input_invalid_output(self):
         block_router = BlockRouter()
-        context = BlockContext(block_router, dict(), dict())
+        context = BlockContext(block_router, dict())
 
         # create blocks
         sender_block = FirstOutputBlock()
@@ -130,7 +130,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
     @unittest.skip('old constraint no longer enforceable, 03172015 changes')
     def test_invalid_input_valid_output1(self):
         block_router = BlockRouter()
-        context = BlockContext(block_router, dict(), dict())
+        context = BlockContext(block_router, dict())
 
         # create blocks
         sender_block = FirstOutputBlock()
@@ -155,7 +155,7 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
 
     def test_invalid_input_valid_output2(self):
         block_router = BlockRouter()
-        context = BlockContext(block_router, dict(), dict())
+        context = BlockContext(block_router, dict())
 
         # create blocks
         sender_block = FirstOutputBlock()
@@ -182,14 +182,14 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
         """ Asserts that data can be passed from a default output to a block
         that has one input overriding default using old receiver format
 
-        OutputBlock has 'default' since it inherits from Block and has no
+        OutputBlock has DEFAULT_TERMINAL since it inherits from Block and has no
         output definitions
 
         FirstInputBlock only input is 'first' yet it receives from 'default'
         """
 
         block_router = BlockRouter()
-        context = BlockContext(block_router, dict(), dict())
+        context = BlockContext(block_router, dict())
 
         # create blocks
         sender_block = OutputBlock()

@@ -188,7 +188,7 @@ class BlockRouter(Runner):
             if receiver not in blocks:
                 raise MissingBlock()
             # handling old format, get a defined input,
-            # which most likely will be 'default'
+            # which most likely will be DEFAULT_TERMINAL
             inputs = blocks[receiver].__class__.inputs()
             # get element from set without removing it
             # TODO: Grab the default input

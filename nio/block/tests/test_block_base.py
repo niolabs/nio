@@ -29,7 +29,7 @@ class TestBaseBlock(NIOTestCaseNoModules):
             Block().configure(JustAnObject)
         with self.assertRaises(TypeError):
             # The context's block router needs to be a BlockRouter
-            Block().configure(BlockContext(JustAnObject, {}, {}, None))
+            Block().configure(BlockContext(JustAnObject, {}))
 
     def test_notify_management_signal(self):
         """Test the block can notify management signals properly to

@@ -2,6 +2,7 @@ from time import sleep
 from threading import Event
 from nio.block.base import Block
 from nio.block.context import BlockContext
+from nio.block.terminals import DEFAULT_TERMINAL
 from nio.service.base import BlockExecution
 from nio.router.context import RouterContext
 from nio.util.support.test_case import NIOTestCase
@@ -24,7 +25,7 @@ class ReceiverBlock(Block):
         self.name = self.__class__.__name__.lower()
         self.signal_received = Event()
 
-    def process_signals(self, signals, input_id='default'):
+    def process_signals(self, signals, input_id=DEFAULT_TERMINAL):
         # Wait half a second before setting the event
         # The calling thread should continue executing while this one is
         # sleeping
@@ -47,7 +48,7 @@ class TestThreadedRouter(NIOTestCase):
         from nio.router.threaded import ThreadedBlockRouter
 
         block_router = ThreadedBlockRouter()
-        context = BlockContext(block_router, dict(), dict())
+        context = BlockContext(block_router, dict())
 
         # create blocks
         sender_block = SenderBlock()
@@ -61,7 +62,8 @@ class TestThreadedRouter(NIOTestCase):
         execution = [BlockExecutionTest(name="senderblock",
                                         receivers=["receiverblock"])]
 
-        router_context = RouterContext(execution, blocks, {})
+        router_context = RouterContext(execution, blocks,
+                                       {"check_signal_type": False})
 
         block_router.do_configure(router_context)
         block_router.do_start()

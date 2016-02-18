@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 from nio.block.base import Block
 from nio.block.context import BlockContext
+from nio.block.terminals import DEFAULT_TERMINAL
 from nio.router.base import BlockRouter
 from nio.router.context import RouterContext
 from nio.service.base import BlockExecution
@@ -15,7 +16,7 @@ class SenderBlock(Block):
         super().__init__()
         self.name = self.__class__.__name__.lower()
 
-    def process_signals(self, signals, input_id='default'):
+    def process_signals(self, signals, input_id=DEFAULT_TERMINAL):
         self.notify_signals(signals)
 
 
@@ -26,7 +27,7 @@ class ReceiverBlock1(Block):
         self.name = self.__class__.__name__.lower()
         self.signal_cache = None
 
-    def process_signals(self, signals, input_id='default'):
+    def process_signals(self, signals, input_id=DEFAULT_TERMINAL):
         # add attribute
         for signal in signals:
             setattr(signal, "receiver", self.__class__.__name__)
@@ -43,7 +44,7 @@ class ReceiverBlock2(Block):
         self.name = self.__class__.__name__.lower()
         self.signal_cache = None
 
-    def process_signals(self, signals, input_id='default'):
+    def process_signals(self, signals, input_id=DEFAULT_TERMINAL):
         for signal in signals:
             setattr(signal, "receiver", self.__class__.__name__)
         self.signal_cache = signals
@@ -68,7 +69,7 @@ class TestCloningSignals(NIOTestCase):
         """
 
         block_router = BlockRouter()
-        context = BlockContext(block_router, dict(), dict())
+        context = BlockContext(block_router, dict())
 
         # create blocks
         sender_block = SenderBlock()
@@ -132,7 +133,7 @@ class TestCloningSignals(NIOTestCase):
         """
 
         block_router = BlockRouter()
-        context = BlockContext(block_router, dict(), dict())
+        context = BlockContext(block_router, dict())
 
         # create blocks
         sender_block = SenderBlock()
