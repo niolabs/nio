@@ -133,7 +133,41 @@ class TestBaseProperty(NIOTestCase):
             serialized_value = property.serialize(mocked_instance)
         self.assertEqual(serialized_value, mocked_property_value.value)
 
-    def test_deserialize_with_valid_value(self):
+    def test_deserialize_with_normal_value(self):
+        """ Call Type.deserialize and return the deserialized value """
         property = BaseProperty(Type)
-        value = 'value'
-        self.assertEqual(value, property.deserialize(value))
+        property.is_expression = MagicMock(return_value=False)
+        property.is_env_var = MagicMock(return_value=False)
+        mocked_value = MagicMock()
+        mocked_deserialized_value = MagicMock()
+        with patch('nio.types.Type.deserialize',
+                   return_value=mocked_deserialized_value) as deserialize:
+            deserialized_value = property.deserialize(mocked_value)
+            deserialize.assert_called_once_with(mocked_value)
+        self.assertEqual(deserialized_value, mocked_deserialized_value)
+
+    def test_deserialize_with_expression_value(self):
+        """ Return unmodified value if it's an expression """
+        property = BaseProperty(Type)
+        property.is_expression = MagicMock(return_value=True)
+        property.is_env_var = MagicMock(return_value=False)
+        mocked_value = MagicMock()
+        mocked_deserialized_value = MagicMock()
+        with patch('nio.types.Type.deserialize',
+                   return_value=mocked_deserialized_value) as deserialize:
+            deserialized_value = property.deserialize(mocked_value)
+            self.assertEqual(deserialize.call_count, 0)
+        self.assertEqual(deserialized_value, mocked_value)
+
+    def test_deserialize_with_env_var_value(self):
+        """ Return unmodified value if it's an environment variable """
+        property = BaseProperty(Type)
+        property.is_expression = MagicMock(return_value=False)
+        property.is_env_var = MagicMock(return_value=True)
+        mocked_value = MagicMock()
+        mocked_deserialized_value = MagicMock()
+        with patch('nio.types.Type.deserialize',
+                   return_value=mocked_deserialized_value) as deserialize:
+            deserialized_value = property.deserialize(mocked_value)
+            self.assertEqual(deserialize.call_count, 0)
+        self.assertEqual(deserialized_value, mocked_value)

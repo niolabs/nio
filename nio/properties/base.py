@@ -128,7 +128,6 @@ class BaseProperty(object):
             merged_kwargs = self.kwargs.copy()
             merged_kwargs.update(**kwargs)
             return self.type.deserialize(value, **merged_kwargs)
-        # TODO: else raise exception?
         return value
 
     def is_expression(self, value):
