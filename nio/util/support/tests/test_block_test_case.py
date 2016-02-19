@@ -9,7 +9,7 @@ from nio.common import RunnerStatus
 
 class TestBlockTestCase(NIOBlockTestCase):
 
-    """ Tests that the BlockTestCase handles roter methods properly. """
+    """ Tests that the BlockTestCase handles router methods properly. """
 
     def signals_notified(self, signals, output_id=DEFAULT_TERMINAL):
         """ Override a signal notification handler """
