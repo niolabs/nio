@@ -22,13 +22,17 @@ class TestBaseProperty(NIOTestCase):
             get_values.append(get_value())
         self.assertEqual(set_values, get_values)
 
-    def test_not_allow_none(self):
+    def test_setting_invalid_value(self):
+        """ Setting of an invalid value is allowed
+
+        Type checking does not happen until the PropertyValue is called.
+
+        """
         type = Type
         instance = MagicMock()
         property = BaseProperty(type)
         set_value = None
-        with self.assertRaises(Exception):
-            property.__set__(instance, set_value)
+        property.__set__(instance, set_value)
         get_value = property.__get__(instance, MagicMock())
         with self.assertRaises(Exception):
             get_value()

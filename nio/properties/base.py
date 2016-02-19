@@ -25,8 +25,7 @@ class BaseProperty(object):
         self._default = default
         self._cached_default = None
         # Skip value validation for default
-        self._default_property_value = PropertyValue(
-            self, self._default, validate=False)
+        self._default_property_value = PropertyValue(self, self._default)
 
         # Set up a values dictionary to keep track of values per instance
         # We want a WeakKeyDict so that instances aren't kept in memory
