@@ -143,20 +143,6 @@ class TestProperties(NIOTestCase):
         self.assertEqual(container.object_property(), contained)
         self.assertEqual(container.list_property(), contained_list)
 
-    def test_allow_wrong_types(self):
-        container = ContainerClass()
-
-        class NotStringable:
-            def __str__(self):
-                raise Exception("Not a string")
-
-        container.string_property = NotStringable()
-        container.int_property = "string"
-        container.float_property = "string"
-        container.object_property = 1
-        container.object_property = ObjectProperty(ContainedClass)
-        container.list_property = "string"
-
     def test_delete_property(self):
         container = ContainerClass()
         with self.assertRaises(AttributeError):

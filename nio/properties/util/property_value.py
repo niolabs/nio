@@ -15,12 +15,7 @@ class PropertyValue:
     def __init__(self, property, value=None):
         self._property = property
         self.value = value
-        try:
-            self.evaluator = Evaluator(str(value))
-        except:
-            # Some propeties cannot be evaluated
-            # TODO: what should happen though?
-            self.evaluator = Evaluator("")
+        self.evaluator = Evaluator(str(value))
 
     def __call__(self, signal=None):
         """ Return value, evaluated if it is an expression """
