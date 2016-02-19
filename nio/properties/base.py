@@ -24,7 +24,6 @@ class BaseProperty(object):
         # Default value info
         self._default = default
         self._cached_default = None
-        # Skip value validation for default
         self._default_property_value = PropertyValue(self, self._default)
 
         # Set up a values dictionary to keep track of values per instance
@@ -98,10 +97,9 @@ class BaseProperty(object):
         # Allow property kwargs to be overriden by call to serialize
         merged_kwargs = self.kwargs.copy()
         merged_kwargs.update(**kwargs)
-        value = self.__get__(instance, instance.__class__).value
-        if value is None:
-            # No value was set for this instance, use the property's default
-            value = self.default
+        property_value = self.__get__(instance, instance.__class__)
+        # Get the raw value from the PropertyValue
+        value = property_value.value
         if value is not None and \
                 not self.is_expression(value) and not self.is_env_var(value):
             return self.type.serialize(value, **merged_kwargs)
@@ -130,7 +128,6 @@ class BaseProperty(object):
             merged_kwargs = self.kwargs.copy()
             merged_kwargs.update(**kwargs)
             return self.type.deserialize(value, **merged_kwargs)
-        # TODO: else raise exception?
         return value
 
     def is_expression(self, value):
