@@ -21,10 +21,19 @@ class PropertyValue:
         """ Return value, evaluated if it is an expression """
         from nio.properties import PropertyHolder
         if self._property.is_expression(self.value):
-            # Evaluate and deserialize string since they might be expressions
+            # Expression properties need to be evaluated
             value = self.evaluator.evaluate(signal or Signal())
-            # TODO: why pass kwargs? shouldn't the property already know?
-            return self._property.deserialize(value, **self._property.kwargs)
+            if value is None:
+                if self._property.allow_none:
+                    return None
+                else:
+                    raise AllowNoneViolation("Property value expression is not"
+                                             "allowed to evaluate to None")
+            else:
+                # TODO: why pass kwargs? shouldn't the property already know?
+                # Deserialize should not be called with None
+                return self._property.deserialize(
+                    value, **self._property.kwargs)
         elif self.value is not None and isinstance(self.value, PropertyHolder):
             # Return property holders as they are
             return self.value
@@ -37,4 +46,4 @@ class PropertyValue:
             # Return None if it is allowed
             return None
         else:
-            raise Exception("Property value None is not allowed")
+            raise AllowNoneViolation("Property value None is not allowed")

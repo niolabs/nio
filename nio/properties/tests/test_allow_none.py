@@ -35,16 +35,13 @@ class TestAllowNone(NIOTestCase):
         properties.allow_none_property = None
         # You can set None
         properties.not_allow_none_property = None
-        with self.assertRaises(Exception):
-            # TODO: should raise AllowNoneViolation
+        with self.assertRaises(AllowNoneViolation):
             # But you can't get the value if it's None
             properties.not_allow_none_property()
         # verify good assignments
         properties.allow_none_property = "Some String 1"
         properties.not_allow_none_property = "Some String 2"
 
-    from unittest import skip
-    @skip('TODO')
     def test_none_expression_violation(self):
         """ Expressions that evaluate to None """
         properties = Properties()
