@@ -88,7 +88,15 @@ class PropertyHolder(object):
         actually valid.
 
         """
-        PropertyValue(prop, value)()
+        value = PropertyValue(prop, value)()
+        # If the value is a PropertyHolder or list of PropertyHolders, then
+        # we're going to need to validate all those too
+        if isinstance(value, PropertyHolder):
+            value.validate_dict(value.to_dict())
+        elif isinstance(value, list):
+            for property in value:
+                if isinstance(property, PropertyHolder):
+                    property.validate_dict(property.to_dict())
 
     def from_dict(self, properties, logger=None):
         """ Loads properties from the specified dict into the instance.

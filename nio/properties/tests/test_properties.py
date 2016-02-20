@@ -41,8 +41,6 @@ class TestProperties(NIOTestCase):
         self.assertIsNotNone(container.object_property)
         self.assertIsNotNone(container.list_property)
 
-    from unittest import skip
-    @skip('TODO: validate_dict needs some serious reworking')
     def test_validate_dict_when_invalid(self):
         container = ContainerClass
 
