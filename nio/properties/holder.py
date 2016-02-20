@@ -2,6 +2,7 @@ from nio.util.versioning.check import compare_versions, \
     VersionCheckResult, InvalidVersionFormat, is_version_valid, \
     get_major_version
 from nio.properties.base import BaseProperty
+from nio.properties.util.property_value import PropertyValue
 
 
 class NoClassVersion(Exception):
@@ -62,22 +63,32 @@ class PropertyHolder(object):
         Returns:
             properties (dict): validated and serialized
 
+        Raises:
+            Exception: a property value is invalid
+
         """
         class_properties = cls.get_class_properties()
-
         for (property_name, prop) in class_properties.items():
             if property_name in properties:
                 value = properties[property_name]
-                # Check value
-                # TODO: all this needs to be made more clear
-                from nio.properties.util.property_value import PropertyValue
-                value = PropertyValue(prop, value)()
-                # Deserialize and then serialize the value to format it
+                # First, check if value is valid
+                cls._validate_property_value(prop, value)
+                # Then get the properly serialized version to return
                 deserialized_value = prop.deserialize(value)
-                value = prop.type.serialize(deserialized_value, **prop.kwargs)
-                properties[property_name] = value
-
+                serialized_value = prop.serialize(cls)
+                properties[property_name] = serialized_value
         return properties
+
+    @classmethod
+    def _validate_property_value(cls, prop, value):
+        """ Check if value is valid by calling the property value
+
+        Some of the validation doesn't happen until the property value is used.
+        Simply instantiate a PropertyValue and call it to test if value is
+        actually valid.
+
+        """
+        PropertyValue(prop, value)()
 
     def from_dict(self, properties, logger=None):
         """ Loads properties from the specified dict into the instance.
@@ -97,20 +108,12 @@ class PropertyHolder(object):
 
         # Retrieve the list of all class properties
         class_properties = self.__class__.get_class_properties()
-
         self._process_and_log_version(class_properties, properties, logger)
-
         for (property_name, prop) in class_properties.items():
-
             if property_name in properties:
-                # if the given property was included in the input dictionary,
-                # deserialize the dictionary's value and set it
-                # value = prop.deserialize(properties[property_name])
-                # setattr(self, property_name, value)
-                # TODO: do we need to call deserialize first?
                 setattr(self, property_name, properties[property_name])
-
                 if hasattr(prop, "deprecated") and logger:
+                    # TODO: test and document "deprecated" flag
                     logger.info("Property: {0} is deprecated")
 
     @classmethod

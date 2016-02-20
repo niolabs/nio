@@ -8,6 +8,7 @@ from nio.properties import ObjectProperty
 from nio.properties import PropertyHolder
 from nio.properties import StringProperty
 from nio.properties import TimeDeltaProperty
+from nio.types import Type
 from nio.util.support.test_case import NIOTestCase
 
 
@@ -24,6 +25,7 @@ class ContainerClass(PropertyHolder):
     int_property = IntProperty(default=0)
     float_property = FloatProperty(default=0.0)
     object_property = ObjectProperty(ContainedClass, default=ContainedClass())
+    typed_list_property = ListProperty(Type, default=[])
     list_property = ListProperty(ContainedClass, default=[])
     td_property = TimeDeltaProperty(default={"seconds":0})
 
@@ -50,6 +52,7 @@ class TestProperties(NIOTestCase):
         with self.assertRaises(TypeError):
             container.validate_dict({'float_property': 'foo'})
 
+        # TODO: why does list property not validate the objects inside it?
         with self.assertRaises(TypeError):
             container.validate_dict({
                 'list_property': [{'int_property': 'foo'}]
@@ -156,6 +159,7 @@ class TestProperties(NIOTestCase):
                                   "string_property": "str",
                                   "float_property": 5.0,
                                   "int_property": 5},
+                              "typed_list_property": [],
                               "list_property": [],
                               "td_property": {
                                   'days': 0,
@@ -178,6 +182,7 @@ class TestProperties(NIOTestCase):
                 "string_property": "str2",
                 "float_property": 2.0,
                 "int_property": 2},
+            "typed_list_property": ["a", "b", "c"],
             "list_property": [{
                 "string_property": "str3",
                 "float_property": 3.0,
@@ -201,6 +206,8 @@ class TestProperties(NIOTestCase):
             properties_to_set['object_property']['float_property']
         container1.object_property = contained
         container1.td_property = timedelta(**properties_to_set['td_property'])
+        container1.typed_list_property = \
+            properties_to_set['typed_list_property']
 
         contained = ContainedClass()
         contained.string_property = \
