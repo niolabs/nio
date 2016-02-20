@@ -1,4 +1,3 @@
-from unittest import skip
 from unittest.mock import MagicMock, patch
 from nio.properties.base import BaseProperty
 from nio.properties.holder import PropertyHolder
@@ -18,19 +17,13 @@ class MyHolder(PropertyHolder):
 
     @classmethod
     def _validate_property_value(cls, prop, value):
+        # Allow validation to pass
         pass
 
 
 class InvalidPropertyHolder(PropertyHolder):
 
     property = MagicMock(spec=BaseProperty)
-
-    def __init__(self):
-        self.property.deserialize.side_effect = TypeError
-
-    @classmethod
-    def _validate_property_value(cls, prop, value):
-        pass
 
 
 class TestPropertyHolder(NIOTestCase):
@@ -55,6 +48,18 @@ class TestPropertyHolder(NIOTestCase):
         property_holder.property.__set__.assert_called_once_with(
             property_holder, 'new value')
 
+    def test_validate(self):
+        """ PropertyHolder.validate """
+        property_holder = MyHolder()
+        validation_status = property_holder.validate()
+        self.assertDictEqual(validation_status, {"property": True})
+
+    def test_validate_fail(self):
+        """ PropertyHolder.validate """
+        property_holder = InvalidPropertyHolder()
+        validation_status = property_holder.validate()
+        self.assertDictEqual(validation_status, {"property": False})
+
     def test_validate_dict_empty(self):
         """ PropertyHolder.validate_dict does nothing with empty dict """
         property_holder = MyHolder()
@@ -73,10 +78,12 @@ class TestPropertyHolder(NIOTestCase):
     def test_validate_dict_fail(self):
         """ PropertyHolder.validate_dict raises deserialized exceptions """
         property_holder = InvalidPropertyHolder()
+        InvalidPropertyHolder._validate_property_value = MagicMock(
+            side_effect=TypeError)
         with self.assertRaises(TypeError):
             property_holder.validate_dict({"property": "invalid value"})
-        property_holder.property.deserialize.assert_called_once_with(
-            'invalid value')
+        property_holder._validate_property_value.assert_called_once_with(
+            property_holder.property, 'invalid value')
         # We never get to serialize since deserialize failed
         self.assertEqual(property_holder.property.serialize.call_count, 0)
 

@@ -50,6 +50,19 @@ class PropertyHolder(object):
         return {property_name: prop.serialize(self)
                 for (property_name, prop) in class_properties.items()}
 
+    def validate(self):
+        """ Returns dictionary of each property and it's validation status """
+        class_properties = self.__class__.get_class_properties()
+        validation_status = {}
+        for (property_name, prop) in class_properties.items():
+            try:
+                self._validate_property_value(
+                    prop, getattr(self, property_name)())
+                validation_status[property_name] = True
+            except:
+                validation_status[property_name] = False
+        return validation_status
+
     @classmethod
     def validate_dict(cls, properties):
         """ Validates the given property dictionary by successively
@@ -88,6 +101,10 @@ class PropertyHolder(object):
         actually valid.
 
         """
+        # TODO: is this the right way to do this? It might be better to be able
+        # to just ask the property if it's valid. The special rules for list
+        # and object properties shouldn't be here.
+
         value = PropertyValue(prop, value)()
         # If the value is a PropertyHolder or list of PropertyHolders, then
         # we're going to need to validate all those too
