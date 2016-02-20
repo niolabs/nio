@@ -66,6 +66,5 @@ class TestAllowNone(NIOTestCase):
         }
         properties = Properties()
         properties.from_dict(properties_to_set)
-        with self.assertRaises(Exception):
-            # TODO: should raise AllowNoneViolation
+        with self.assertRaises(AllowNoneViolation):
             properties.validate_dict(properties_to_set)
