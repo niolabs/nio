@@ -26,7 +26,9 @@ class OlderThanMinVersion(Exception):
 
 class PropertyHolder(object):
 
-    """ Functionality to group all properties of a given class.
+    """ Support nio.properties.BaseProperty as class attribtes.
+
+    Functionality to group all properties of a given class.
     Provides methods to serialize and deserialize a given instance, and
     to obtain the description at the class level.
 
@@ -37,7 +39,7 @@ class PropertyHolder(object):
     """
 
     def to_dict(self):
-        """ Returns a dictionary representation of itself
+        """ Return a dictionary representation of itself.
 
         Args:
             None
@@ -51,9 +53,12 @@ class PropertyHolder(object):
                 for (property_name, prop) in class_properties.items()}
 
     def validate(self):
-        """ Returns dictionary of each property and it's validation status
+        """ Return dictionary of each property and it's validation status.
 
         Returns:
+            dict: Values are True if valid, False otherwise.
+
+            Example::
             {
                 "valid_property": True,
                 "invalid_property": False
@@ -75,7 +80,9 @@ class PropertyHolder(object):
 
     @classmethod
     def validate_dict(cls, properties):
-        """ Validates the given property dictionary by successively
+        """ Call and deserialize each input property to determine validity.
+
+        Validates the given property dictionary by successively
         de-serializing each property, returning the resulting (validated)
         property dictionary. If no exceptions are thrown here, all
         properties are valid.
@@ -105,7 +112,8 @@ class PropertyHolder(object):
         return properties
 
     def from_dict(self, properties, logger=None):
-        """ Loads properties from the specified dict into the instance.
+        """ Load properties from the specified dict into the instance.
+
         Note: Existing values for properties that are not included in
         the properties dict would remain.
 
@@ -132,7 +140,7 @@ class PropertyHolder(object):
 
     @classmethod
     def get_description(cls):
-        """ Provides the instance properties.
+        """ Provide the instance properties.
 
         Args:
             None
@@ -151,7 +159,7 @@ class PropertyHolder(object):
 
     @classmethod
     def get_defaults(cls):
-        """ Determines the instance properties and their default values.
+        """ Determine the instance properties and their default values.
 
         Args:
             None
@@ -166,7 +174,7 @@ class PropertyHolder(object):
 
     @classmethod
     def get_serializable_defaults(cls):
-        """ Determines the instance properties and their serializable defaults.
+        """ Determine the instance properties and their serializable defaults.
 
         Args:
             None
@@ -181,9 +189,10 @@ class PropertyHolder(object):
 
     @classmethod
     def get_class_properties(cls):
-        """ Determines the metadata properties on this class by
-        means of reflection. This is useful in serialization and
-        deserialization.
+        """ Determine the metadata properties on this class.
+
+        Determine the metadata properties on this class by means of reflection.
+        This is useful in serialization and deserialization.
 
         Args:
             None
@@ -230,8 +239,10 @@ class PropertyHolder(object):
                                (name, e.instance_version, e.min_version))
 
     def _handle_versions(self, class_properties, instance_properties):
-        """ Determine version relation of an instance with respect to class
-        version definition.
+        """ Raise version exceptions based on instance config.
+
+        Determine version relation of an instance with respect to class version
+        definition.
 
         Assumes that both, class and instance refer to their version through
         a version property
