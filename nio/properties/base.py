@@ -121,6 +121,8 @@ class BaseProperty(object):
             TODO: give an example of when this is useful
         Returns:
             Deserialized version of property value
+        Raises:
+            TypeError: Value is invalid for Type and cannot be deserialized
 
         """
         if not self.is_expression(value) and not self.is_env_var(value):

@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import timedelta
 from unittest.mock import MagicMock
 
@@ -50,7 +51,6 @@ class TestProperties(NIOTestCase):
         with self.assertRaises(TypeError):
             container.validate_dict({'float_property': 'foo'})
 
-        # TODO: why does list property not validate the objects inside it?
         with self.assertRaises(TypeError):
             container.validate_dict({
                 'list_property': [{'int_property': 'foo'}]
@@ -77,49 +77,59 @@ class TestProperties(NIOTestCase):
 
     def test_validate_dict_when_valid(self):
         container = ContainerClass
-
-        container.validate_dict({'int_property': 1})
-        container.validate_dict({'float_property': 1.34})
-        container.validate_dict({
+        valid_dict = {'int_property': 1}
+        self.assertDictEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
+        valid_dict = {'float_property': 1.34}
+        self.assertDictEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
+        valid_dict = {
             'list_property': [{'int_property': 2}]
-        })
-        container.validate_dict({
+        }
+        self.assertDictEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
+        valid_dict = {
             'object_property': {
                 'int_property': 1
             }
-        })
-        container.validate_dict({
+        }
+        self.assertDictEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
+        valid_dict = {
             'object_property': {
                 'float_property': 1.34
             }
-        })
-        container.validate_dict({
+        }
+        self.assertDictEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
+        valid_dict = {
             'td_property': {'seconds': 23}
-        })
+        }
+        self.assertCountEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
 
         # validate object property
-        legit_object = {
+        valid_dict = {
             'object_property': {
                 'int_property': "23",
                 'float_property': "23.23",
                 'string_property': 'bar',
             }
         }
-
-        props = container.validate_dict(legit_object)
-        self.assertCountEqual(props, legit_object)
+        self.assertCountEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
 
         # make sure that the property holder passes validation
         # when there's an env var inside an object
-        legit_object_2 = {
+        valid_dict = {
             'object_property': {
                 'int_property': "[[SOMEINT]]",
                 'string_property': 'bar',
             }
         }
 
-        props = container.validate_dict(legit_object_2)
-        self.assertCountEqual(props, legit_object_2)
+        self.assertCountEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
 
     def test_accept_values(self):
         container = ContainerClass()

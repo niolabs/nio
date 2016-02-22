@@ -14,16 +14,19 @@ class MyHolder(PropertyHolder):
         self.property.serialize.return_value = 'serialized value'
         self.property.deserialize.return_value = 'deserialized value'
         self.property.description = "property description"
-
-    @classmethod
-    def _validate_property_value(cls, prop, value):
-        # Allow validation to pass
-        pass
+        self.property.kwargs = {}
+        # Also need to mock type.serialize since it's used in validate_dict
+        self.property.type = MagicMock()
+        self.property.type.serialize.return_value = 'serialized value'
 
 
 class InvalidPropertyHolder(PropertyHolder):
 
     property = MagicMock(spec=BaseProperty)
+    property.serialize.return_value = 'serialized value'
+    property.deserialize.side_effect = TypeError
+    # Also, raise TypeError when the property/PropertyValue is called
+    property.side_effect = TypeError
 
 
 class TestPropertyHolder(NIOTestCase):
@@ -71,51 +74,30 @@ class TestPropertyHolder(NIOTestCase):
         property_holder = MyHolder()
         validated = property_holder.validate_dict({"not_a_property": "?"})
         self.assertDictEqual(validated, {"not_a_property": "?"})
-        # TODO: The way class attribues are bing mocked is messing this up
-        #self.assertEqual(property_holder.property.deserialize.call_count, 0)
-        #self.assertEqual(property_holder.property.serialize.call_count, 0)
 
     def test_validate_dict_fail(self):
-        """ PropertyHolder.validate_dict raises deserialized exceptions """
+        """ PropertyHolder.validate_dict raises deserialize TypeError """
         property_holder = InvalidPropertyHolder()
-        InvalidPropertyHolder._validate_property_value = MagicMock(
-            side_effect=TypeError)
         with self.assertRaises(TypeError):
             property_holder.validate_dict({"property": "invalid value"})
-        property_holder._validate_property_value.assert_called_once_with(
-            property_holder.property, 'invalid value')
+        property_holder.property.deserialize.assert_called_with(
+            'invalid value')
         # We never get to serialize since deserialize failed
         self.assertEqual(property_holder.property.serialize.call_count, 0)
 
     def test_validate_dict_as_classmethod(self):
         """ PropertyHolder.validate_dict can be called as class method """
-        with patch('nio.properties.base.BaseProperty',
-                   spec=BaseProperty) as mocked_property:
-            class StaticClassHolder(PropertyHolder):
-                property = mocked_property
-            # Let the property value validation pass
-            StaticClassHolder._validate_property_value = MagicMock()
-            mocked_property.serialize.return_value = 'serialized value'
-            validated = \
-                StaticClassHolder.validate_dict({"property": "valid value"})
-            mocked_property.deserialize.assert_called_once_with('valid value')
-            mocked_property.serialize.assert_called_once_with(
-                StaticClassHolder)
+        validated = MyHolder.validate_dict({"property": "valid value"})
+        MyHolder.property.deserialize.assert_called_with('valid value')
+        MyHolder.property.type.serialize.assert_called_with('valid value')
         self.assertDictEqual(validated, {"property": "serialized value"})
 
     def test_validate_dict_fail_as_classmethod(self):
         """ PropertyHolder.validate_dict can be called as class method """
-        with patch('nio.properties.base.BaseProperty',
-                   spec=BaseProperty) as mocked_property:
-            class StaticClassHolder(PropertyHolder):
-                property = mocked_property
-            # Let the property value validation pass
-            StaticClassHolder._validate_property_value = MagicMock(
-                side_effect=TypeError)
-            with self.assertRaises(TypeError):
-                StaticClassHolder.validate_dict({"property": "invalid value"})
-            StaticClassHolder._validate_property_value.assert_called_once_with(
-                mocked_property, 'invalid value')
+        with self.assertRaises(TypeError):
+            InvalidPropertyHolder.validate_dict({"property": "invalid value"})
+        InvalidPropertyHolder.property.deserialize.assert_called_with(
+            'invalid value')
 
     def test_delete_property(self):
         """ Properties can't be deleted from a holder """

@@ -51,13 +51,23 @@ class PropertyHolder(object):
                 for (property_name, prop) in class_properties.items()}
 
     def validate(self):
-        """ Returns dictionary of each property and it's validation status """
+        """ Returns dictionary of each property and it's validation status
+
+        Returns:
+            {
+                "valid_property": True,
+                "invalid_property": False
+            }
+
+        """
         class_properties = self.__class__.get_class_properties()
         validation_status = {}
         for (property_name, prop) in class_properties.items():
             try:
-                self._validate_property_value(
-                    prop, getattr(self, property_name)())
+                # Calling a PropertyValue is the best way to determine if a
+                # value is valid. It checks allow_none violations and
+                # deserializes (which checks type errors).
+                getattr(self, property_name)()
                 validation_status[property_name] = True
             except:
                 validation_status[property_name] = False
@@ -77,43 +87,22 @@ class PropertyHolder(object):
             properties (dict): validated and serialized
 
         Raises:
-            Exception: a property value is invalid
+            AllowNoneViolation: Property value does not allow none
+            TypeError: Property value is invalid
 
         """
         class_properties = cls.get_class_properties()
         for (property_name, prop) in class_properties.items():
             if property_name in properties:
                 value = properties[property_name]
-                # First, check if value is valid
-                cls._validate_property_value(prop, value)
-                # Then get the properly serialized version to return
-                deserialized_value = prop.deserialize(value)
-                serialized_value = prop.serialize(cls)
+                # Calling a PropertyValue is the best way to determine if a
+                # value is valid. It checks allow_none violations and
+                # deserializes (which checks type errors).
+                PropertyValue(prop, value)()
+                # Return the serialized version of the input dictionary
+                serialized_value = prop.type.serialize(value, **prop.kwargs)
                 properties[property_name] = serialized_value
         return properties
-
-    @classmethod
-    def _validate_property_value(cls, prop, value):
-        """ Check if value is valid by calling the property value
-
-        Some of the validation doesn't happen until the property value is used.
-        Simply instantiate a PropertyValue and call it to test if value is
-        actually valid.
-
-        """
-        # TODO: is this the right way to do this? It might be better to be able
-        # to just ask the property if it's valid. The special rules for list
-        # and object properties shouldn't be here.
-
-        value = PropertyValue(prop, value)()
-        # If the value is a PropertyHolder or list of PropertyHolders, then
-        # we're going to need to validate all those too
-        if isinstance(value, PropertyHolder):
-            value.validate_dict(value.to_dict())
-        elif isinstance(value, list):
-            for property in value:
-                if isinstance(property, PropertyHolder):
-                    property.validate_dict(property.to_dict())
 
     def from_dict(self, properties, logger=None):
         """ Loads properties from the specified dict into the instance.
