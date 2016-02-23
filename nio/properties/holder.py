@@ -62,10 +62,10 @@ class PropertyHolder(object):
         """
         class_properties = self.__class__.get_class_properties()
         for (property_name, prop) in class_properties.items():
-            # Calling a PropertyValue is the best way to determine if a
-            # value is valid. It checks allow_none violations and
-            # deserializes (which checks type errors).
-            getattr(self, property_name)()
+            # Deserialize the raw value of the PropertyValue
+            value = getattr(self, property_name).value
+            # Deserialize to check for AllowNoneViolation and TypeError
+            prop.deserialize(value)
 
     @classmethod
     def validate_dict(cls, properties):
@@ -91,10 +91,8 @@ class PropertyHolder(object):
         for (property_name, prop) in class_properties.items():
             if property_name in properties:
                 value = properties[property_name]
-                # Calling a PropertyValue is the best way to determine if a
-                # value is valid. It checks allow_none violations and
-                # deserializes (which checks type errors).
-                PropertyValue(prop, value)()
+                # Deserialize to check for AllowNoneViolation and TypeError
+                prop.deserialize(value)
                 # Return the serialized version of the input dictionary
                 serialized_value = prop.type.serialize(value, **prop.kwargs)
                 properties[property_name] = serialized_value
