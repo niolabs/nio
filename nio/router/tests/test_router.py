@@ -197,6 +197,11 @@ class TestBaseRouter(NIOTestCaseNoModules):
         source, dest, router = self._configure_router(
             SourceBlock, DestBlock, "test_output", None)
 
+        # Cannot configure a router with default outputs if the block
+        # doesn't declare a default output
+        with self.assertRaises(InvalidBlockOutput):
+            self._configure_router(SourceBlock, DestBlock, None, None)
+
         router.do_start()
         # Notify a signal from the specified output
         source.notify_signals([Signal()], "test_output")
@@ -264,6 +269,9 @@ class TestBaseRouter(NIOTestCaseNoModules):
 
         router.do_start()
         # Notify a signal from the default output
+        with self.assertRaises(InvalidBlockOutput):
+            source.notify_signals([Signal()])
+        # Notify a signal from a non-existent output
         with self.assertRaises(InvalidBlockOutput):
             source.notify_signals([Signal()], "invalid_output")
         router.do_stop()
