@@ -136,6 +136,8 @@ class Service(PropertyHolder, CommandHolder, Runner):
         """
         # populate service properties
         self.from_dict(context.properties, self._logger)
+        # verify that service properties are valid
+        self.validate()
 
         # reset logger after modules initialization
         # and properties setting
