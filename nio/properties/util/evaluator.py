@@ -1,6 +1,17 @@
 import re
 
 from nio.properties.util.parser import Parser
+from nio.signal.base import Signal
+
+
+class TemporarySignal(Signal):
+
+    def __getattribute__(self, name):
+        raise InvalidEvaluationCall
+
+
+class InvalidEvaluationCall(Exception):
+    pass
 
 
 class Evaluator:
@@ -57,7 +68,15 @@ class Evaluator:
         result = []
         for item in parsed:
             if hasattr(item, '__call__'):
+                if signal is None:
+                    # Use a temporary signal that raises InvalidEvaluationCall
+                    signal = TemporarySignal()
+                # Evaluate the expression against the signal
                 item = item(signal, self)
+                if isinstance(item, TemporarySignal):
+                    # This is to catch evaluating the expression "{{ $ }}"
+                    # when evaluated without a Signal
+                    raise InvalidEvaluationCall
             result.append(item)
         return result
 

@@ -1,4 +1,4 @@
-from nio.properties.util.evaluator import Evaluator
+from nio.properties.util.evaluator import Evaluator, InvalidEvaluationCall
 from nio.signal.base import Signal
 from nio.util.support.test_case import NIOTestCase
 
@@ -64,3 +64,14 @@ class TestEvaluator(NIOTestCase):
         evaluator = Evaluator(expression)
         result = evaluator.evaluate()
         self.assertEqual(result, 42)
+
+    def test_evaluation_without_signal(self):
+        expressions = [
+            "{{ $ }}",
+            "{{ $not_a_property }}",
+            "{{ $.not_a_property }}",
+        ]
+        for expression in expressions:
+            evaluator = Evaluator(expression)
+            with self.assertRaises(InvalidEvaluationCall):
+                evaluator.evaluate()
