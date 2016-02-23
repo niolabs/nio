@@ -14,7 +14,6 @@ class Evaluator:
     Args:
         expression (str): The string or expression to be interpolated or
             evaluated.
-        default (ANY): The default value for non-existent attributes.
 
     Raises:
         Exception: If an expression is evaluated and it tries to get an
@@ -27,7 +26,7 @@ class Evaluator:
     def __init__(self, expression):
         self.expression = expression
 
-    def evaluate(self, signal):
+    def evaluate(self, signal=None):
         cache_key = (self.expression)
         parsed = self.__class__.expression_cache.get(cache_key, None)
         if parsed is None:
