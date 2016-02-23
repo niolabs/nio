@@ -70,7 +70,7 @@ class TestBaseBlock(NIOTestCaseNoModules):
         with patch.object(blk, '_block_router') as router_patch:
             blk.notify_signals(my_sigs)
             router_patch.notify_signals.assert_called_once_with(
-                blk, my_sigs, DEFAULT_TERMINAL)
+                blk, my_sigs, None)
 
         # test sending more than one Signal
         with patch.object(blk, '_block_router') as router_patch:

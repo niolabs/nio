@@ -287,8 +287,6 @@ class TestBaseRouter(NIOTestCaseNoModules):
 
         router.do_start()
         # Notify a signal from the default output
-        # TODO: Make a notify call without an output ID pass the actual default
-        # output instead of DEFAULT_TERMINAL every time
         source.notify_signals([Signal()])
         # Should have 1 and only 1 signals on the specified input
         self.assertEqual(dest.total_signals_received, 1)
@@ -305,6 +303,7 @@ class TestBaseRouter(NIOTestCaseNoModules):
         self.assertEqual(len(dest.signals_received["test_input_2"]), 2)
         router.do_stop()
 
+
 class RouterTestBlock(Block):
 
     def __init__(self, **kwargs):
@@ -313,6 +312,5 @@ class RouterTestBlock(Block):
         self.signals_received = defaultdict(list)
 
     def process_signals(self, signals, input_id):
-        print("RECEIVED ON --------------- {}".format(input_id))
         self.total_signals_received += len(signals)
         self.signals_received[input_id].extend(signals)

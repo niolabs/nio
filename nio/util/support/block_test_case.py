@@ -23,7 +23,9 @@ class TestBlockRouter(BlockRouter):
     def configure(self, test_case):
         self._test_case = test_case
 
-    def notify_signals(self, block, signals, output_id=DEFAULT_TERMINAL):
+    def notify_signals(self, block, signals, output_id):
+        if output_id is None:
+            output_id = DEFAULT_TERMINAL
 
         if not block.is_output_valid(output_id):
             msg = "Invalid output: '{0}' for block: {1}".format(
@@ -98,7 +100,7 @@ class NIOBlockTestCase(NIOTestCase):
             'TestSuite',
             ''))
 
-    def signals_notified(self, signals, output_id=DEFAULT_TERMINAL):
+    def signals_notified(self, signals, output_id):
         """Method to be overridden by sub-classed tests.
 
         This method will get called with the signals that the block notifies.
