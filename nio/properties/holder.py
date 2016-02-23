@@ -53,30 +53,19 @@ class PropertyHolder(object):
                 for (property_name, prop) in class_properties.items()}
 
     def validate(self):
-        """ Return dictionary of each property and it's validation status.
+        """ Call and deserialize each input property to determine validity.
 
-        Returns:
-            dict: Values are True if valid, False otherwise.
-
-            Example::
-            {
-                "valid_property": True,
-                "invalid_property": False
-            }
+        Raises:
+            AllowNoneViolation: Property value does not allow none
+            TypeError: Property value is invalid
 
         """
         class_properties = self.__class__.get_class_properties()
-        validation_status = {}
         for (property_name, prop) in class_properties.items():
-            try:
-                # Calling a PropertyValue is the best way to determine if a
-                # value is valid. It checks allow_none violations and
-                # deserializes (which checks type errors).
-                getattr(self, property_name)()
-                validation_status[property_name] = True
-            except:
-                validation_status[property_name] = False
-        return validation_status
+            # Calling a PropertyValue is the best way to determine if a
+            # value is valid. It checks allow_none violations and
+            # deserializes (which checks type errors).
+            getattr(self, property_name)()
 
     @classmethod
     def validate_dict(cls, properties):

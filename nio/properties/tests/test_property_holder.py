@@ -52,16 +52,16 @@ class TestPropertyHolder(NIOTestCase):
             property_holder, 'new value')
 
     def test_validate(self):
-        """ PropertyHolder.validate """
+        """ PropertyHolder.validate does not raise exception when valid """
         property_holder = MyHolder()
-        validation_status = property_holder.validate()
-        self.assertDictEqual(validation_status, {"property": True})
+        validated = property_holder.validate()
+        self.assertIsNone(validated)
 
     def test_validate_fail(self):
-        """ PropertyHolder.validate """
+        """ PropertyHolder.validate raises exception when invalie"""
         property_holder = InvalidPropertyHolder()
-        validation_status = property_holder.validate()
-        self.assertDictEqual(validation_status, {"property": False})
+        with self.assertRaises(TypeError):
+            property_holder.validate()
 
     def test_validate_dict_empty(self):
         """ PropertyHolder.validate_dict does nothing with empty dict """
