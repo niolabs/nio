@@ -58,3 +58,9 @@ class TestEvaluator(NIOTestCase):
             evaluator = Evaluator(expression)
             with self.assertRaises(Exception):
                 evaluator.evaluate(signal)
+
+    def test_expression_that_is_not_a_string(self):
+        expression = 42
+        evaluator = Evaluator(expression)
+        result = evaluator.evaluate()
+        self.assertEqual(result, 42)

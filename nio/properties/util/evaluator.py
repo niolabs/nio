@@ -5,7 +5,9 @@ from nio.properties.util.parser import Parser
 
 class Evaluator:
 
-    """ Class for transforming NIO's dynamic signal access mini-language
+    """ Evaluate python expressions against a Signal.
+
+    Class for transforming NIO's dynamic signal access mini-language
     into valid Python.
 
     Creates a new parser object each time 'evaluate' is called (i.e. for each
@@ -13,11 +15,11 @@ class Evaluator:
 
     Args:
         expression (str): The string or expression to be interpolated or
-            evaluated.
+            evaluated. If expression is not a string then the raw expression
+            is returned when evaluated.
 
     Raises:
-        Exception: If an expression is evaluated and it tries to get an
-            attribute on a signal when that attribute doesn't exist.
+        Exception: Raise any python exception during evaluation
 
     """
     delimiter = re.compile(r'(?<!\\)({{|}})|(\s)')
@@ -27,6 +29,8 @@ class Evaluator:
         self.expression = expression
 
     def evaluate(self, signal=None):
+        if not isinstance(self.expression, str):
+            return self.expression
         cache_key = (self.expression)
         parsed = self.__class__.expression_cache.get(cache_key, None)
         if parsed is None:
