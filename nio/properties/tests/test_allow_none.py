@@ -65,7 +65,10 @@ class TestAllowNone(NIOTestCase):
             "not_allow_none_property": None
         }
         properties = Properties()
+        # From_dict will set anything
         properties.from_dict(properties_to_set)
-        with self.assertRaises(Exception):
-            # TODO: should raise AllowNoneViolation
-            properties.validate_dict(properties_to_set)
+        # But validate should catch the None value
+        with self.assertRaises(AllowNoneViolation):
+            Properties.validate_dict(properties_to_set)
+        with self.assertRaises(AllowNoneViolation):
+            properties.validate()

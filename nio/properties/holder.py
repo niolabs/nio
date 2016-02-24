@@ -2,6 +2,7 @@ from nio.util.versioning.check import compare_versions, \
     VersionCheckResult, InvalidVersionFormat, is_version_valid, \
     get_major_version
 from nio.properties.base import BaseProperty
+from nio.properties.util.property_value import PropertyValue
 
 
 class NoClassVersion(Exception):
@@ -25,7 +26,9 @@ class OlderThanMinVersion(Exception):
 
 class PropertyHolder(object):
 
-    """ Functionality to group all properties of a given class.
+    """ Support nio.properties.BaseProperty as class attribtes.
+
+    Functionality to group all properties of a given class.
     Provides methods to serialize and deserialize a given instance, and
     to obtain the description at the class level.
 
@@ -36,7 +39,7 @@ class PropertyHolder(object):
     """
 
     def to_dict(self):
-        """ Returns a dictionary representation of itself
+        """ Return a dictionary representation of itself.
 
         Args:
             None
@@ -49,9 +52,26 @@ class PropertyHolder(object):
         return {property_name: prop.serialize(self)
                 for (property_name, prop) in class_properties.items()}
 
+    def validate(self):
+        """ Call and deserialize each input property to determine validity.
+
+        Raises:
+            AllowNoneViolation: Property value does not allow none
+            TypeError: Property value is invalid
+
+        """
+        class_properties = self.__class__.get_class_properties()
+        for (property_name, prop) in class_properties.items():
+            # Deserialize the raw value of the PropertyValue
+            value = getattr(self, property_name).value
+            # Deserialize to check for AllowNoneViolation and TypeError
+            prop.deserialize(value)
+
     @classmethod
     def validate_dict(cls, properties):
-        """ Validates the given property dictionary by successively
+        """ Call and deserialize each input property to determine validity.
+
+        Validates the given property dictionary by successively
         de-serializing each property, returning the resulting (validated)
         property dictionary. If no exceptions are thrown here, all
         properties are valid.
@@ -62,25 +82,25 @@ class PropertyHolder(object):
         Returns:
             properties (dict): validated and serialized
 
+        Raises:
+            AllowNoneViolation: Property value does not allow none
+            TypeError: Property value is invalid
+
         """
         class_properties = cls.get_class_properties()
-
         for (property_name, prop) in class_properties.items():
             if property_name in properties:
                 value = properties[property_name]
-                # Check value
-                # TODO: all this needs to be made more clear
-                from nio.properties.util.property_value import PropertyValue
-                value = PropertyValue(prop, value)()
-                # Deserialize and then serialize the value to format it
-                deserialized_value = prop.deserialize(value)
-                value = prop.type.serialize(deserialized_value, **prop.kwargs)
-                properties[property_name] = value
-
+                # Deserialize to check for AllowNoneViolation and TypeError
+                prop.deserialize(value)
+                # Return the serialized version of the input dictionary
+                serialized_value = prop.type.serialize(value, **prop.kwargs)
+                properties[property_name] = serialized_value
         return properties
 
     def from_dict(self, properties, logger=None):
-        """ Loads properties from the specified dict into the instance.
+        """ Load properties from the specified dict into the instance.
+
         Note: Existing values for properties that are not included in
         the properties dict would remain.
 
@@ -97,25 +117,17 @@ class PropertyHolder(object):
 
         # Retrieve the list of all class properties
         class_properties = self.__class__.get_class_properties()
-
         self._process_and_log_version(class_properties, properties, logger)
-
         for (property_name, prop) in class_properties.items():
-
             if property_name in properties:
-                # if the given property was included in the input dictionary,
-                # deserialize the dictionary's value and set it
-                # value = prop.deserialize(properties[property_name])
-                # setattr(self, property_name, value)
-                # TODO: do we need to call deserialize first?
                 setattr(self, property_name, properties[property_name])
-
                 if hasattr(prop, "deprecated") and logger:
+                    # TODO: test and document "deprecated" flag
                     logger.info("Property: {0} is deprecated")
 
     @classmethod
     def get_description(cls):
-        """ Provides the instance properties.
+        """ Provide the instance properties.
 
         Args:
             None
@@ -134,7 +146,7 @@ class PropertyHolder(object):
 
     @classmethod
     def get_defaults(cls):
-        """ Determines the instance properties and their default values.
+        """ Determine the instance properties and their default values.
 
         Args:
             None
@@ -149,7 +161,7 @@ class PropertyHolder(object):
 
     @classmethod
     def get_serializable_defaults(cls):
-        """ Determines the instance properties and their serializable defaults.
+        """ Determine the instance properties and their serializable defaults.
 
         Args:
             None
@@ -164,9 +176,10 @@ class PropertyHolder(object):
 
     @classmethod
     def get_class_properties(cls):
-        """ Determines the metadata properties on this class by
-        means of reflection. This is useful in serialization and
-        deserialization.
+        """ Determine the metadata properties on this class.
+
+        Determine the metadata properties on this class by means of reflection.
+        This is useful in serialization and deserialization.
 
         Args:
             None
@@ -213,8 +226,10 @@ class PropertyHolder(object):
                                (name, e.instance_version, e.min_version))
 
     def _handle_versions(self, class_properties, instance_properties):
-        """ Determine version relation of an instance with respect to class
-        version definition.
+        """ Raise version exceptions based on instance config.
+
+        Determine version relation of an instance with respect to class version
+        definition.
 
         Assumes that both, class and instance refer to their version through
         a version property

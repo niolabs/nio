@@ -30,18 +30,14 @@ class PropertyValue:
                     raise AllowNoneViolation("Property value expression is not"
                                              "allowed to evaluate to None")
             else:
-                # TODO: why pass kwargs? shouldn't the property already know?
                 # Deserialize should not be called with None
-                return self._property.deserialize(
-                    value, **self._property.kwargs)
+                return self._property.deserialize(value)
         elif self.value is not None and isinstance(self.value, PropertyHolder):
             # Return property holders as they are
             return self.value
         elif self.value is not None:
             # Deserialize properties
-            # TODO: why pass kwargs? shouldn't the property already know?
-            return self._property.deserialize(self.value,
-                                              **self._property.kwargs)
+            return self._property.deserialize(self.value)
         elif self.value is None and self._property.allow_none:
             # Return None if it is allowed
             return None

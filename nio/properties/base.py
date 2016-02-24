@@ -1,5 +1,6 @@
 from weakref import WeakKeyDictionary
 
+from nio.properties.exceptions import AllowNoneViolation
 from nio.properties.util.property_value import PropertyValue
 
 
@@ -121,12 +122,17 @@ class BaseProperty(object):
             TODO: give an example of when this is useful
         Returns:
             Deserialized version of property value
+        Raises:
+            TypeError: value is invalid for Type and cannot be deserialized
+            AllowNoneViolation: value is None and allow_none is False
 
         """
         if not self.is_expression(value) and not self.is_env_var(value):
             # Allow property kwargs to be overriden by call to serialize
             merged_kwargs = self.kwargs.copy()
             merged_kwargs.update(**kwargs)
+            if value is None and not self.allow_none:
+                raise AllowNoneViolation("Property value None is not allowed")
             return self.type.deserialize(value, **merged_kwargs)
         return value
 

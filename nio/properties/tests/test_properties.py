@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import timedelta
 from unittest.mock import MagicMock
 
@@ -8,6 +9,7 @@ from nio.properties import ObjectProperty
 from nio.properties import PropertyHolder
 from nio.properties import StringProperty
 from nio.properties import TimeDeltaProperty
+from nio.types import Type
 from nio.util.support.test_case import NIOTestCase
 
 
@@ -24,6 +26,7 @@ class ContainerClass(PropertyHolder):
     int_property = IntProperty(default=0)
     float_property = FloatProperty(default=0.0)
     object_property = ObjectProperty(ContainedClass, default=ContainedClass())
+    typed_list_property = ListProperty(Type, default=[])
     list_property = ListProperty(ContainedClass, default=[])
     td_property = TimeDeltaProperty(default={"seconds":0})
 
@@ -39,8 +42,6 @@ class TestProperties(NIOTestCase):
         self.assertIsNotNone(container.object_property)
         self.assertIsNotNone(container.list_property)
 
-    from unittest import skip
-    @skip('TODO: validate_dict needs some serious reworking')
     def test_validate_dict_when_invalid(self):
         container = ContainerClass
 
@@ -76,49 +77,59 @@ class TestProperties(NIOTestCase):
 
     def test_validate_dict_when_valid(self):
         container = ContainerClass
-
-        container.validate_dict({'int_property': 1})
-        container.validate_dict({'float_property': 1.34})
-        container.validate_dict({
+        valid_dict = {'int_property': 1}
+        self.assertDictEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
+        valid_dict = {'float_property': 1.34}
+        self.assertDictEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
+        valid_dict = {
             'list_property': [{'int_property': 2}]
-        })
-        container.validate_dict({
+        }
+        self.assertDictEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
+        valid_dict = {
             'object_property': {
                 'int_property': 1
             }
-        })
-        container.validate_dict({
+        }
+        self.assertDictEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
+        valid_dict = {
             'object_property': {
                 'float_property': 1.34
             }
-        })
-        container.validate_dict({
+        }
+        self.assertDictEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
+        valid_dict = {
             'td_property': {'seconds': 23}
-        })
+        }
+        self.assertCountEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
 
         # validate object property
-        legit_object = {
+        valid_dict = {
             'object_property': {
                 'int_property': "23",
                 'float_property': "23.23",
                 'string_property': 'bar',
             }
         }
-
-        props = container.validate_dict(legit_object)
-        self.assertCountEqual(props, legit_object)
+        self.assertCountEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
 
         # make sure that the property holder passes validation
         # when there's an env var inside an object
-        legit_object_2 = {
+        valid_dict = {
             'object_property': {
                 'int_property': "[[SOMEINT]]",
                 'string_property': 'bar',
             }
         }
 
-        props = container.validate_dict(legit_object_2)
-        self.assertCountEqual(props, legit_object_2)
+        self.assertCountEqual(container.validate_dict(deepcopy(valid_dict)),
+                             valid_dict)
 
     def test_accept_values(self):
         container = ContainerClass()
@@ -156,6 +167,7 @@ class TestProperties(NIOTestCase):
                                   "string_property": "str",
                                   "float_property": 5.0,
                                   "int_property": 5},
+                              "typed_list_property": [],
                               "list_property": [],
                               "td_property": {
                                   'days': 0,
@@ -178,6 +190,7 @@ class TestProperties(NIOTestCase):
                 "string_property": "str2",
                 "float_property": 2.0,
                 "int_property": 2},
+            "typed_list_property": ["a", "b", "c"],
             "list_property": [{
                 "string_property": "str3",
                 "float_property": 3.0,
@@ -201,6 +214,8 @@ class TestProperties(NIOTestCase):
             properties_to_set['object_property']['float_property']
         container1.object_property = contained
         container1.td_property = timedelta(**properties_to_set['td_property'])
+        container1.typed_list_property = \
+            properties_to_set['typed_list_property']
 
         contained = ContainedClass()
         contained.string_property = \
