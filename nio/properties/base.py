@@ -1,7 +1,11 @@
+import re
 from weakref import WeakKeyDictionary
 
 from nio.properties.exceptions import AllowNoneViolation
 from nio.properties.util.property_value import PropertyValue
+
+
+ENVIRONMENT_VAR = re.compile("\[\[([^\[\]]*)\]\]")
 
 
 class BaseProperty(object):
@@ -182,13 +186,12 @@ class BaseProperty(object):
         Examples:
             >>> is_env_var("[[ENV_VAR]]")
             True
-            >>> is_env_var("No an [[ENV_VAR]]")
+            >>> is_env_var("Not an [[ENV_VAR]]")
             False
 
         """
 
         try:
-            return value.startswith("[[") and \
-                    value.endswith("]]")
+            return ENVIRONMENT_VAR.fullmatch(value) is not None
         except:
             return False
