@@ -15,8 +15,7 @@ class TestFloatProperty(NIOTestCaseNoModules):
         container = ContainerClass()
         self.assertIsNotNone(container.property)
         self.assertEqual(container.default(), 1.23)
-        # TODO: add ability to get 'default' from PropertyValue
-        #self.assertEqual(container.default.default, 1.23)
+        self.assertEqual(container.default._property.default, 1.23)
 
     def test_expression(self):
         """Test expressions for file property."""
@@ -24,7 +23,7 @@ class TestFloatProperty(NIOTestCaseNoModules):
         container.property = "{{ 1 + 2.1 }}"
         self.assertIsNotNone(container.property)
         self.assertEqual(container.property(), 3.1)
-        #self.assertEqual(container.default.default, 1.23)
+        self.assertEqual(container.default._property.default, 1.23)
 
     def test_expression_with_signal(self):
         """Test signal expressions for file property."""
