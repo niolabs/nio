@@ -100,7 +100,7 @@ class CommandHolder(object):
         class_commands = self.get_commands()
         command = class_commands.get(name)
         if command is None or command.method is None:
-            raise RuntimeError("Invalid command: %s" % name)
+            raise RuntimeError("Invalid command: {}".format(name))
 
         method = getattr(self, command.method, None)
 
@@ -111,6 +111,6 @@ class CommandHolder(object):
             except TypeError as e:
                 raise InvalidCommandArg(e)
         else:
-            raise RuntimeError("Invalid command: %s" % name)
+            raise RuntimeError("Invalid command: {}".format(name))
 
         return result

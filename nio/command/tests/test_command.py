@@ -30,20 +30,20 @@ class CommandBlock(Block):
             print(phrase)
 
     def walk(self, steps):
-        print("i'm walking %d steps" % steps)
+        print("i'm walking {} steps".format(steps))
 
     def eat(self, food):
-        print("i'm eating %s food" % food)
+        print("i'm eating {} food".format(food))
 
     def make_signal(self, sig):
         """ Command parameter is a dict """
         Signal(sig)
 
     def sing(self, song):
-        print("i'm singing %s song" % song)
+        print("i'm singing {} song".format(song))
 
     def real_sing(self, song):
-        print("i'm singing %s song" % song)
+        print("i'm singing {} song".format(song))
 
 
 class TestCommand(NIOBlockTestCase):
