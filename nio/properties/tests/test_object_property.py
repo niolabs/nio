@@ -35,3 +35,12 @@ class TestObjectProperty(NIOTestCase):
         self.assertIsNotNone(container.property)
         self.assertEqual(container.property().sub_property(
             Signal({'value': 'sub-meta'})), 'sub-meta')
+
+    def test_object_property_with_invalid_obj_type(self):
+        """Raise TypeError when obj_type is invalid."""
+        with self.assertRaisesRegexp(TypeError, 'not a PropertyHolder'):
+            class Holder(PropertyHolder):
+                property = ObjectProperty(str)
+        with self.assertRaisesRegexp(TypeError, 'not a PropertyHolder'):
+            class Holder(PropertyHolder):
+                property = ObjectProperty('not a property holder')
