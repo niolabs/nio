@@ -94,7 +94,8 @@ class Terminal(object):
         }
 
     @classmethod
-    def get_terminals_on_class(cls, class_to_inspect, terminal_type):
+    def get_terminals_on_class(cls, class_to_inspect, terminal_type,
+                               order=True):
         """ Get a list of the unique terminals on a class of a certain type
 
         This method will recurse up the base classes and return all of the
@@ -107,13 +108,15 @@ class Terminal(object):
             class_to_inspect (Block): A class that is a sub-class of Block that
                 you want to get the terminals of
             terminal_type (TerminalType): What type of terminals to look for
+            order (bool): Whether or not to sort the terminals based on the
+                order attribute. If not, they will be sorted from first to
+                last as the classes appear in the MRO
 
         Returns:
             list: A list of unique terminals on this block, sorted in order
                 according to the terminal's order attribute
 
         Raises:
-            TypeError: If class_to_inspect is not a subclass of Block
             TypeError: If terminal_type is not a valid TerminalType enum
         """
         if not isinstance(terminal_type, TerminalType):
@@ -137,8 +140,44 @@ class Terminal(object):
         if len(terminals) > 1:
             terminals = [t for t in terminals if t.id != DEFAULT_TERMINAL]
 
-        # Return the terminals sorted by their order
-        return sorted(terminals, key=lambda t: t.order)
+        if order:
+            # Return the terminals sorted by their order
+            return sorted(terminals, key=lambda t: t.order)
+        else:
+            return terminals
+
+    @classmethod
+    def get_default_terminal_on_class(cls, class_to_inspect, terminal_type):
+        """ Gets the default terminal of a given type on a class
+
+        If multiple terminals are declared as default, the one on the class
+        that appears first in the MRO will be used. In other words, when
+        iterating up the MRO, default terminals that are detected after a
+        default terminal will be ignored.
+
+        Args:
+            class_to_inspect (Block): A class that is a sub-class of Block that
+                you want to get the default terminal
+            terminal_type (TerminalType): What type of terminals to look for
+
+        Returns:
+            Terminal: The default terminal on the class. None if no default
+                exists
+
+        Raises:
+            TypeError: If terminal_type is not a valid TerminalType enum
+        """
+        if not isinstance(terminal_type, TerminalType):
+            raise TypeError("Terminal type must be a TerminalType")
+
+        # Iterate through the terminals ignoring their order attribute. We need
+        # to do this so that we properly recurse up the MRO
+        my_terms = cls.get_terminals_on_class(
+            class_to_inspect, terminal_type, order=False)
+        for terminal in my_terms:
+            if terminal.default:
+                return terminal
+        return None
 
     @classmethod
     def _get_terminals_entry(cls, _class, terminal_type):

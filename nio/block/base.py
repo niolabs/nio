@@ -56,6 +56,8 @@ class Block(PropertyHolder, CommandHolder, Runner):
         self._block_router = None
         self.persistence = None
         self._service_name = None
+        self._default_output = Terminal.get_default_terminal_on_class(
+            self.__class__, TerminalType.output)
 
     def configure(self, context):
         """Overrideable method to be called when the block configures.
@@ -109,7 +111,7 @@ class Block(PropertyHolder, CommandHolder, Runner):
         """
         pass  # pragma: no cover
 
-    def notify_signals(self, signals, output_id=DEFAULT_TERMINAL):
+    def notify_signals(self, signals, output_id=None):
         """Notify signals to router.
 
         This is the method the block should call whenever it would like

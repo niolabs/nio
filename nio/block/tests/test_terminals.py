@@ -4,7 +4,7 @@ from nio.block.terminals import input, output, Terminal, TerminalType, \
     DEFAULT_TERMINAL
 
 
-@input("i1")
+@input("i1", default=True)
 @input("i2")
 @output("o1", order=5)
 @output("o2", label="parent", order=10, description="desc", default=False,
@@ -13,7 +13,7 @@ class Parent(Block):
     pass
 
 
-@input("ParentSubClass_input")
+@input("ParentSubClass_input", default=True)
 @output("ParentSubClass_output")
 class ParentSubClass(Parent):
     pass
@@ -22,6 +22,14 @@ class ParentSubClass(Parent):
 @input("i1")
 @output("o2", label="sub", order=1)
 class Duplicates(Parent):
+    pass
+
+
+# This class overrides both of the original terminals on Block, but doesn't
+# declare a default. This is acceptable
+@input("not a default")
+@output("not a default")
+class NoDefaultTerminals(Block):
     pass
 
 
@@ -71,6 +79,37 @@ class TestInputOutput(NIOTestCaseNoModules):
             'visible': True,
             'order': 5
         })
+
+    def test_base_block_default_terminals(self):
+        """Asserts that the base block has default terminals"""
+        default_input = Terminal.get_default_terminal_on_class(
+            Block, TerminalType.input)
+        default_output = Terminal.get_default_terminal_on_class(
+            Block, TerminalType.output)
+        self.assertIsInstance(default_input, Terminal)
+        self.assertIsInstance(default_output, Terminal)
+        self.assertEqual(default_input.id, DEFAULT_TERMINAL)
+        self.assertEqual(default_output.id, DEFAULT_TERMINAL)
+
+    def test_no_default_terminals(self):
+        """Assert that a block that defines no default terminal is allowed"""
+        self.assertIsNone(Terminal.get_default_terminal_on_class(
+            NoDefaultTerminals, TerminalType.input))
+        self.assertIsNone(Terminal.get_default_terminal_on_class(
+            NoDefaultTerminals, TerminalType.output))
+
+    def test_sub_block_default_terminals(self):
+        """Asserts that the sub block can override the parent's default"""
+        default_input = Terminal.get_default_terminal_on_class(
+            ParentSubClass, TerminalType.input)
+        default_output = Terminal.get_default_terminal_on_class(
+            ParentSubClass, TerminalType.output)
+        # they overrode both input and output, but only marked the input
+        # as default. This is allowed and should result in having no default
+        # output
+        self.assertIsInstance(default_input, Terminal)
+        self.assertEqual(default_input.id, "ParentSubClass_input")
+        self.assertIsNone(default_output)
 
     def test_terminal_inheritance(self):
         """Asserts that terminal definitions are inherited by subclasses."""
@@ -130,11 +169,15 @@ class TestInputOutput(NIOTestCaseNoModules):
         """Asserts that terminals can only be created with TerminalType"""
         # Try to create a bad terminal
         with self.assertRaises(TypeError):
-            Terminal("not a real terminal type", "fake terminal name")
+            Terminal("invalid", "fake terminal name")
 
         # Try to fetch a bad terminal
         with self.assertRaises(TypeError):
-            Terminal.get_terminals_on_class(Block, "not a real terminal type")
+            Terminal.get_terminals_on_class(Block, "invalid")
+
+        # Try to fetch a bad default terminal
+        with self.assertRaises(TypeError):
+            Terminal.get_default_terminal_on_class(Block, "invalid")
 
     def test_import_locations(self):
         """Make sure the input and output can be imported from nio.block"""
