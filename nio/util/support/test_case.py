@@ -33,27 +33,13 @@ class NIOTestCase(TestCase):
 
         logging.config.dictConfig(self.get_logging_config())
 
-    def get_persistence_module_context(self):
-        return ModuleContext()
-
-    def get_scheduler_module_context(self):
-        return ModuleContext()
-
-    def get_security_module_context(self):
-        return ModuleContext()
-
-    def get_communication_module_context(self):
-        return ModuleContext()
-
-    def get_web_module_context(self):
-        return ModuleContext()
-
     def setupModules(self):
         self._module_initializer = ModuleInitializer()
         for module_name in self.get_test_modules():
+            module = self.get_module(module_name)
             self._module_initializer.register_module(
-                self.get_module(module_name),
-                getattr(self, 'get_{}_module_context'.format(module_name))())
+                module,
+                self.get_context(module))
 
         # Perform a safe initialization in case a proxy never got cleaned up
         self._module_initializer.initialize(safe=True)
@@ -69,6 +55,9 @@ class NIOTestCase(TestCase):
         if module_name not in known_modules:
             raise ValueError("{} is not a valid module".format(module_name))
         return known_modules.get(module_name)()
+
+    def get_context(self, module):
+        return getattr(module, "prepare_core_context")()
 
     def tearDownModules(self):
         # Perform a safe finalization in case anything wasn't proxied first

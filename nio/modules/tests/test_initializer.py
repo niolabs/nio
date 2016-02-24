@@ -17,10 +17,9 @@ class TestModuleInterface(Module):
         super().initialize(context)
         # Append this module's name to the list of modules
         # We will use this for the order of modules
-        self._initialized_modules = context.configuration.get(
-            'init_modules', [])
-        self._finalized_modules = context.configuration.get(
-            'finalized_modules', [])
+        self._initialized_modules = getattr(context, "init_module_order", [])
+        self._finalized_modules = getattr(context, "finalized_module_order", [])
+
         self._initialized_modules.append(self.__class__.__name__)
 
     def finalize(self):
@@ -46,7 +45,7 @@ class TestModuleInitializer(NIOTestCaseNoModules):
         """ Test that we can register then initialize a module """
         initializer = ModuleInitializer()
         impl = FirstModuleImplementation()
-        ctx = ModuleContext(configuration={"key": "val"})
+        ctx = ModuleContext()
         with patch.object(impl, 'initialize') as init_call:
             initializer.register_module(impl, ctx)
             # Don't want an init call after registering
@@ -75,9 +74,9 @@ class TestModuleInitializer(NIOTestCaseNoModules):
         impl2 = SecondModuleImplementation()
         init_module_order = list()
         finalized_module_order = list()
-        ctx = ModuleContext(configuration={
-            "init_modules": init_module_order,
-            "finalized_modules": finalized_module_order})
+        ctx = ModuleContext()
+        ctx.init_module_order = init_module_order
+        ctx.finalized_module_order = finalized_module_order
         # Even if we register them in reverse order
         initializer.register_module(impl2, ctx)
         initializer.register_module(impl1, ctx)
