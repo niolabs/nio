@@ -3,13 +3,13 @@ from unittest.mock import MagicMock, patch
 from nio.properties import BaseProperty
 from nio.properties.util.property_value import PropertyValue
 from nio.types import Type
-from nio.util.support.test_case import NIOTestCase
+from nio.util.support.test_case import NIOTestCaseNoModules
 
 
-class TestBaseProperty(NIOTestCase):
+class TestBaseProperty(NIOTestCaseNoModules):
 
     def test_set(self):
-        """ Set a value and store a PropertyValue in Base._values """
+        """Set a value and store a PropertyValue in Base._values."""
         mocked_instance = MagicMock()
         property = BaseProperty(Type)
         # Initially, _values is empty
@@ -24,7 +24,7 @@ class TestBaseProperty(NIOTestCase):
                 property._values[mocked_instance].value, set_value)
 
     def test_get(self):
-        """ Get the PropertyValue from Base._values for the given instance """
+        """Get the PropertyValue from Base._values for the given instance."""
         mocked_instance = MagicMock()
         mocked_property_value = MagicMock(spec=PropertyValue)
         property = BaseProperty(Type)
@@ -38,7 +38,7 @@ class TestBaseProperty(NIOTestCase):
         self.assertEqual(property_value, mocked_property_value)
 
     def test_get_default(self):
-        """ Get the default PropertyValue when a value is not yet set """
+        """Get the default PropertyValue when a value is not yet set."""
         mocked_instance = MagicMock()
         default_value = MagicMock()
         property = BaseProperty(Type, default=default_value)
@@ -50,7 +50,7 @@ class TestBaseProperty(NIOTestCase):
         self.assertEqual(property_value.value, default_value)
 
     def test_set_and_get_value(self):
-        """ Test the whole set, get, and call process """
+        """Test the whole set, get, and call process."""
         mocked_instance = MagicMock()
         property = BaseProperty(Type)
         set_values = ["", "string", 1, {}, []]
@@ -63,7 +63,7 @@ class TestBaseProperty(NIOTestCase):
         self.assertEqual(set_values, get_values)
 
     def test_allow_none_is_false(self):
-        """ None is allowed to be set but raises an exception when used """
+        """None is allowed to be set but raises an exception when used."""
         mocked_instance = MagicMock()
         property = BaseProperty(Type, allow_none=False)
         set_value = None
@@ -73,7 +73,7 @@ class TestBaseProperty(NIOTestCase):
             value = property_value()
 
     def test_allow_none_is_true(self):
-        """ None values are alowed when allow_none is True """
+        """None values are alowed when allow_none is True."""
         mocked_instance = MagicMock()
         property = BaseProperty(Type, allow_none=True)
         set_value = None
@@ -83,7 +83,7 @@ class TestBaseProperty(NIOTestCase):
         self.assertEqual(set_value, value)
 
     def test_serialize_with_normal_value(self):
-        """ Call Type.serialize and return the serialized value """
+        """Call Type.serialize and return the serialized value."""
         mocked_serialized_value = MagicMock()
         mocked_instance = MagicMock()
         property = BaseProperty(Type)
@@ -96,7 +96,7 @@ class TestBaseProperty(NIOTestCase):
         self.assertEqual(serialized_value, mocked_serialized_value)
 
     def test_serialize_with_default_value(self):
-        """ Return the raw default value if a value is not yet set """
+        """Return the raw default value if a value is not yet set."""
         mocked_instance = MagicMock()
         default_value = MagicMock()
         property = BaseProperty(Type, default=default_value)
@@ -106,7 +106,7 @@ class TestBaseProperty(NIOTestCase):
         self.assertEqual(serialized_value, default_value)
 
     def test_serialize_with_expression_value(self):
-        """ Return raw PropertyValue.value if it's an expression """
+        """Return raw PropertyValue.value if it's an expression."""
         mocked_serialized_value = MagicMock()
         mocked_instance = MagicMock()
         property = BaseProperty(Type)
@@ -120,7 +120,7 @@ class TestBaseProperty(NIOTestCase):
         self.assertEqual(serialized_value, mocked_property_value.value)
 
     def test_serialize_with_env_var_value(self):
-        """ Return raw PropertyValue.value if it's an environment variable """
+        """Return raw PropertyValue.value if it's an environment variable."""
         mocked_serialized_value = MagicMock()
         mocked_instance = MagicMock()
         property = BaseProperty(Type)
@@ -134,7 +134,7 @@ class TestBaseProperty(NIOTestCase):
         self.assertEqual(serialized_value, mocked_property_value.value)
 
     def test_deserialize_with_normal_value(self):
-        """ Call Type.deserialize and return the deserialized value """
+        """Call Type.deserialize and return the deserialized value."""
         property = BaseProperty(Type)
         property.is_expression = MagicMock(return_value=False)
         property.is_env_var = MagicMock(return_value=False)
@@ -147,7 +147,7 @@ class TestBaseProperty(NIOTestCase):
         self.assertEqual(deserialized_value, mocked_deserialized_value)
 
     def test_deserialize_with_expression_value(self):
-        """ Return unmodified value if it's an expression """
+        """Return unmodified value if it's an expression."""
         property = BaseProperty(Type)
         property.is_expression = MagicMock(return_value=True)
         property.is_env_var = MagicMock(return_value=False)
@@ -160,7 +160,7 @@ class TestBaseProperty(NIOTestCase):
         self.assertEqual(deserialized_value, mocked_value)
 
     def test_deserialize_with_env_var_value(self):
-        """ Return unmodified value if it's an environment variable """
+        """Return unmodified value if it's an environment variable."""
         property = BaseProperty(Type)
         property.is_expression = MagicMock(return_value=False)
         property.is_env_var = MagicMock(return_value=True)
