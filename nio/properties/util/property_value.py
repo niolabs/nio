@@ -1,4 +1,3 @@
-from nio.signal.base import Signal
 from nio.properties.exceptions import AllowNoneViolation
 from nio.properties.util.evaluator import Evaluator
 
@@ -22,7 +21,7 @@ class PropertyValue:
         from nio.properties import PropertyHolder
         if self._property.is_expression(self.value):
             # Expression properties need to be evaluated
-            value = self.evaluator.evaluate(signal or Signal())
+            value = self.evaluator.evaluate(signal)
             if value is None:
                 if self._property.allow_none:
                     return None

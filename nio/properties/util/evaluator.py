@@ -1,11 +1,24 @@
 import re
 
 from nio.properties.util.parser import Parser
+from nio.signal.base import Signal
+
+
+class TemporarySignal(Signal):
+
+    def __getattribute__(self, name):
+        raise InvalidEvaluationCall
+
+
+class InvalidEvaluationCall(Exception):
+    pass
 
 
 class Evaluator:
 
-    """ Class for transforming NIO's dynamic signal access mini-language
+    """ Evaluate python expressions against a Signal.
+
+    Class for transforming NIO's dynamic signal access mini-language
     into valid Python.
 
     Creates a new parser object each time 'evaluate' is called (i.e. for each
@@ -13,12 +26,11 @@ class Evaluator:
 
     Args:
         expression (str): The string or expression to be interpolated or
-            evaluated.
-        default (ANY): The default value for non-existent attributes.
+            evaluated. If expression is not a string then the raw expression
+            is returned when evaluated.
 
     Raises:
-        Exception: If an expression is evaluated and it tries to get an
-            attribute on a signal when that attribute doesn't exist.
+        Exception: Raise any python exception during evaluation
 
     """
     delimiter = re.compile(r'(?<!\\)({{|}})|(\s)')
@@ -27,7 +39,9 @@ class Evaluator:
     def __init__(self, expression):
         self.expression = expression
 
-    def evaluate(self, signal):
+    def evaluate(self, signal=None):
+        if not isinstance(self.expression, str):
+            return self.expression
         cache_key = (self.expression)
         parsed = self.__class__.expression_cache.get(cache_key, None)
         if parsed is None:
@@ -54,7 +68,15 @@ class Evaluator:
         result = []
         for item in parsed:
             if hasattr(item, '__call__'):
+                if signal is None:
+                    # Use a temporary signal that raises InvalidEvaluationCall
+                    signal = TemporarySignal()
+                # Evaluate the expression against the signal
                 item = item(signal, self)
+                if isinstance(item, TemporarySignal):
+                    # This is to catch evaluating the expression "{{ $ }}"
+                    # when evaluated without a Signal
+                    raise InvalidEvaluationCall
             result.append(item)
         return result
 
