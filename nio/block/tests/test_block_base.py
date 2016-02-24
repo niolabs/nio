@@ -2,6 +2,7 @@ from unittest.mock import patch, Mock
 from nio.block.base import Block
 from nio.block.context import BlockContext
 from nio.block.terminals import DEFAULT_TERMINAL
+from nio.properties.exceptions import AllowNoneViolation
 from nio.signal.base import Signal
 from nio.router.base import BlockRouter
 from nio.router.context import RouterContext
@@ -30,6 +31,13 @@ class TestBaseBlock(NIOTestCaseNoModules):
         with self.assertRaises(TypeError):
             # The context's block router needs to be a BlockRouter
             Block().configure(BlockContext(JustAnObject, {}))
+        with self.assertRaises(AllowNoneViolation):
+            # Block needs a name
+            Block().configure(BlockContext(BlockRouter(), {"name": None}))
+        with self.assertRaises(TypeError):
+            # Wrong types (like log_level not being corrrect) raise TypeError
+            Block().configure(BlockContext(BlockRouter(), {"name": "BlockName",
+                                                           "log_level": 42}))
 
     def test_notify_management_signal(self):
         """Test the block can notify management signals properly to
