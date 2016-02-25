@@ -27,8 +27,7 @@ class ClassVersionInitialize(PropertyHolder):
 
 class TestVersion(NIOTestCaseNoModules):
     def test_valid_versions(self):
-        """ assert that it takes valid values
-        """
+        """Version property suppoerts specific value formats."""
         instance = ClassWithVersion()
         versions = ["1.2.3", "1.2.*", "1.*", "*", "1.1.1", "1.0.1rc1"]
         for version in versions:
@@ -36,8 +35,7 @@ class TestVersion(NIOTestCaseNoModules):
             self.assertEqual(instance.version(), version)
 
     def test_invalid_versions(self):
-        """ assert that it rejects invalid values
-        """
+        """InvalidVersionFormat is raised when bad version format is used."""
         instance = ClassWithVersion()
 
         invalid_versions = ["1.k.3", "invalid.2.*", "not a version"]
@@ -46,10 +44,7 @@ class TestVersion(NIOTestCaseNoModules):
                 instance.version = invalid_version
 
     def test_serialize_matching(self):
-        """ assert that a 360 conversion is valid
-        first it does a "to_dict", then it does a "from_dict" and then a
-        "to_dict" and compares against first "to_dict" result
-        """
+        """Version property serialize then deserialize like other props."""
         properties_to_set = {"version": "1.4.1"}
         properties_serialized = {"version": "1.4.1"}
 
@@ -68,8 +63,7 @@ class TestVersion(NIOTestCaseNoModules):
         self.assertEqual(instance_serialized, instance2_serialized)
 
     def test_description(self):
-        """ asserts that description is retrieved as expected
-        """
+        """Description is retrieved as expected."""
         instance = ClassWithVersion()
         description = instance.get_description()
         description_json = json.dumps(description)
@@ -87,20 +81,19 @@ class TestVersion(NIOTestCaseNoModules):
         self.assertIsNotNone(prop.get('min_version'))
 
     def test_deserialize(self):
-        """ asserts for equality a deserialize call
-        """
+        """Version properties cab be deserialized."""
         prop = VersionProperty(default="1.1.1")
         self.assertEqual(prop.deserialize("1.1.1"), "1.1.1")
 
     def test_defaults(self):
-        """ asserts that defaults are retrieved as expected
-        """
+        """Version properties support defaults."""
         instance = ClassWithVersion()
         defaults = instance.get_defaults()
         self.assertIn('version', defaults)
         self.assertEqual(defaults['version'], "1.1.1")
 
     def test_min_version(self):
+        """Minimum version is supported."""
         properties_to_set = {"version": "1.0.1"}
         properties_serialized = {"version": "1.0.1"}
 
@@ -115,7 +108,7 @@ class TestVersion(NIOTestCaseNoModules):
         self.assertEqual(instance_serialized, instance2_serialized)
 
     def test_handle_versions(self):
-
+        """Exceptions are raised when version is incorrect."""
         instance = ClassWithNoVersion()
         class_properties = instance.get_class_properties()
         instance_properties = {"version": "1.1.1"}
@@ -156,9 +149,7 @@ class TestVersion(NIOTestCaseNoModules):
             instance._handle_versions(class_properties, instance_properties)
 
     def test_process_and_log_version(self):
-        """ Processes same tests as handle versions + ensuring that log
-        statements are valid
-        """
+        """Ensure proper messages are logged when version is invalid."""
 
         import logging
 
@@ -203,7 +194,7 @@ class TestVersion(NIOTestCaseNoModules):
                                           instance_properties, logger)
 
     def test_version_initialize(self):
-
+        """Version property values initialize to given value."""
         instance = ClassVersionInitialize()
         self.assertEqual(instance.version_straight(), "1.1.1")
         self.assertEqual(instance.version_default(), "1.1.2")
