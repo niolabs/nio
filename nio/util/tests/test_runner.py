@@ -1,7 +1,6 @@
 from unittest.mock import Mock
 
-from nio.common import RunnerStatus
-from nio.util.runner import Runner
+from nio.util.runner import Runner, RunnerStatus
 from nio.util.support.test_case import NIOTestCase
 
 

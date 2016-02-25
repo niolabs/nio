@@ -1,5 +1,5 @@
 from nio.router.base import BlockRouter
-from nio.common import RunnerStatus
+from nio.util.runner import RunnerStatus
 from nio.util.threading import spawn
 
 
