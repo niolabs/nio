@@ -49,6 +49,15 @@ class NIOTestCase(TestCase):
         return ModuleContext()
 
     def setupModules(self):
+        """ Initializes the modules that will be active when running the test
+
+        There are three important methods to override in a test when
+        wanting to customize the modules behaviour.
+            - get_test_modules
+            - get_module
+            - get_context
+
+        """
         self._module_initializer = ModuleInitializer()
         for module_name in self.get_test_modules():
             self._module_initializer.register_module(
@@ -59,6 +68,18 @@ class NIOTestCase(TestCase):
         self._module_initializer.initialize(safe=True)
 
     def get_module(self, module_name):
+        """ Returns a module class type given a module name
+
+        Override this method to customize functionality in a module or
+        simply when needing a module other than the default testing module.
+
+        Args:
+            module_name (str): module name
+
+        Returns:
+            module class type
+
+        """
         known_modules = {
             'scheduler': TestingSchedulerModule,
             'persistence': TestingPersistenceModule,
@@ -76,12 +97,14 @@ class NIOTestCase(TestCase):
 
     def get_test_modules(self):
         """ Returns set of modules to load during test
+
         Override this method to customize which modules you want to load
         during a test
         """
         return {'scheduler', 'persistence'}
 
     def get_logging_config(self):
+        """ Specifies the default logging configuration """
         return {
             "version": 1,
             "formatters": {
@@ -121,7 +144,7 @@ class NIOTestCase(TestCase):
             else:
                 print('Setting multiprocess start method, details: {0}'.
                       format(str(e)))
-        # setup Modules
+
         self.setupModules()
 
     def tearDown(self):

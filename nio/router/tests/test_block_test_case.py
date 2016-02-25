@@ -11,11 +11,11 @@ class TestBlockTestCase(NIOBlockTestCase):
 
     """ Tests that the BlockTestCase handles roter methods properly. """
 
-    def signals_notified(self, signals, output_id=DEFAULT_TERMINAL):
+    def signals_notified(self, block, signals, output_id=DEFAULT_TERMINAL):
         """ Override a signal notification handler """
         self._signals_notified = True
 
-    def management_signal_notified(self, signal):
+    def management_signal_notified(self, block, signal):
         """ Override a management signal notification handler """
         self._management_notified = True
 
