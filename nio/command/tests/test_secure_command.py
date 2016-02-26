@@ -3,22 +3,20 @@ from nio.command import command, Command
 from nio.command.holder import CommandHolder
 from nio.command.params.int import IntParameter
 from nio.command.params.string import StringParameter
-from nio.command.security import command_security, SecureCommand
 from nio.modules.security.authorizer import Authorizer, Unauthorized
 from nio.modules.security.task import SecureTask
 from nio.modules.security.user import User
 from nio.util.support.test_case import NIOTestCase
 
 
-@command_security('to_be_renamed', SecureTask('t1'))
 @command('cmd_with_params', StringParameter("phrase"), IntParameter("times"))
 @command('cmd_without_params')
-@command('to_be_renamed', IntParameter("steps"))
-@command_security('secure_single_task', SecureTask('valid_john'),
+@command('secure_with_params', IntParameter("steps"), tasks=[SecureTask('t1')])
+@command('secure_single_task', tasks=[SecureTask('valid_john')],
                   meet_all=True)
-@command_security('secure_any_task', SecureTask('t1'), SecureTask('t2'),
+@command('secure_any_task', tasks=[SecureTask('t1'), SecureTask('t2')],
                   meet_all=False)
-@command_security('secure_all_tasks', SecureTask('t1'), SecureTask('t2'),
+@command('secure_all_tasks', tasks=[SecureTask('t1'), SecureTask('t2')],
                   meet_all=True)
 class CommandHolderSecure(CommandHolder):
     pass
@@ -36,15 +34,15 @@ class TestCommand(NIOTestCase):
         self.assertEqual(6, len(cmds))
         self.assertIsInstance(cmds['cmd_with_params'], Command)
         self.assertIsInstance(cmds['cmd_without_params'], Command)
-        self.assertIsInstance(cmds['to_be_renamed'], SecureCommand)
-        self.assertIsInstance(cmds['secure_single_task'], SecureCommand)
-        self.assertIsInstance(cmds['secure_any_task'], SecureCommand)
-        self.assertIsInstance(cmds['secure_all_tasks'], SecureCommand)
+        self.assertIsInstance(cmds['secure_with_params'], Command)
+        self.assertIsInstance(cmds['secure_single_task'], Command)
+        self.assertIsInstance(cmds['secure_any_task'], Command)
+        self.assertIsInstance(cmds['secure_all_tasks'], Command)
 
     def test_check_single_secure_task(self):
         """Make sure a command can be secured with a single task."""
         cmd = CommandHolderSecure().get_commands().get('secure_single_task')
-        self.assertIsInstance(cmd, SecureCommand)
+        self.assertIsInstance(cmd, Command)
         # Simulate a successful authorization
         with patch.object(Authorizer, 'authorize', return_value=None):
             self.assertTrue(cmd.can_invoke(User('john')))
@@ -55,7 +53,7 @@ class TestCommand(NIOTestCase):
     def test_check_any_secure_task(self):
         """Make sure a command can be secured with any of multiple tasks."""
         cmd = CommandHolderSecure().get_commands().get('secure_any_task')
-        self.assertIsInstance(cmd, SecureCommand)
+        self.assertIsInstance(cmd, Command)
 
         # Simulate two successful authorizations
         with patch.object(Authorizer, 'authorize', return_value=None) as auth:
@@ -80,7 +78,7 @@ class TestCommand(NIOTestCase):
     def test_check_all_secure_task(self):
         """Make sure a command can be secured with all of multiple tasks."""
         cmd = CommandHolderSecure().get_commands().get('secure_all_tasks')
-        self.assertIsInstance(cmd, SecureCommand)
+        self.assertIsInstance(cmd, Command)
 
         # Simulate two successful authorizations
         with patch.object(Authorizer, 'authorize', return_value=None) as auth:
@@ -104,9 +102,9 @@ class TestCommand(NIOTestCase):
             self.assertEqual(auth.call_count, 1)
 
     def test_check_renamed_command(self):
-        """Make sure a renamed command can be secured."""
-        cmd = CommandHolderSecure().get_commands().get('to_be_renamed')
-        self.assertIsInstance(cmd, SecureCommand)
+        """ Make sure a renamed command can be secured """
+        cmd = CommandHolderSecure().get_commands().get('secure_with_params')
+        self.assertIsInstance(cmd, Command)
         # Simulate a successful authorization
         with patch.object(Authorizer, 'authorize', return_value=None):
             self.assertTrue(cmd.can_invoke(User('john')))

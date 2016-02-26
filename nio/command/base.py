@@ -1,9 +1,6 @@
-"""
-    Base Command class
-
-"""
-from nio.command.params.string import StringParameter
 from nio.command.params.base import Parameter
+from nio.command.params.string import StringParameter
+from nio.modules.security.authorizer import Authorizer, Unauthorized
 
 
 class InvalidCommandArg(Exception):
@@ -29,12 +26,15 @@ class Command(object):
 
     """
 
-    def __init__(self, name, title=None, method=None):
+    def __init__(self, name,
+                 title=None, method=None, tasks=None, meet_all=True):
         self._name = name
         self._title = title or name
         self._parameters = []
         self._accept_kwargs = False
         self._method = method or name
+        self._tasks = tasks or []
+        self._meet_all = meet_all
 
     @property
     def name(self):
@@ -153,7 +153,18 @@ class Command(object):
         return result, result_kwargs
 
     def can_invoke(self, user):
-        """ Evaluates if user can perform the command
+        """ Returns if the user specified meets the conditions contained in
+        this command
 
         """
-        return True
+        if not self._tasks:
+            # If no SecureTasks are defined then it's not secure
+            return True
+        if user is None:
+            return False
+        try:
+            Authorizer.authorize_multiple(
+                user, *self._tasks, meet_all=self._meet_all)
+            return True
+        except Unauthorized:
+            return False

@@ -1,6 +1,5 @@
 from nio.router.context import RouterContext
 from nio.command import command
-from nio.command.security import command_security
 from nio.command.holder import CommandHolder
 from nio import discoverable
 from nio.util.versioning.dependency import DependsOn
@@ -41,8 +40,8 @@ class BlockMapping(PropertyHolder):
 @command('status', method="full_status")
 @command('heartbeat')
 @command('runproperties')
-@command_security('start', SecureTask('services.start'))
-@command_security('stop', SecureTask('services.stop'))
+@command('start', tasks=[SecureTask('services.start')])
+@command('stop', tasks=[SecureTask('services.stop')])
 @discoverable
 class Service(PropertyHolder, CommandHolder, Runner):
 

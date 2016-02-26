@@ -1,8 +1,9 @@
 import inspect
 from nio.command.base import Command
+from nio.command.holder import CommandHolder
 
 
-def command(name, *params, title=None, method=None):
+def command(name, *params, title=None, method=None, tasks=None, meet_all=True):
     """ Command decorator that exposes command Blocks and Services operations
 
     Args:
@@ -14,9 +15,16 @@ def command(name, *params, title=None, method=None):
             command. If left blank, title defaults to name.
         method (str): The name of the real method exposed by this command if
             different than name
+        tasks (list): List of SecureTask
+        meet_all (bool): True to validate all tasks are met
+           before the command can be executed
     """
     def wrap_command(cls):
-        nio_command = Command(name, title=title, method=method)
+        if not issubclass(cls, CommandHolder):
+            raise TypeError(
+                "Must place command decorator on a CommandHolder")
+        nio_command = Command(
+            name, title=title, method=method, tasks=tasks, meet_all=meet_all)
         for p in params:
             nio_command.add_parameter(p)
         cls.add_command(nio_command)
