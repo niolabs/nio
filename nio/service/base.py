@@ -10,8 +10,7 @@ from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
 from nio.modules.security.task import SecureTask
-from nio.util.runner import Runner
-from nio.common import RunnerStatus
+from nio.util.runner import Runner, RunnerStatus
 
 
 class BlockExecution(PropertyHolder):

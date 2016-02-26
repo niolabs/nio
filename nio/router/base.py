@@ -2,9 +2,8 @@ import inspect
 from copy import deepcopy
 from collections import Iterable
 
-from nio.common import RunnerStatus
 from nio.util.logging import get_nio_logger
-from nio.util.runner import Runner
+from nio.util.runner import Runner, RunnerStatus
 from nio.signal.base import Signal
 
 

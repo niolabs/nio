@@ -4,7 +4,7 @@ from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.block.base import Block
 from nio.signal.base import Signal
 from nio.signal.status import BlockStatusSignal
-from nio.common import RunnerStatus
+from nio.util.runner import RunnerStatus
 
 
 class TestBlockTestCase(NIOBlockTestCase):
