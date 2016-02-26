@@ -6,7 +6,6 @@ import logging.config
 import multiprocessing
 from unittest import TestCase
 
-from nio.modules.context import ModuleContext
 from nio.modules.initializer import ModuleInitializer
 
 # Testing module implementations
@@ -39,7 +38,7 @@ class NIOTestCase(TestCase):
             module = self.get_module(module_name)
             self._module_initializer.register_module(
                 module,
-                self.get_context(module))
+                self.get_context(module_name, module))
 
         # Perform a safe initialization in case a proxy never got cleaned up
         self._module_initializer.initialize(safe=True)
@@ -56,7 +55,17 @@ class NIOTestCase(TestCase):
             raise ValueError("{} is not a valid module".format(module_name))
         return known_modules.get(module_name)()
 
-    def get_context(self, module):
+    def get_context(self, module_name, module):
+        """ Provides the context to use when initializing the module
+
+        Args:
+            module_name (str): module name
+            module (type): module class type
+
+        Returns:
+            module context
+
+        """
         return getattr(module, "prepare_core_context")()
 
     def tearDownModules(self):
