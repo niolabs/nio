@@ -23,19 +23,10 @@ class Scheduler(object):
         return cls._logger
 
     @classmethod
-    def configure(cls, configuration):
+    def configure(cls, context):
         # Load in the minimum delta and resolution from the config
-        try:
-            cls._sched_min_delta = float(configuration.get('min_interval'))
-        except:
-            # They didn't provide a good one, use the default
-            pass
-
-        try:
-            cls._sched_resolution = float(configuration.get('resolution'))
-        except:
-            # They didn't provide a good one, use the default
-            pass
+        cls._sched_min_delta = context.min_interval
+        cls._sched_resolution = context.resolution
 
     @classmethod
     def schedule_task(cls, target, delta, repeatable, *args, **kwargs):
