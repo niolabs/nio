@@ -42,7 +42,7 @@ class TestCommand(NIOTestCase):
         self.assertIsInstance(cmds['secure_all_tasks'], Command)
 
     def test_security_tasks(self):
-        """ Make sure security tasks are on the command"""
+        """Make sure security tasks are on the command"""
         # Default 'commands.execute' when tasks are not defined.
         cmd = CommandHolderSecure().get_commands().get('cmd_with_params')
         self.assertIsInstance(cmd, Command)

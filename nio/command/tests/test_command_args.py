@@ -88,11 +88,6 @@ class TestCommand(NIOBlockTestCase):
         self.blk.invoke('sing', {'song': 'Macarena'})
         self.assertEquals(self.blk.sing_arg, "Macarena")
 
-    def test_fail_args_nokwargs(self):
-        # Tests call failed when passing present but kwargs are not
-        self.blk.invoke('sing', {'song': 'Macarena'})
-        self.assertEquals(self.blk.sing_arg, "Macarena")
-
     def test_args_all_kwargs(self):
         """Tests call is executed when only kwargs are present."""
         self.blk.eat_args = None
