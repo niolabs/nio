@@ -1,6 +1,7 @@
 from nio.command.params.base import Parameter
 from nio.command.params.string import StringParameter
 from nio.modules.security.authorizer import Authorizer, Unauthorized
+from nio.modules.security.task import SecureTask
 
 
 class InvalidCommandArg(Exception):
@@ -13,27 +14,45 @@ class MissingCommandArg(Exception):
 
 class Command(object):
 
-    """ The basic Command object. Maintains metadata for command methods
-    implemented in Blocks and Services.
+    """Command to be used in CommandHolders (Blocks and Services).
+
+    Commands can be secured with security modules SecureTask. An executing user
+    with be authorized against the list of SecureTasks and then command will
+    only be invoked if the user has permission.
+    If ``meet_all`` is True, then the user needs to be authorized for every
+    SecureTask. If False, then the user only needs to be authorized for one.
+
+    Default security is ``SecureTask('commands.execute')``, but security can be
+    removed from a command by passing an empty list as ``tasks``.
 
     Args:
-        name (str): The name of the command. Should be the same as the
-            name of the corresponding method.
+        name (str): The name of the command. Should be the same as the name of
+            the corresponding method.
+        params (Properties): List of Property Params that are part of the
+            command
         title (str): An optionally more detailed description of the
             command. If left blank, title defaults to name.
         method (str): The name of the real method exposed by this command if
             different than name
+        tasks (list): List of SecureTask
+        meet_all (bool): True to validate all tasks are met before the command
+            can be executed
 
     """
 
-    def __init__(self, name,
-                 title=None, method=None, tasks=None, meet_all=True):
+    def __init__(self, name, *params, title=None, method=None,
+                 tasks=None, meet_all=True):
         self._name = name
-        self._title = title or name
         self._parameters = []
-        self._accept_kwargs = False
+        for p in params:
+            self._add_parameter(p)
+        self._title = title or name
         self._method = method or name
-        self._tasks = tasks or []
+        if tasks is None:
+            # Defult security if none is specified
+            self._tasks = [SecureTask('commands.execute')]
+        else:
+            self._tasks = tasks
         self._meet_all = meet_all
 
     @property
@@ -47,14 +66,6 @@ class Command(object):
     @property
     def parameters(self):
         return self._parameters
-
-    @property
-    def accept_kwargs(self):
-        return self._accept_kwargs
-
-    @accept_kwargs.setter
-    def accept_kwargs(self, accept):
-        self._accept_kwargs = accept
 
     @property
     def method(self):
@@ -79,15 +90,11 @@ class Command(object):
         description["params"] = params
         return description
 
-    def add_parameter(self, param):
-        """ Add a parameter to this command. Parameters should be added
-        in the order they appear in the corresponding method prototype.
+    def _add_parameter(self, param):
+        """ Add a parameter to this command.
 
         Args:
             param (Parameter): The parameter to add.
-
-        Returns:
-            None
 
         """
         if isinstance(param, Parameter):
@@ -133,14 +140,9 @@ class Command(object):
             # default value covered, lets check for unrecognized param passed
             invalid_args = [arg for arg in args if arg not in
                             [p.name for p in self._parameters]]
-            if invalid_args:
-                if self.accept_kwargs:
-                    # Treat all args in the passed dict as kwargs
-                    for arg in invalid_args:
-                        result_kwargs[arg] = args.get(arg)
-                else:
-                    raise InvalidCommandArg(
-                        "Invalid arguments passed: {0}".format(invalid_args))
+            # Treat all extra args in the passed dict as kwargs
+            for arg in invalid_args:
+                result_kwargs[arg] = args.get(arg)
         else:
             # Try to use whole arg as the param if the method only
             # needs one

@@ -9,6 +9,7 @@ from nio.modules.security.user import User
 from nio.util.support.test_case import NIOTestCase
 
 
+@command('unsecure', tasks=[])
 @command('cmd_with_params', StringParameter("phrase"), IntParameter("times"))
 @command('cmd_without_params')
 @command('secure_with_params', IntParameter("steps"), tasks=[SecureTask('t1')])
@@ -31,13 +32,32 @@ class TestCommand(NIOTestCase):
         """Get commands from a command holder."""
         cmd = CommandHolderSecure()
         cmds = cmd.get_commands()
-        self.assertEqual(6, len(cmds))
+        self.assertEqual(7, len(cmds))
+        self.assertIsInstance(cmds['unsecure'], Command)
         self.assertIsInstance(cmds['cmd_with_params'], Command)
         self.assertIsInstance(cmds['cmd_without_params'], Command)
         self.assertIsInstance(cmds['secure_with_params'], Command)
         self.assertIsInstance(cmds['secure_single_task'], Command)
         self.assertIsInstance(cmds['secure_any_task'], Command)
         self.assertIsInstance(cmds['secure_all_tasks'], Command)
+
+    def test_security_tasks(self):
+        """ Make sure security tasks are on the command"""
+        # Default 'commands.execute' when tasks are not defined.
+        cmd = CommandHolderSecure().get_commands().get('cmd_with_params')
+        self.assertIsInstance(cmd, Command)
+        self.assertEqual(len(cmd._tasks), 1)
+        self.assertEqual(cmd._tasks[0].task, 'commands.execute')
+        # Remove security
+        cmd = CommandHolderSecure().get_commands().get('unsecure')
+        self.assertIsInstance(cmd, Command)
+        self.assertEqual(len(cmd._tasks), 0)
+        # Override/add security
+        cmd = CommandHolderSecure().get_commands().get('secure_any_task')
+        self.assertIsInstance(cmd, Command)
+        self.assertEqual(len(cmd._tasks), 2)
+        self.assertEqual(cmd._tasks[0].task, 't1')
+        self.assertEqual(cmd._tasks[1].task, 't2')
 
     def test_check_single_secure_task(self):
         """Make sure a command can be secured with a single task."""
@@ -49,6 +69,22 @@ class TestCommand(NIOTestCase):
         # Simulate a failed authorization
         with patch.object(Authorizer, 'authorize', side_effect=Unauthorized):
             self.assertFalse(cmd.can_invoke(User('john')))
+
+    def test_check_default_secure_task(self):
+        """ Make sure a command is secured by default """
+        cmd = CommandHolderSecure().get_commands().get('cmd_with_params')
+        self.assertIsInstance(cmd, Command)
+        # Simulate a failed authorization
+        with patch.object(Authorizer, 'authorize', side_effect=Unauthorized):
+            self.assertFalse(cmd.can_invoke(User('john')))
+
+    def test_check_not_secure_task(self):
+        """ Make sure a command can be made unsecure """
+        cmd = CommandHolderSecure().get_commands().get('unsecure')
+        self.assertIsInstance(cmd, Command)
+        # Simulate a failed authorization, but comannd invoked anyway
+        with patch.object(Authorizer, 'authorize', side_effect=Unauthorized):
+            self.assertTrue(cmd.can_invoke(User('john')))
 
     def test_check_any_secure_task(self):
         """Make sure a command can be secured with any of multiple tasks."""
@@ -100,14 +136,3 @@ class TestCommand(NIOTestCase):
             # Authorize should only be called once since we can short circuit
             # after the first success
             self.assertEqual(auth.call_count, 1)
-
-    def test_check_renamed_command(self):
-        """ Make sure a renamed command can be secured """
-        cmd = CommandHolderSecure().get_commands().get('secure_with_params')
-        self.assertIsInstance(cmd, Command)
-        # Simulate a successful authorization
-        with patch.object(Authorizer, 'authorize', return_value=None):
-            self.assertTrue(cmd.can_invoke(User('john')))
-        # Simulate a failed authorization
-        with patch.object(Authorizer, 'authorize', side_effect=Unauthorized):
-            self.assertFalse(cmd.can_invoke(User('john')))
