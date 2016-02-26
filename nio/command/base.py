@@ -72,7 +72,8 @@ class Command(object):
         return self._method
 
     def get_description(self):
-        """ Returns a description for a command instance.
+        """Returns a description for a command instance.
+
         This method is used iteratively in CommandHolder.get_description.
 
         Args:
@@ -91,21 +92,16 @@ class Command(object):
         return description
 
     def _add_parameter(self, param):
-        """ Add a parameter to this command.
-
-        Args:
-            param (Parameter): The parameter to add.
-
-        """
         if isinstance(param, Parameter):
             self._parameters.append(param)
         else:
-            raise RuntimeError(
-                "Invalid command parameter type: '{}'".format(
+            raise RuntimeError("Invalid command parameter type: '{}'".format(
                 getattr(param, 'name', param)))
 
     def collect_arguments(self, args):
-        """ Assign values to the command's parameters. This is done to
+        """Format passed arguments into parameter args and kwargs.
+
+        Assign values to the command's parameters. This is done to
         provide safe conversion of command arguments from strings (they
         will likely arrive as strings in an HTTP request body) and to
         ensure that arguments are of the correct types.
@@ -155,10 +151,7 @@ class Command(object):
         return result, result_kwargs
 
     def can_invoke(self, user):
-        """ Returns if the user specified meets the conditions contained in
-        this command
-
-        """
+        """Check if the user specified meets the security conditions."""
         if not self._tasks:
             # If no SecureTasks are defined then it's not secure
             return True
