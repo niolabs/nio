@@ -19,10 +19,8 @@ from nio.signal.status import BlockStatusSignal
 from nio.signal.base import Signal
 
 
-@input(DEFAULT_TERMINAL, default=True, label="default")
-@output(DEFAULT_TERMINAL, default=True, label="default")
 @command('properties')
-class Block(PropertyHolder, CommandHolder, Runner):
+class Base(PropertyHolder, CommandHolder, Runner):
 
     """The base class for blocks to inherit from."""
 
@@ -231,3 +229,9 @@ class Block(PropertyHolder, CommandHolder, Runner):
         """ Provides block logger
         """
         return self._logger
+
+
+@input(DEFAULT_TERMINAL, default=True, label="default")
+@output(DEFAULT_TERMINAL, default=True, label="default")
+class Block(Base):
+    pass
