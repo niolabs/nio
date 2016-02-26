@@ -16,7 +16,7 @@ from nio.types import ListType
 from nio.types import SelectType
 from nio.types import StringType
 from nio.types import TimeDeltaType
-from nio.util.support.test_case import NIOTestCase
+from nio.util.support.test_case import NIOTestCaseNoModules
 
 
 class ContainedClass(PropertyHolder):
@@ -69,10 +69,10 @@ class ContainerClass(PropertyHolder):
         SelectProperty(SampleEnum, default='[[ENV_VARIABLE]]')
 
 
-class TestTypes(NIOTestCase):
+class TestTypes(NIOTestCaseNoModules):
 
     def test_types(self):
-        """ Testing that defaults are retrieved and are serializable """
+        """Testing that defaults are retrieved and are serializable."""
         description = ContainerClass.get_description()
 
         self.assertEqual(description['string_property']['type'],

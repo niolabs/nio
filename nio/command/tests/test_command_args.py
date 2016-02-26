@@ -51,14 +51,6 @@ class CommandBlock(Block):
 
 class TestCommand(NIOBlockTestCase):
 
-    def setupModules(self):
-        # Not using functionality modules
-        pass
-
-    def tearDownModules(self):
-        # Not using functionality modules
-        pass
-
     def setUp(self):
         super().setUp()
         self.blk = CommandBlock()
@@ -66,19 +58,19 @@ class TestCommand(NIOBlockTestCase):
         self.blk.start()
 
     def test_calling_args(self):
-        # Tests args are received
+        """Tests args are received."""
         self.blk.invoke('dance',
                         {'song': 'new Song', 'times': 3, 'temp': 23.3})
         self.assertEquals(self.blk.song, 'new Song')
         self.assertEquals(self.blk.times, 3)
 
     def test_calling_kwargs(self):
-        # Tests kwargs are received
+        """Tests kwargs are received."""
         self.blk.invoke('walk', {'steps': 3})
         self.assertEquals(self.blk.steps, 3)
 
     def test_all_args(self):
-        # Tests args and kwargs are received
+        """Tests args and kwargs are received."""
         self.blk.invoke('quack', {'animal': 'duck',
                                   'type': "mallard",
                                   'migrates': "no"})
@@ -87,32 +79,31 @@ class TestCommand(NIOBlockTestCase):
         self.assertEquals(self.blk.quack_type, "mallard")
 
     def test_fail_args(self):
-        # Tests call failed when passing kwargs and they are not expected
+        """Tests call failed when passing kwargs and they are not expected."""
         with self.assertRaises(InvalidCommandArg):
             self.blk.invoke('sing', {'song': 'Macarena', 'type': "dance"})
 
     def test_args_nokwargs(self):
-        # Tests call is executed when args are present but kwargs are not
+        """Tests call is executed when args are present but kwargs are not."""
         self.blk.invoke('sing', {'song': 'Macarena'})
         self.assertEquals(self.blk.sing_arg, "Macarena")
 
     def test_args_all_kwargs(self):
-        # Tests call is executed when only kwargs are present
+        """Tests call is executed when only kwargs are present."""
         self.blk.eat_args = None
         expected = {'meat': 'chicken', 'drink': 'water'}
         self.blk.invoke('eat', expected)
         self.assertDictEqual(expected, self.blk.eat_args)
 
     def test_args_all_kwargs2(self):
-        # Tests call is executed when only kwargs are present
+        """Tests call is executed when only kwargs are present."""
         self.blk.eat_args = None
         expected = {'meat': 'chicken', 'drink': 'water'}
         self.blk.invoke('eat2', expected)
         self.assertDictEqual(expected, self.blk.eat_args)
 
     def test_args_all_kwargs3(self):
-        # Test call is executed when only kwargs are present and no param
-        # is passed
+        """Test call is executed when kwargs are present and no param."""
         self.blk.eat_args = None
         self.blk.invoke('eat2', {})
         self.assertDictEqual({'meat': 'ham', 'drink': 'wine'},

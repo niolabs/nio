@@ -29,8 +29,8 @@ class TestCommand(NIOTestCase):
     def get_test_modules(self):
         return super().get_test_modules() | {'security'}
 
-    # Test command types
     def test_get_commands(self):
+        """Get commands from a command holder."""
         cmd = CommandHolderSecure()
         cmds = cmd.get_commands()
         self.assertEqual(6, len(cmds))
@@ -42,7 +42,7 @@ class TestCommand(NIOTestCase):
         self.assertIsInstance(cmds['secure_all_tasks'], SecureCommand)
 
     def test_check_single_secure_task(self):
-        """ Make sure a command can be secured with a single task """
+        """Make sure a command can be secured with a single task."""
         cmd = CommandHolderSecure().get_commands().get('secure_single_task')
         self.assertIsInstance(cmd, SecureCommand)
         # Simulate a successful authorization
@@ -53,7 +53,7 @@ class TestCommand(NIOTestCase):
             self.assertFalse(cmd.can_invoke(User('john')))
 
     def test_check_any_secure_task(self):
-        """ Make sure a command can be secured with any of multiple tasks """
+        """Make sure a command can be secured with any of multiple tasks."""
         cmd = CommandHolderSecure().get_commands().get('secure_any_task')
         self.assertIsInstance(cmd, SecureCommand)
 
@@ -78,7 +78,7 @@ class TestCommand(NIOTestCase):
             self.assertEqual(auth.call_count, 2)
 
     def test_check_all_secure_task(self):
-        """ Make sure a command can be secured with all of multiple tasks """
+        """Make sure a command can be secured with all of multiple tasks."""
         cmd = CommandHolderSecure().get_commands().get('secure_all_tasks')
         self.assertIsInstance(cmd, SecureCommand)
 
@@ -104,7 +104,7 @@ class TestCommand(NIOTestCase):
             self.assertEqual(auth.call_count, 1)
 
     def test_check_renamed_command(self):
-        """ Make sure a renamed command can be secured """
+        """Make sure a renamed command can be secured."""
         cmd = CommandHolderSecure().get_commands().get('to_be_renamed')
         self.assertIsInstance(cmd, SecureCommand)
         # Simulate a successful authorization

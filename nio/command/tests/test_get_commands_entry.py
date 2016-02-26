@@ -35,13 +35,6 @@ class CommandBlock3(CommandBlock2):
 
 # noinspection PyProtectedMember
 class TestCommandEntries(NIOBlockTestCase):
-    def setupModules(self):
-        # Not using functionality modules
-        pass
-
-    def tearDownModules(self):
-        # Not using functionality modules
-        pass
 
     def setUp(self):
         super().setUp()
@@ -53,9 +46,7 @@ class TestCommandEntries(NIOBlockTestCase):
         self.blk2.start()
 
     def test_entries(self):
-        """ Make sure get_description does not affect _get_commands_entry
-        functionality
-        """
+        """get_description does not affect _get_commands_entry."""
         desc = CommandBlock.get_description()
         self.assertIsNotNone(desc)
         desc2 = CommandBlock2.get_description()
@@ -81,6 +72,7 @@ class TestCommandEntries(NIOBlockTestCase):
         self.assertIn('talk3', commands3)
 
     def test_description(self):
+        """Commands are on desriptions."""
         descr = CommandBlock.get_description()
         commands = descr.get('commands')
         self.assertIsNotNone(commands)
@@ -101,6 +93,7 @@ class TestCommandEntries(NIOBlockTestCase):
         self.assertIn('talk3', commands3)
 
     def test_invokes(self):
+        """Sub-classes can invoke parent commands."""
         self.blk = CommandBlock()
         self.configure_block(self.blk, {})
         self.blk.start()

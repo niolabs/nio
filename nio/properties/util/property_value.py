@@ -1,4 +1,3 @@
-from nio.signal.base import Signal
 from nio.properties.exceptions import AllowNoneViolation
 from nio.properties.util.evaluator import Evaluator
 
@@ -12,38 +11,34 @@ class PropertyValue:
 
     """
 
-    def __init__(self, property, value=None, validate=True):
+    def __init__(self, property, value=None):
         self._property = property
         self.value = value
-        if validate:
-            self._validate_value()
         self.evaluator = Evaluator(str(value))
-
-    def _validate_value(self):
-        # Check that the value is the correct type
-        self._property.deserialize(self.value, **self._property.kwargs)
-        # Check if we are setting None if that's not allowed
-        if not self._property.allow_none and self.value is None:
-            raise AllowNoneViolation
 
     def __call__(self, signal=None):
         """ Return value, evaluated if it is an expression """
         from nio.properties import PropertyHolder
         if self._property.is_expression(self.value):
-            # Evaluate and deserialize string since they might be expressions
-            value = self.evaluator.evaluate(signal or Signal())
-            # TODO: why pass kwargs? shouldn't the property already know?
-            return self._property.deserialize(value, **self._property.kwargs)
+            # Expression properties need to be evaluated
+            value = self.evaluator.evaluate(signal)
+            if value is None:
+                if self._property.allow_none:
+                    return None
+                else:
+                    raise AllowNoneViolation("Property value expression is not"
+                                             "allowed to evaluate to None")
+            else:
+                # Deserialize should not be called with None
+                return self._property.deserialize(value)
         elif self.value is not None and isinstance(self.value, PropertyHolder):
             # Return property holders as they are
             return self.value
         elif self.value is not None:
             # Deserialize properties
-            # TODO: why pass kwargs? shouldn't the property already know?
-            return self._property.deserialize(self.value,
-                                              **self._property.kwargs)
+            return self._property.deserialize(self.value)
         elif self.value is None and self._property.allow_none:
             # Return None if it is allowed
             return None
         else:
-            raise Exception("Property value None is not allowed")
+            raise AllowNoneViolation("Property value None is not allowed")

@@ -82,6 +82,8 @@ class Base(PropertyHolder, CommandHolder, Runner):
 
         # load the configuration as class variables
         self.from_dict(context.properties, self._logger)
+        # verify that block properties are valid
+        self.validate()
 
         self._logger = get_nio_logger(self.name())
         self._logger.setLevel(self.log_level())

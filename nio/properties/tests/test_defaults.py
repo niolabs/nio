@@ -12,7 +12,7 @@ from nio.properties import PropertyHolder
 from nio.properties import StringProperty
 from nio.properties import TimeDeltaProperty
 from nio.types import IntType
-from nio.util.support.test_case import NIOTestCase
+from nio.util.support.test_case import NIOTestCaseNoModules
 
 
 class ContainedClass(PropertyHolder):
@@ -70,11 +70,10 @@ class MyBlock(Block):
     another_block_property = StringProperty(default="another_block_property")
 
 
-class TestDefaults(NIOTestCase):
+class TestDefaults(NIOTestCaseNoModules):
 
     def test_defaults(self):
-        """ Testing that defaults are retrieved and are serializable
-        """
+        """Testing that defaults are retrieved"""
         defaults = ContainerClass.get_defaults()
         defaults2 = ContainerClass.get_defaults()
         # assert that obtaining it twice doesn't change anything
@@ -96,15 +95,17 @@ class TestDefaults(NIOTestCase):
         self.assertEqual(defaults["float_property_default_env_variable"],
                          '[[ENV_VARIABLE]]')
 
-        # TODO: what should this be? should defalut be ContainedClass?
-        #self.assertEqual(defaults["object_property"],
-        #                 {'string_property': 'str', 'int_property': 5})
+        self.assertEqual(defaults["object_property"].string_property(),
+                         'str')
+        self.assertEqual(defaults["object_property"].int_property(),
+                         5)
         self.assertEqual(defaults["object_property_default_env_variable"],
                          '[[ENV_VARIABLE]]')
 
-        # TODO: similar question as above
-        #self.assertEqual(defaults["list_property1"],
-        #                 [{'string_property': 'str', 'int_property': 5}])
+        self.assertEqual(defaults["list_property1"][0].string_property(),
+                         'str')
+        self.assertEqual(defaults["list_property1"][0].int_property(),
+                         5)
         self.assertEqual(defaults["list_property2"], None)
         self.assertEqual(defaults["list_property3"], [1])
         self.assertEqual(defaults["list_property_default_env_variable"],
@@ -125,17 +126,29 @@ class TestDefaults(NIOTestCase):
         self.assertIsNotNone(properties_as_str)
 
     def test_serializable_defaults(self):
-        """ Testing that serializable defaults are different from defaults
-        """
+        """Testing that serializable defaults are different from defaults."""
         defaults = ContainerClass.get_defaults()
         serializable = ContainerClass.get_serializable_defaults()
+        # Test timedelta property
         self.assertIsInstance(defaults['timedelta_property'], timedelta)
         self.assertNotIsInstance(serializable['timedelta_property'], timedelta)
         self.assertIsInstance(serializable['timedelta_property'], dict)
+        # Test object property
+        self.assertIsInstance(defaults['object_property'], ContainedClass)
+        self.assertIsInstance(serializable['object_property'], dict)
+        self.assertDictEqual(serializable["object_property"],
+                         {'string_property': 'str', 'int_property': 5})
+        # Test list property of objects
+        self.assertIsInstance(defaults['list_property1'], list)
+        self.assertIsInstance(defaults['list_property1'][0], ContainedClass)
+        self.assertIsInstance(serializable['list_property1'], list)
+        self.assertIsInstance(serializable['list_property1'][0], dict)
+        self.assertEqual(len(serializable['list_property1']), 1)
+        self.assertDictEqual(serializable["list_property1"][0],
+                         {'string_property': 'str', 'int_property': 5})
 
     def test_block_defaults(self):
-        """ Testing that block defaults are retrieved and are serializable
-        """
+        """Testing that block defaults are retrieved and are serializable."""
         defaults = Block.get_serializable_defaults()
         defaults2 = MyBlock.get_serializable_defaults()
         self.assertNotEqual(defaults, defaults2)
@@ -144,8 +157,7 @@ class TestDefaults(NIOTestCase):
         self.assertIsNotNone(properties_as_str)
 
     def test_service_defaults(self):
-        """ Testing that service defaults are retrieved and are serializable
-        """
+        """Testing that service defaults are retrieved and are serializable."""
         defaults = Service.get_serializable_defaults()
         properties_as_str = json.dumps(defaults)
         self.assertIsNotNone(properties_as_str)

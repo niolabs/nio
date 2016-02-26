@@ -1,6 +1,11 @@
+import re
 from weakref import WeakKeyDictionary
 
+from nio.properties.exceptions import AllowNoneViolation
 from nio.properties.util.property_value import PropertyValue
+
+
+ENVIRONMENT_VAR = re.compile("\[\[([^\[\]]*)\]\]")
 
 
 class BaseProperty(object):
@@ -24,9 +29,7 @@ class BaseProperty(object):
         # Default value info
         self._default = default
         self._cached_default = None
-        # Skip value validation for default
-        self._default_property_value = PropertyValue(
-            self, self._default, validate=False)
+        self._default_property_value = PropertyValue(self, self._default)
 
         # Set up a values dictionary to keep track of values per instance
         # We want a WeakKeyDict so that instances aren't kept in memory
@@ -79,8 +82,7 @@ class BaseProperty(object):
         self._values[instance] = PropertyValue(self, value)
 
     def __str__(self):
-        return "type is: %s, args are %s" % (self.type,
-                                             self.kwargs)
+        return "type is: {}, args are {}".format(self.type, self.kwargs)
 
     def serialize(self, instance, **kwargs):
         """ Serialze and return the value of an instance of this property
@@ -99,10 +101,9 @@ class BaseProperty(object):
         # Allow property kwargs to be overriden by call to serialize
         merged_kwargs = self.kwargs.copy()
         merged_kwargs.update(**kwargs)
-        value = self.__get__(instance, instance.__class__).value
-        if value is None:
-            # No value was set for this instance, use the property's default
-            value = self.default
+        property_value = self.__get__(instance, instance.__class__)
+        # Get the raw value from the PropertyValue
+        value = property_value.value
         if value is not None and \
                 not self.is_expression(value) and not self.is_env_var(value):
             return self.type.serialize(value, **merged_kwargs)
@@ -124,14 +125,18 @@ class BaseProperty(object):
             TODO: give an example of when this is useful
         Returns:
             Deserialized version of property value
+        Raises:
+            TypeError: value is invalid for Type and cannot be deserialized
+            AllowNoneViolation: value is None and allow_none is False
 
         """
         if not self.is_expression(value) and not self.is_env_var(value):
             # Allow property kwargs to be overriden by call to serialize
             merged_kwargs = self.kwargs.copy()
             merged_kwargs.update(**kwargs)
+            if value is None and not self.allow_none:
+                raise AllowNoneViolation("Property value None is not allowed")
             return self.type.deserialize(value, **merged_kwargs)
-        # TODO: else raise exception?
         return value
 
     def is_expression(self, value):
@@ -180,13 +185,12 @@ class BaseProperty(object):
         Examples:
             >>> is_env_var("[[ENV_VAR]]")
             True
-            >>> is_env_var("No an [[ENV_VAR]]")
+            >>> is_env_var("Not an [[ENV_VAR]]")
             False
 
         """
 
         try:
-            return value.startswith("[[") and \
-                    value.endswith("]]")
+            return ENVIRONMENT_VAR.fullmatch(value) is not None
         except:
             return False

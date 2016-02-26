@@ -23,7 +23,11 @@ class ObjectType(Type):
             if isinstance(value, dict):
                 # Object types supports deserializing dictionaries
                 sub_instance = kwargs["obj_type"]()
-                return sub_instance.from_dict(value)
+                # First load the value from the dict into the property holder
+                sub_instance.from_dict(value)
+                # Then make sure the values are valid
+                sub_instance.validate_dict(value)
+                return sub_instance
             elif isinstance(value, PropertyHolder):
                 # And object types also work when value is already a holder
                 return value
