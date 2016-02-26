@@ -1,5 +1,7 @@
 from unittest.mock import patch, Mock
 from nio.block.base import Block
+from nio.block.terminator_block import TerminatorBlock
+from nio.block.generator_block import GeneratorBlock
 from nio.block.context import BlockContext
 from nio.block.terminals import DEFAULT_TERMINAL
 from nio.signal.base import Signal
@@ -134,3 +136,15 @@ class TestBaseBlock(NIOTestCaseNoModules):
         self.assertTrue(blk.is_output_valid(DEFAULT_TERMINAL))
         self.assertFalse(blk.is_input_valid('fake input'))
         self.assertFalse(blk.is_output_valid('fake output'))
+
+    def test_terminal_block_terminals(self):
+        """Make sure the block has only an input terminal"""
+        blk = TerminatorBlock()
+        self.assertTrue(blk.is_input_valid(DEFAULT_TERMINAL))
+        self.assertFalse(blk.is_output_valid(DEFAULT_TERMINAL))
+
+    def test_generator_block_terminals(self):
+        """Make sure the block has only an output terminal"""
+        blk = GeneratorBlock()
+        self.assertFalse(blk.is_input_valid(DEFAULT_TERMINAL))
+        self.assertTrue(blk.is_output_valid(DEFAULT_TERMINAL))
