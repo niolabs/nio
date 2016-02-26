@@ -24,26 +24,27 @@ from nio.util.support.block_test_case import NIOBlockTestCase
 @command('lip_sing', StringParameter("song"), method="real_sing")
 class CommandBlock(Block):
 
-    # TODO: shouldn't this have phrase, times and ftimes?
+    # TODO: test what happens when a caommand defines a parameter that doesn't
+    # exist on the method. (example: ftimes)
     def talk(self, phrase, times):
         for i in range(times):
             print(phrase)
 
     def walk(self, steps):
-        print("i'm walking %d steps" % steps)
+        print("i'm walking {} steps".format(steps))
 
     def eat(self, food):
-        print("i'm eating %s food" % food)
+        print("i'm eating {} food".format(food))
 
     def make_signal(self, sig):
         """ Command parameter is a dict """
         Signal(sig)
 
     def sing(self, song):
-        print("i'm singing %s song" % song)
+        print("i'm singing {} song".format(song))
 
     def real_sing(self, song):
-        print("i'm singing %s song" % song)
+        print("i'm singing {} song".format(song))
 
 
 class TestCommand(NIOBlockTestCase):
@@ -63,6 +64,7 @@ class TestCommand(NIOBlockTestCase):
         self.blk.start()
 
     def test_description(self):
+        """Commands have a description."""
         descr = CommandBlock.get_description()
         commands = descr.get('commands')
         self.assertIsNotNone(commands)
@@ -72,12 +74,14 @@ class TestCommand(NIOBlockTestCase):
         self.assertIsNotNone(descr.get('properties'))
 
     def test_invoke(self):
+        """Commands can be invoked."""
         self.blk.talk = MagicMock()
         self.blk.invoke('talk', {'phrase': 'foobar', 'times': '3',
                                  'ftimes': '3.0'})
         self.blk.talk.assert_called_once_with('foobar', 3, 3.0)
 
     def test_invoke_dict(self):
+        """Commands can be invoked with a dictionary."""
         self.blk.make_signal = MagicMock()
         self.blk.invoke('make_signal', {'sig': {'key': 'value'}})
         self.blk.make_signal.assert_called_once_with({'key': 'value'})
@@ -92,20 +96,19 @@ class TestCommand(NIOBlockTestCase):
             self.blk.invoke('make_signal', {'sig': '{"key": value}'})
 
     def test_invoke_one_arg(self):
-        # Test that a method with only one param can accept something other
-        # than a dict
+        """Methods with only one param accept something other than a dict."""
         self.blk.eat = MagicMock()
         self.blk.invoke('eat', "Bananas")
         self.blk.eat.assert_called_once_with("Bananas")
 
     def test_invoke_one_arg_nostring(self):
-        # Test that a method with only one param can accept something other
-        # than a dict only if param is String type
+        """Methods accept string param."""
         self.blk.walk = MagicMock()
         with self.assertRaises(InvalidCommandArg):
             self.blk.invoke('walk', "The only arg")
 
     def test_invoke_list(self):
+        """Methods can be invoked with a list."""
         self.blk.make_multi = MagicMock()
         self.blk.invoke('make_multi', {'sigs': [
             {'key1': 'val1'}, {'key2': 'val2'}
@@ -115,6 +118,7 @@ class TestCommand(NIOBlockTestCase):
         ])
 
     def test_bad_argument(self):
+        """Raise MissingCommandArg if invoked with a missing arg."""
         with self.assertRaises(TypeError):
             self.blk.invoke('talk', {'phrase': 'foobar', 'times': 'baz',
                                      'ftimes': 'qux'})
@@ -122,6 +126,7 @@ class TestCommand(NIOBlockTestCase):
             self.blk.invoke('walk', {'steps': None})
 
     def test_bogus_args(self):
+        """Raise InvalidCommandArg if invoked with extra args."""
         with self.assertRaises(InvalidCommandArg):
             self.blk.invoke('talk', {
                 'phrase': 'foobar',
@@ -131,18 +136,20 @@ class TestCommand(NIOBlockTestCase):
             })
 
     def test_bogus_command(self):
+        """Raise RuntimeError if a command is invoked that doesn't exist."""
         with self.assertRaises(RuntimeError):
             self.blk.invoke('fly', {'wings': 'yes plz'})
 
     def test_use_default(self):
+        """Use default args when not invoked with an arg."""
         self.blk.talk = MagicMock()
         self.blk.invoke('talk', {'times': '3', 'ftimes': '3.0'})
         self.blk.talk.assert_called_once_with('quuuux', 3, 3.0)
 
     def test_bogus_param(self):
+        """Command parameters must be TypedParameters."""
         with self.assertRaises(RuntimeError):
 
-            # command parameters must be TypedParameters
             @command('fail', int)
             class BogusBlock(Block):
 
@@ -150,10 +157,12 @@ class TestCommand(NIOBlockTestCase):
                     print("this will never get called")
 
     def test_bogus_command_with_method(self):
+        """Raise RuntimeError if a command alias doesn't exist."""
         with self.assertRaises(RuntimeError):
             self.blk.invoke('fake_sing', {'song': 'hey, baby'})
 
     def test_command_with_method(self):
+        """Commands can be invoked through method alias."""
         self.blk.sing = MagicMock()
         self.blk.real_sing = MagicMock()
         self.blk.invoke('sing', {'song': 'my life'})
@@ -161,8 +170,10 @@ class TestCommand(NIOBlockTestCase):
         self.assertEqual(0, self.blk.sing.call_count)
 
     def test_none_existent_method_command_with_method(self):
+        """Command method doesn't need to exist as long as alias metho does."""
         self.blk.sing = MagicMock()
         self.blk.real_sing = MagicMock()
+        # lip_sing isn't a method but's alias method is real_sing
         self.blk.invoke('lip_sing', {'song': 'my life'})
         self.blk.real_sing.assert_called_once_with("my life")
         self.assertEqual(0, self.blk.sing.call_count)

@@ -94,8 +94,8 @@ class Command(object):
             self._parameters.append(param)
         else:
             raise RuntimeError(
-                "Invalid command parameter type: '%s'" %
-                getattr(param, 'name', param))
+                "Invalid command parameter type: '{}'".format(
+                getattr(param, 'name', param)))
 
     def collect_arguments(self, args):
         """ Assign values to the command's parameters. This is done to
@@ -127,8 +127,8 @@ class Command(object):
                     result.append(val)
                 else:
                     raise MissingCommandArg(
-                        "Command %s: missing argument %s" % (self.name, p.name)
-                    )
+                        "Command {}: missing argument {}".format(
+                            self.name, p.name))
             # Now that we have all params that were not passed but have
             # default value covered, lets check for unrecognized param passed
             invalid_args = [arg for arg in args if arg not in

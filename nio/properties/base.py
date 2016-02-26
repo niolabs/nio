@@ -82,8 +82,7 @@ class BaseProperty(object):
         self._values[instance] = PropertyValue(self, value)
 
     def __str__(self):
-        return "type is: %s, args are %s" % (self.type,
-                                             self.kwargs)
+        return "type is: {}, args are {}".format(self.type, self.kwargs)
 
     def serialize(self, instance, **kwargs):
         """ Serialze and return the value of an instance of this property

@@ -1,3 +1,4 @@
+import inspect
 from nio.properties import BaseProperty
 from nio.properties import PropertyHolder
 from nio.properties.util.object_type import ObjectType
@@ -18,9 +19,11 @@ class ObjectProperty(BaseProperty):
             obj_type (class): class type which is an instance of PropertyHolder
         """
         # Validate that the object is a PropertyHolder
-        if not issubclass(obj_type, PropertyHolder):
-            raise TypeError("Specified object type %s is not a PropertyHolder"
-                            % obj_type.__class__)
+        if not inspect.isclass(obj_type) or \
+                not issubclass(obj_type, PropertyHolder):
+            raise TypeError(
+                "Specified object type {} is not a PropertyHolder".format(
+                    obj_type.__class__))
         kwargs['obj_type'] = obj_type
         super().__init__(ObjectType, **kwargs)
         self.description.update(self._get_description(**kwargs))
