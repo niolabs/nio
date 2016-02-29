@@ -36,7 +36,7 @@ class NIOTestCase(TestCase):
         """ Initializes the modules that will be active when running the test
 
         There are three important methods to override in a test when
-        wanting to customize the modules behaviour.
+        wanting to customize the modules behaviour. These are:
             - get_test_modules
             - get_module
             - get_context
