@@ -6,12 +6,15 @@ from nio.properties import StringProperty
 
 # noinspection PyProtectedMember
 class TestProperties(unittest.TestCase):
-    """ These tests check that PropertyHolder
-    correctly returns the list of properties
-    for different hierarchy 'shapes'
+    """Test ability to get class properties from PropertyHolder
+
+    These tests check that PropertyHolder correctly returns the list of
+    properties for different hierarchy 'shapes'
+
     """
 
     def test_parent_child(self):
+        """get_class_properties works wth sub classes."""
         class ParentClass(PropertyHolder):
             parent_property = StringProperty(default="str")
 
@@ -26,6 +29,7 @@ class TestProperties(unittest.TestCase):
         self.assertTrue("parent_property" in properties)
 
     def test_three_levels(self):
+        """get_class_properties works with sub classes of sub classes."""
         class TopLevel(PropertyHolder):
             top_property = StringProperty(default="str")
 
@@ -44,6 +48,7 @@ class TestProperties(unittest.TestCase):
         self.assertTrue("bottom_property" in properties)
 
     def test_diamond_shape(self):
+        """get_class_properties works with multiple inheritance."""
         class TopLevel(PropertyHolder):
             top_property = StringProperty(default="str")
 
@@ -66,6 +71,7 @@ class TestProperties(unittest.TestCase):
         self.assertTrue("bottom_property" in properties)
 
     def test_parent_child_override(self):
+        """get_class_properties only gets child property if it overrides."""
         class ParentClass(PropertyHolder):
             parent_property = StringProperty(default="str")
 

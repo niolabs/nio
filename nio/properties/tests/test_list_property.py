@@ -4,7 +4,7 @@ from nio.properties import ListProperty
 from nio.properties import PropertyHolder
 from nio.properties import StringProperty
 from nio.types import IntType
-from nio.util.support.test_case import NIOTestCase
+from nio.util.support.test_case import NIOTestCaseNoModules
 
 
 class ContainedClass(PropertyHolder):
@@ -19,7 +19,7 @@ class ContainerClass(PropertyHolder):
     holder_list = ListProperty(ContainedClass, default=[ContainedClass()])
 
 
-class TestListProperties(NIOTestCase):
+class TestListProperties(NIOTestCaseNoModules):
     def setUp(self):
         super().setUp()
         # Set up a native object list
@@ -45,17 +45,16 @@ class TestListProperties(NIOTestCase):
 
         self.prop_list_to_use = [prop_a, prop_b, IntProperty(default=3)]
 
-    def test_native_type_invalid_value(self):
-        """Test when a list has a native python type with invalid values"""
-
+    def test_nio_type_invalid_value(self):
+        """Test when a list has a nio Type with invalid values."""
         container = ContainerClass()
-
+        # Set the invalid list
+        container.type_list = self.invalid_type_list_to_use
         with self.assertRaises(TypeError):
-            # Set the invalid list
-            container.type_list = self.invalid_type_list_to_use
+            container.type_list()
 
-    def test_native_type(self):
-        """Test when a list has a native python type"""
+    def test_nio_type(self):
+        """Test when a list has a nio Type."""
 
         container = ContainerClass()
 
@@ -66,7 +65,7 @@ class TestListProperties(NIOTestCase):
         self.assertEqual(self.type_list_to_use, container.type_list())
 
     def test_holder_type(self):
-        """Test when a list has a native python type"""
+        """Test when a list has is a PropertyHolder type."""
 
         container = ContainerClass()
 
@@ -77,7 +76,7 @@ class TestListProperties(NIOTestCase):
         self.assertEqual(self.holder_list_to_use, container.holder_list())
 
     def test_to_from_dict(self):
-        """Make sure the serialize/deserialze hold"""
+        """Make sure the serialize/deserialze hold."""
 
         container_1 = ContainerClass()
         container_1.type_list = self.type_list_to_use
@@ -92,18 +91,20 @@ class TestListProperties(NIOTestCase):
         self.assertEqual(one, two)
 
     def test_bad_dict(self):
-        """Make sure attempts to deserialize something not a list
-        raises a TypeError"""
+        """Raise TypeError when deserializing non-list items."""
 
         invalid_props = {
             "type_list": "not a list"
         }
         container_1 = ContainerClass()
-
+        # You can set invalid props
+        container_1.from_dict(invalid_props)
         with self.assertRaises(TypeError):
-            container_1.from_dict(invalid_props)
+            # But deserializing in validate_dict is not ok
+            container_1.validate_dict(invalid_props)
 
     def test_expression(self):
+        """Test expressions for list property."""
         container = ContainerClass()
         contained = ContainedClass()
         contained.expression_property = "three is {{ 1 + 2 }}"
@@ -113,6 +114,7 @@ class TestListProperties(NIOTestCase):
             container.holder_list()[0].expression_property(), 'three is 3')
 
     def test_expression_with_signal(self):
+        """Test signal expressions for list property."""
         container = ContainerClass()
         contained = ContainedClass()
         self.assertIsNotNone(container.holder_list)
@@ -121,6 +123,7 @@ class TestListProperties(NIOTestCase):
                          'signal')
 
     def test_defaults(self):
+        """Test list defaults."""
         defaults = ContainerClass.get_serializable_defaults()
         self.assertEqual(defaults["type_list"], [1])
         self.assertEqual(defaults["holder_list"],

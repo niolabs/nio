@@ -1,22 +1,22 @@
 from nio.properties import PropertyHolder
 from nio.properties import VarProperty
-from nio.util.support.test_case import NIOTestCase
+from nio.util.support.test_case import NIOTestCaseNoModules
 
 
 class SampleClass(PropertyHolder):
     var_property = VarProperty(allow_none=True)
 
 
-class TestVarProperty(NIOTestCase):
+class TestVarProperty(NIOTestCaseNoModules):
 
     def test_initialization(self):
-        """ Make sure we can initialize and have the property """
+        """Make sure we can initialize and have the property."""
         instance = SampleClass()
         self.assertIsNotNone(instance.var_property)
         self.assertIsNone(instance.var_property())
 
     def test_accept_anything(self):
-        """ The property should accept anything """
+        """The property should accept anything."""
         instance = SampleClass()
 
         # Anything includes an integer
@@ -32,7 +32,7 @@ class TestVarProperty(NIOTestCase):
         self.assertEqual(instance.var_property(), [])
 
     def test_serialize_deserialize_matching(self):
-        """Serialize then deserialize should match the original"""
+        """Serialize then deserialize should match the original."""
         instance1 = SampleClass()
         instance1.var_property = []
         instance1_serialized = instance1.to_dict()
@@ -44,7 +44,7 @@ class TestVarProperty(NIOTestCase):
         self.assertDictEqual(instance2_serialized, instance1_serialized)
 
     def test_deserialize_serialize_matching(self):
-        """Deserialize then serialize should match the original"""
+        """Deserialize then serialize should match the original."""
         my_dict = {
             'var_property': []
         }

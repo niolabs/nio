@@ -19,10 +19,8 @@ from nio.signal.status import BlockStatusSignal
 from nio.signal.base import Signal
 
 
-@input(DEFAULT_TERMINAL, default=True, label="default")
-@output(DEFAULT_TERMINAL, default=True, label="default")
 @command('properties')
-class Block(PropertyHolder, CommandHolder, Runner):
+class Base(PropertyHolder, CommandHolder, Runner):
 
     """The base class for blocks to inherit from."""
 
@@ -56,6 +54,8 @@ class Block(PropertyHolder, CommandHolder, Runner):
         self._block_router = None
         self.persistence = None
         self._service_name = None
+        self._default_output = Terminal.get_default_terminal_on_class(
+            self.__class__, TerminalType.output)
 
     def configure(self, context):
         """Overrideable method to be called when the block configures.
@@ -82,6 +82,8 @@ class Block(PropertyHolder, CommandHolder, Runner):
 
         # load the configuration as class variables
         self.from_dict(context.properties, self._logger)
+        # verify that block properties are valid
+        self.validate()
 
         self._logger = get_nio_logger(self.name())
         self._logger.setLevel(self.log_level())
@@ -109,7 +111,7 @@ class Block(PropertyHolder, CommandHolder, Runner):
         """
         pass  # pragma: no cover
 
-    def notify_signals(self, signals, output_id=DEFAULT_TERMINAL):
+    def notify_signals(self, signals, output_id=None):
         """Notify signals to router.
 
         This is the method the block should call whenever it would like
@@ -229,3 +231,9 @@ class Block(PropertyHolder, CommandHolder, Runner):
         """ Provides block logger
         """
         return self._logger
+
+
+@input(DEFAULT_TERMINAL, default=True, label="default")
+@output(DEFAULT_TERMINAL, default=True, label="default")
+class Block(Base):
+    pass

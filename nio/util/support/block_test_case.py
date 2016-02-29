@@ -34,7 +34,7 @@ class TestBlockRouter(BlockRouter):
         """
         self._test_case = test_case
 
-    def notify_signals(self, block, signals, output_id=DEFAULT_TERMINAL):
+    def notify_signals(self, block, signals, output_id):
         """ Receives block signals.
 
          Keeps track of the signal count per block and per output id
@@ -46,6 +46,8 @@ class TestBlockRouter(BlockRouter):
             output_id: output identifier
 
         """
+        if output_id is None:
+            output_id = DEFAULT_TERMINAL
 
         if not block.is_output_valid(output_id):
             msg = "Invalid output: '{0}' for block: {1}".format(
@@ -144,7 +146,7 @@ class NIOBlockTestCase(NIOTestCase):
             'TestSuite',
             ''))
 
-    def signals_notified(self, block, signals, output_id=DEFAULT_TERMINAL):
+    def signals_notified(self, block, signals, output_id):
         """ Receives block signals notification
 
         Args:

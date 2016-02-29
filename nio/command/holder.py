@@ -7,17 +7,15 @@ from nio.command.base import Command, InvalidCommandArg
 
 class CommandHolder(object):
 
-    """ Provides bookkeeping infrastructure surrounding block commands.
-
-    """
-
     @classmethod
     def get_commands_entry(cls):
-        """ Keeps the commands for the specific class where they
-        are defined
+        """Get all commands on this CommandHolder.
+
+        This does not include commands defined on parent classes.
 
         Returns:
-            commands defined in the class
+            dict: commands defined in the class
+
         """
         commands_attr = "{0}_commands_entry".format(cls.__name__)
         if not hasattr(cls, commands_attr):
@@ -26,13 +24,16 @@ class CommandHolder(object):
 
     @classmethod
     def get_commands(cls):
-        """ Finds out all commands for the class, including commands for
-        ancestor classes
+        """Get all commands on this CommandHolder and its parent classes.
+
+        This does include commands defined on parent classes.
 
         Once this method is called, it assumes no new command definitions
         are added to the class.
 
-        Returns: all available commands for this class
+        Returns:
+            dict: all available commands for this class
+
         """
         commands_attr = "{0}_commands".format(cls.__name__)
         if not hasattr(cls, commands_attr):
@@ -47,15 +48,14 @@ class CommandHolder(object):
 
     @classmethod
     def add_command(cls, command):
-        """Commands are defined as instance methods on the block but
+        """Add a command to this CommandHolder.
+
+        Commands are defined as instance methods on the block but
         are added to the block class as 'Command' objects for bookkeeping
         convenience and data encapsulation.
 
         Args:
             command (Command): A command object to be added.
-
-        Returns:
-            None
 
         """
         class_commands = cls.get_commands_entry()
@@ -67,11 +67,9 @@ class CommandHolder(object):
 
     @classmethod
     def get_command_description(cls):
-        """ Determines the command descriptions for this class.
-        This is useful in serialization/deserialization.
+        """Get the command descriptions for this CommandHolder and its parents.
 
-        Args:
-            None
+        This is useful in serialization/deserialization.
 
         Returns:
             description (dict): a dictionary containing both property and
@@ -100,7 +98,7 @@ class CommandHolder(object):
         class_commands = self.get_commands()
         command = class_commands.get(name)
         if command is None or command.method is None:
-            raise RuntimeError("Invalid command: %s" % name)
+            raise RuntimeError("Invalid command: {}".format(name))
 
         method = getattr(self, command.method, None)
 
@@ -111,6 +109,6 @@ class CommandHolder(object):
             except TypeError as e:
                 raise InvalidCommandArg(e)
         else:
-            raise RuntimeError("Invalid command: %s" % name)
+            raise RuntimeError("Invalid command: {}".format(name))
 
         return result

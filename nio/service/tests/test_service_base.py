@@ -1,5 +1,6 @@
 from unittest.mock import Mock
 
+from nio.properties.exceptions import AllowNoneViolation
 from nio.router.base import BlockRouter
 from nio.service.base import Service
 from nio.service.context import ServiceContext
@@ -18,6 +19,24 @@ class TestBaseService(NIOTestCaseNoModules):
         ))
         # Make sure the name property got set properly
         self.assertEqual(service.name(), "ServiceName")
+
+    def test_config_with_no_name(self):
+        """Make sure a service cononfig has required 'name' property."""
+        service = Service()
+        with self.assertRaises(AllowNoneViolation):
+            service.configure(ServiceContext({}))
+
+    def test_invalid_config(self):
+        """Make sure a service cononfig fails with invalid property config."""
+        invalid_configs = [
+            {"name": "ServiceName", "log_level": 42},
+            {"name": "ServiceName", "execution": "not a list"},
+            {"name": "ServiceName", "mappings": "not a list"},
+        ]
+        for config in invalid_configs:
+            service = Service()
+            with self.assertRaises(TypeError):
+                service.configure(ServiceContext(config))
 
     def test_notify_management_signal(self):
         """Test the service can notify management signals properly"""

@@ -4,12 +4,12 @@ from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.block.base import Block
 from nio.signal.base import Signal
 from nio.signal.status import BlockStatusSignal
-from nio.common import RunnerStatus
+from nio.util.runner import RunnerStatus
 
 
 class TestBlockTestCase(NIOBlockTestCase):
 
-    """ Tests that the BlockTestCase handles roter methods properly. """
+    """ Tests that the BlockTestCase handles router methods properly. """
 
     def signals_notified(self, block, signals, output_id=DEFAULT_TERMINAL):
         """ Override a signal notification handler """

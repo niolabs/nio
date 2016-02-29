@@ -1,6 +1,6 @@
 from nio.properties import PropertyHolder
 from nio.properties import StringProperty
-from nio.util.support.test_case import NIOTestCase
+from nio.util.support.test_case import NIOTestCaseNoModules
 
 
 class ClassWithoutVersion(PropertyHolder):
@@ -17,10 +17,9 @@ class ClassWithVersionAsProperty(PropertyHolder):
     version = StringProperty(default="version_as_property")
 
 
-class TestDefaults(NIOTestCase):
+class TestDefaults(NIOTestCaseNoModules):
     def test_description(self):
-        """ Testing that version is retrieved as expected
-        """
+        """Testing that version is retrieved as expected."""
         without_version = ClassWithoutVersion.get_description()
         self.assertNotIn("version", without_version)
 

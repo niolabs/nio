@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from nio.properties import FileProperty
 from nio.properties import PropertyHolder
-from nio.util.support.test_case import NIOTestCase
+from nio.util.support.test_case import NIOTestCaseNoModules
 
 
 class FileContainerClass(PropertyHolder):
@@ -16,7 +16,7 @@ class FileWritableContainerClass(PropertyHolder):
     file_property = FileProperty(mode="+w", default="default_filename")
 
 
-class TestFileProperty(NIOTestCase):
+class TestFileProperty(NIOTestCaseNoModules):
 
     def setUp(self):
         file_dir_name = dirname(realpath(__file__))
@@ -27,10 +27,12 @@ class TestFileProperty(NIOTestCase):
             remove(self.tmp_block_file)
 
     def test_file_property(self):
-        """ Asserts basic file property functionality such as value to actual
-        file mapping
-        """
+        """Check base file property functionality.
 
+        Asserts basic file property functionality such as value to actual
+        file mapping
+
+        """
         container = FileContainerClass()
         self.assertEqual(container.file_property.value, "default_filename")
         self.assertIsNone(container.file_property().file)
@@ -40,8 +42,7 @@ class TestFileProperty(NIOTestCase):
         self.assertTrue(isfile(container.file_property().file))
 
     def test_with_on_property(self):
-        """ Asserts that 'with' construct works as expected
-        """
+        """Asserts that 'with' construct works as expected."""
 
         file_contents = 'file contents, to be deleted'
         with open(self.tmp_block_file, "+w") as my_stream:
@@ -55,8 +56,7 @@ class TestFileProperty(NIOTestCase):
             self.assertEqual(line, file_contents)
 
     def test_file_mode(self):
-        """ Asserts 'mode' keyword argument when defining property
-        """
+        """Asserts 'mode' keyword argument when defining property."""
 
         # Populate test file with some text
         file_contents = 'file contents, to be deleted'
@@ -84,8 +84,7 @@ class TestFileProperty(NIOTestCase):
             self.assertEqual(file_contents, new_contents)
 
     def test_absolute_file_to_environment(self):
-        """ Assert that an absolute file from environment is accessed
-        """
+        """Assert that an absolute file from environment is accessed."""
         container = FileContainerClass()
         # build absolute path to this test file
         container.file_property = __file__
@@ -93,7 +92,7 @@ class TestFileProperty(NIOTestCase):
         self.assertEqual(container.file_property().file, __file__)
 
     def test_relative_file_to_working_dir(self):
-        """ Assert that a file from the cwd can be accessed only by name """
+        """Assert that a file from the cwd can be accessed only by name."""
         container = FileContainerClass()
         # specify the tests directory and test filename only
         #  "file_property": "tests/test_file_property.py"

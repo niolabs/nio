@@ -2,10 +2,8 @@ import inspect
 from copy import deepcopy
 from collections import Iterable
 
-from nio.common import RunnerStatus
 from nio.util.logging import get_nio_logger
-from nio.util.runner import Runner
-from nio.block.terminals import DEFAULT_TERMINAL
+from nio.util.runner import Runner, RunnerStatus
 from nio.signal.base import Signal
 
 
@@ -136,10 +134,15 @@ class BlockRouter(Runner):
                     self._receivers[sender_block_name].extend(parsed_receivers)
             else:
                 # receivers have the simple list format, i.e. [receivers]
+                if sender_block._default_output is None:
+                    raise InvalidBlockOutput(
+                        "Block {} does not define a default output, must "
+                        "specify outputs in execution config".format(
+                            sender_block))
                 parsed_receivers = self._process_receivers_list(
                     block_execution.receivers(),
                     context.blocks,
-                    DEFAULT_TERMINAL)
+                    sender_block._default_output.id)
                 self._receivers[sender_block_name].extend(parsed_receivers)
 
     def _process_receivers_list(self, receivers, blocks, output_id):
@@ -253,6 +256,18 @@ class BlockRouter(Runner):
             if not signals:
                 # discard an empty list or something that evaluates to False
                 return
+
+            if output_id is None:
+                if block._default_output is None:
+                    raise InvalidBlockOutput(
+                        "Block does not define a default output, must "
+                        "explicitly specify output in notify_signals")
+                else:
+                    output_id = block._default_output.id
+            elif not block.is_output_valid(output_id):
+                raise InvalidBlockOutput(
+                    "Output {} not defined on block {}".format(
+                        output_id, block))
 
             # make sure we can iterate
             if not isinstance(signals, Iterable):

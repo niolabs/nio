@@ -1,7 +1,10 @@
 from unittest.mock import patch, Mock
 from nio.block.base import Block
+from nio.block.terminator_block import TerminatorBlock
+from nio.block.generator_block import GeneratorBlock
 from nio.block.context import BlockContext
 from nio.block.terminals import DEFAULT_TERMINAL
+from nio.properties.exceptions import AllowNoneViolation
 from nio.signal.base import Signal
 from nio.router.base import BlockRouter
 from nio.router.context import RouterContext
@@ -30,6 +33,13 @@ class TestBaseBlock(NIOTestCaseNoModules):
         with self.assertRaises(TypeError):
             # The context's block router needs to be a BlockRouter
             Block().configure(BlockContext(JustAnObject, {}))
+        with self.assertRaises(AllowNoneViolation):
+            # Block needs a name
+            Block().configure(BlockContext(BlockRouter(), {"name": None}))
+        with self.assertRaises(TypeError):
+            # Wrong types (like log_level not being corrrect) raise TypeError
+            Block().configure(BlockContext(BlockRouter(), {"name": "BlockName",
+                                                           "log_level": 42}))
 
     def test_notify_management_signal(self):
         """Test the block can notify management signals properly to
@@ -70,7 +80,7 @@ class TestBaseBlock(NIOTestCaseNoModules):
         with patch.object(blk, '_block_router') as router_patch:
             blk.notify_signals(my_sigs)
             router_patch.notify_signals.assert_called_once_with(
-                blk, my_sigs, DEFAULT_TERMINAL)
+                blk, my_sigs, None)
 
         # test sending more than one Signal
         with patch.object(blk, '_block_router') as router_patch:
@@ -134,3 +144,15 @@ class TestBaseBlock(NIOTestCaseNoModules):
         self.assertTrue(blk.is_output_valid(DEFAULT_TERMINAL))
         self.assertFalse(blk.is_input_valid('fake input'))
         self.assertFalse(blk.is_output_valid('fake output'))
+
+    def test_terminal_block_terminals(self):
+        """Make sure the block has only an input terminal"""
+        blk = TerminatorBlock()
+        self.assertTrue(blk.is_input_valid(DEFAULT_TERMINAL))
+        self.assertFalse(blk.is_output_valid(DEFAULT_TERMINAL))
+
+    def test_generator_block_terminals(self):
+        """Make sure the block has only an output terminal"""
+        blk = GeneratorBlock()
+        self.assertFalse(blk.is_input_valid(DEFAULT_TERMINAL))
+        self.assertTrue(blk.is_output_valid(DEFAULT_TERMINAL))

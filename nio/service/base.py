@@ -1,6 +1,5 @@
 from nio.router.context import RouterContext
 from nio.command import command
-from nio.command.security import command_security
 from nio.command.holder import CommandHolder
 from nio import discoverable
 from nio.util.versioning.dependency import DependsOn
@@ -10,8 +9,7 @@ from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
 from nio.modules.security.task import SecureTask
-from nio.util.runner import Runner
-from nio.common import RunnerStatus
+from nio.util.runner import Runner, RunnerStatus
 
 
 class BlockExecution(PropertyHolder):
@@ -42,8 +40,8 @@ class BlockMapping(PropertyHolder):
 @command('status', method="full_status")
 @command('heartbeat')
 @command('runproperties')
-@command_security('start', SecureTask('services.start'))
-@command_security('stop', SecureTask('services.stop'))
+@command('start', tasks=[SecureTask('services.start')])
+@command('stop', tasks=[SecureTask('services.stop')])
 @discoverable
 class Service(PropertyHolder, CommandHolder, Runner):
 
@@ -136,6 +134,8 @@ class Service(PropertyHolder, CommandHolder, Runner):
         """
         # populate service properties
         self.from_dict(context.properties, self._logger)
+        # verify that service properties are valid
+        self.validate()
 
         # reset logger after modules initialization
         # and properties setting
