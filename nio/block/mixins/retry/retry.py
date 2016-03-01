@@ -15,10 +15,10 @@ class Retry(object):
     an execption if the one retry fails.
 
     How to use this mixin:
-        1. Call _execute_with_retry with the method that you want to execute
-        and any keyword arguments. _execute_with_retry will raise an Exception
+        1. Call execute_with_retry with the method that you want to execute
+        and any keyword arguments. execute_with_retry will raise an Exception
         if the execute_method continues to fail after retrying.
-        2. Optionally, override _before_retry to write custom code that will be
+        2. Optionally, override before_retry to write custom code that will be
         performed before attempting a retry. Return True if you want to retry
         and False if not.
         3. In configure, update num_retries if you want to retry execute_method
@@ -31,7 +31,7 @@ class Retry(object):
         super().__init__()
         self.num_retries = 1
 
-    def _execute_with_retry(self, execute_method, **kwargs):
+    def execute_with_retry(self, execute_method, **kwargs):
         """Use this in your block to call `execute_method`
 
         Returns the return value of execute_method or raises an Exception if
@@ -48,7 +48,7 @@ class Retry(object):
                     "On attempt {}, failed to execute method {}".format(
                         retry_count+1, execute_method.__name__),
                     exc_info=True)
-                if not self._before_retry(retry_count, **kwargs):
+                if not self.before_retry(retry_count, **kwargs):
                     # Because we are done retrying, save the exception to raise
                     # later, outside of the except block.
                     exc_to_raise = e
@@ -56,7 +56,7 @@ class Retry(object):
                 raise exc_to_raise
             retry_count += 1
 
-    def _before_retry(self, retry_count, **kwargs):
+    def before_retry(self, retry_count, **kwargs):
         """Determine if a retry should be attempted or not.
 
         Optionally override in block.

@@ -1,5 +1,6 @@
-from nio.properties.timedelta import TimeDeltaProperty
+from collections import defaultdict
 from threading import Lock
+from nio.properties.timedelta import TimeDeltaProperty
 from nio.modules.scheduler import Job
 
 
@@ -25,7 +26,7 @@ class Collector(object):
         super().__init__()
         self._collect_job = None
         self._collect_lock = Lock()
-        self._sigs_out = []
+        self._sigs_out = defaultdict(list)
 
     def start(self):
         # Start the collection job, if we want to be collecting
@@ -38,13 +39,13 @@ class Collector(object):
             self._collect_job.cancel()
         super().stop()
 
-    def notify_signals(self, signals):
+    def notify_signals(self, signals, output_id=None):
         """Override the notify signals call to keep collecting"""
         if self._are_we_collecting():
             with self._collect_lock:
-                self._sigs_out.extend(signals)
+                self._sigs_out[output_id].extend(signals)
         else:
-            super().notify_signals(signals)
+            super().notify_signals(signals, output_id)
 
     def _are_we_collecting(self):
         """Return True if we should be collecting signals"""
@@ -56,6 +57,9 @@ class Collector(object):
         This gets called by the scheduled Job.
         """
         with self._collect_lock:
-            if len(self._sigs_out):
-                super().notify_signals(self._sigs_out)
-                self._sigs_out = []
+            for output_id, output_sigs in self._sigs_out.items():
+                if len(output_sigs):
+                    # Notify the signals for this output ID then
+                    # remove the signals from the list
+                    super().notify_signals(output_sigs, output_id)
+                    del output_sigs[:]

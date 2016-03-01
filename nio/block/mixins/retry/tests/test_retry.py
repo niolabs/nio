@@ -21,7 +21,7 @@ class RetryBlock(Retry, Block):
         output = []
         for signal in signals:
             try:
-                output.append(self._execute_with_retry(
+                output.append(self.execute_with_retry(
                     self._execute,
                     signal=signal))
             except:
@@ -40,12 +40,12 @@ class RetryBlock(Retry, Block):
             raise Exception
         return signal
 
-    def _before_retry(self, retry_count, **kwargs):
+    def before_retry(self, retry_count, **kwargs):
         if self._retry_count:
             self._retry_count += retry_count
         else:
             self._retry_count = retry_count
-        return super()._before_retry(retry_count, **kwargs)
+        return super().before_retry(retry_count, **kwargs)
 
 
 class TestRetry(NIOBlockTestCase):

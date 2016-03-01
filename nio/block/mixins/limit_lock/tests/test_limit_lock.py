@@ -24,7 +24,7 @@ class LockBlock(LimitLock, Block):
         output = []
         for signal in signals:
             try:
-                output_signal = self._execute_with_lock(
+                output_signal = self.execute_with_lock(
                     self._execute, self._num_locks, signal=signal)
                 if output_signal:
                     output.append(output_signal)
@@ -50,7 +50,7 @@ class TestLock(NIOBlockTestCase):
         """Only the first signal is notified and the others are dropped"""
         e = Event()
         block = LockBlock(e, 5, 1)
-        self.configure_block(block, {})
+        self.configure_block(block, {"name": "LockBlock"})
         block.start()
         for _ in range(5):
             spawn(block.process_signals, [Signal()])
@@ -104,7 +104,7 @@ class TestLock(NIOBlockTestCase):
         block = LimitLock()
         block._logger = MagicMock()
         self.assertRaises(Exception,
-                          block._execute_with_lock, execute_method, 1)
+                          block.execute_with_lock, execute_method, 1)
         # The lock needs to be released after the exception
         self.assertEqual(block._number_of_locks, 0)
 
@@ -116,7 +116,7 @@ class TestLock(NIOBlockTestCase):
         block._logger = MagicMock()
         # max locks is 0 so it will always be full
         self.assertRaises(LockQueueFull,
-                          block._execute_with_lock, execute_method, 0)
+                          block.execute_with_lock, execute_method, 0)
         self.assertEqual(block._number_of_locks, 0)
 
     def test_execute_method_args(self):
@@ -126,7 +126,7 @@ class TestLock(NIOBlockTestCase):
             self.assertEqual(arg2, 2)
         block = LimitLock()
         block._logger = MagicMock()
-        block._execute_with_lock(execute_method, 1, 1, 2)
+        block.execute_with_lock(execute_method, 1, 1, 2)
         self.assertEqual(block._number_of_locks, 0)
 
     def test_execute_method_kwargs(self):
@@ -136,7 +136,7 @@ class TestLock(NIOBlockTestCase):
             self.assertEqual(arg2, 2)
         block = LimitLock()
         block._logger = MagicMock()
-        block._execute_with_lock(execute_method, 1, arg1=1, arg2=2)
+        block.execute_with_lock(execute_method, 1, arg1=1, arg2=2)
         self.assertEqual(block._number_of_locks, 0)
 
     def test_execute_method_args_and_kwargs(self):
@@ -148,5 +148,5 @@ class TestLock(NIOBlockTestCase):
             self.assertEqual(arg4, 4)
         block = LimitLock()
         block._logger = MagicMock()
-        block._execute_with_lock(execute_method, 1, 1, 2, arg4=4)
+        block.execute_with_lock(execute_method, 1, 1, 2, arg4=4)
         self.assertEqual(block._number_of_locks, 0)

@@ -28,7 +28,27 @@ class LimitLock(object):
         self._exceute_lock = Lock()
         self._number_of_locks = 0
 
-    def _execute_with_lock(self, execute_method, max_locks, *args, **kwargs):
+    def execute_with_lock(self, execute_method, max_locks, *args, **kwargs):
+        """ Execute a given method inside of a limited lock
+
+        This method will wait to acquire a lock before executing the specified
+        method, but will limit the number of threads who are allowed to wait
+        for the lock.
+
+        Args:
+            execute_method (function): The function to execute once the lock
+                is acquired
+            max_locks (int): The maximum number of threads allowed to wait for
+                the lock to acquire
+            *args, **kwargs: Additional arguments to pass to the execute_method
+
+        Returns:
+            The result of the execute_method, once it actually executes
+
+        Raises:
+            LockQueueFull: If the call exceeds the maximum number of threads
+                that can wait for the lock.
+        """
         if self._number_of_locks >= max_locks:
             self._logger.warning(
                 "Currently {} locks waiting to be acquired. This is more than "

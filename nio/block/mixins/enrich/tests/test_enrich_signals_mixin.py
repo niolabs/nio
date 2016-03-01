@@ -4,7 +4,7 @@ from nio.signal.base import Signal
 from nio.util.support.block_test_case import NIOBlockTestCase
 
 
-class DummyBlock(EnrichSignals, Block):
+class EnrichingBlock(EnrichSignals, Block):
     pass
 
 
@@ -12,7 +12,7 @@ class TestEnrichSignals(NIOBlockTestCase):
 
     def test_exclude_existing(self):
         """ Make sure we can just return new data """
-        blk = DummyBlock()
+        blk = EnrichingBlock()
         self.set_up_block(blk, True, 'doesnt matter')
         incoming_signal = Signal({
             'key1': 'val1',
@@ -27,7 +27,7 @@ class TestEnrichSignals(NIOBlockTestCase):
 
     def test_add_to_field(self):
         """ Make sure we can add results to a new field on the signal """
-        blk = DummyBlock()
+        blk = EnrichingBlock()
         self.set_up_block(blk, False, 'results')
         incoming_signal = Signal({
             'key1': 'val1',
@@ -45,7 +45,7 @@ class TestEnrichSignals(NIOBlockTestCase):
 
     def test_signal_merge(self):
         """ Make sure we can add results to a new field on the signal """
-        blk = DummyBlock()
+        blk = EnrichingBlock()
         self.set_up_block(blk, False, '')
         incoming_signal = Signal({
             'key1': 'val1',
@@ -65,7 +65,7 @@ class TestEnrichSignals(NIOBlockTestCase):
 
     def test_copy(self):
         """ Make sure that incoming signals can be copied """
-        blk = DummyBlock()
+        blk = EnrichingBlock()
         self.set_up_block(blk, False, 'results')
         incoming_signal = Signal({
             'key1': 'val1',
@@ -88,7 +88,7 @@ class TestEnrichSignals(NIOBlockTestCase):
 
     def test_no_copy(self):
         """ Make sure that incoming signals can be copied """
-        blk = DummyBlock()
+        blk = EnrichingBlock()
         self.set_up_block(blk, False, 'results')
         incoming_signal = Signal({
             'key1': 'val1',
@@ -111,7 +111,7 @@ class TestEnrichSignals(NIOBlockTestCase):
 
     def test_notified(self):
         """ Make sure we notify the signals properly """
-        blk = DummyBlock()
+        blk = EnrichingBlock()
         self.set_up_block(blk, False, '')
         incoming_signal = Signal({
             'key1': 'val1',

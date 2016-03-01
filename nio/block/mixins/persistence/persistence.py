@@ -22,39 +22,34 @@ class Persistence(object):
         self._backup_job = None
 
     def persisted_values(self):
-        """ Return a dictionary containing the values to be persisted.
+        """ Return a list containing the values to be persisted.
 
         This function should be overriden in a Block that wishes to use
-        persistence. Return a dictionary with the key being the key you wish
-        to save it under (useful for making changes to the block) and the value
-        being the name of the instance attribute to save and load into.
+        persistence. Return a list of the names of the instance level variables
+        to save.
 
         For example, if your block class has an instance level attribute called
-        `_values` and you wish to save it, you could return this dictionary:
-
-            {
-               "values": "_values"
-            }
-
+        `_values` and you wish to save it, you would return this list:
+            ["_values"]
         """
-        return {}
+        return []
 
     def _load(self):
         """ Load the values from persistence """
         self._logger.debug("Loading from persistence")
-        for persist_key, persist_target in self.persisted_values().items():
-            if self.persistence.has_key(persist_key):
-                loaded = self.persistence.load(persist_key)
+        for persisted_var in self.persisted_values():
+            if self.persistence.has_key(persisted_var):
+                loaded = self.persistence.load(persisted_var)
                 self._logger.debug("Loaded value {} for attribute {}".format(
-                    loaded, persist_target))
+                    loaded, persisted_var))
                 # Set the loaded value to the attribute on this class
-                setattr(self, persist_target, loaded)
+                setattr(self, persisted_var, loaded)
 
     def _save(self):
         """ Save the values to persistence """
         self._logger.debug("Saving to persistence")
-        for persist_key, persist_target in self.persisted_values().items():
-            self.persistence.store(persist_key, getattr(self, persist_target))
+        for persisted_var in self.persisted_values():
+            self.persistence.store(persisted_var, getattr(self, persisted_var))
         self.persistence.save()
 
     def configure(self, context):

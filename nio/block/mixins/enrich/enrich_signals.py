@@ -33,7 +33,7 @@ class EnrichSignals(object):
         Returns:
             sig (Signal): A single Signal formatted according to the block
         """
-        if self.enrich().exclude_existing():
+        if self.enrich(incoming_signal).exclude_existing(incoming_signal):
             # This is the easy case, we don't want any of the previous data
             return Signal(signal_data)
 
