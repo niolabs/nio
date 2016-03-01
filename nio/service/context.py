@@ -9,7 +9,6 @@ class ServiceContext(object):
 
     def __init__(self, properties, blocks=None,
                  block_router_type=None, router_settings=None,
-                 service_data=None, block_data=None, all_blocks_data=None,
                  mgmt_signal_handler=None):
         """ Initializes information needed for a Service
 
