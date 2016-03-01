@@ -1,10 +1,9 @@
-from nio.block.terminals import DEFAULT_TERMINAL
-from nio.router.base import InvalidBlockOutput
-from nio.util.support.block_test_case import NIOBlockTestCase
 from nio.block.base import Block
+from nio.block.terminals import DEFAULT_TERMINAL
 from nio.signal.base import Signal
 from nio.signal.status import BlockStatusSignal
 from nio.util.runner import RunnerStatus
+from nio.util.support.block_test_case import NIOBlockTestCase
 
 
 class TestBlockTestCase(NIOBlockTestCase):
@@ -81,9 +80,13 @@ class TestBlockTestCase(NIOBlockTestCase):
         self.assertTrue(self._signals_notified)
 
     def test_invalid_output(self):
-        """ Asserts that an an exception is raised when output is invalid """
+        """ Asserts that no exception is raised when output is invalid.
+
+        This is an intentionally added feature added to the block unit test
+        to prevent test writers from having to explicitly have to add outputs
+        to testing blocks if they want to notify signals to a different output.
+        """
         b1 = Block()
         self.configure_block(b1, {})
-
-        with self.assertRaises(InvalidBlockOutput):
-            b1.notify_signals([Signal()], "invalid_output")
+        b1.notify_signals([Signal()], "invalid_output")
+        self.assert_num_signals_notified(1, b1, "invalid_output")

@@ -3,7 +3,6 @@
 
 """
 from collections import defaultdict
-from nio.router.base import InvalidBlockOutput
 from nio.util.support.test_case import NIOTestCase
 from nio.router.base import BlockRouter
 from nio.block.context import BlockContext
@@ -48,11 +47,6 @@ class TestBlockRouter(BlockRouter):
         """
         if output_id is None:
             output_id = DEFAULT_TERMINAL
-
-        if not block.is_output_valid(output_id):
-            msg = "Invalid output: '{0}' for block: {1}".format(
-                output_id, block.name)
-            raise InvalidBlockOutput(msg)
 
         self._block_signal_counts[block] = \
             self._block_signal_counts.get(block) or defaultdict(int)
