@@ -10,7 +10,7 @@ from nio.modules.web import WebEngine
 
 class NIOWebTestCase(NIOTestCase):
 
-    """ Base Unit Test case class for Web related things.
+    """ Base Unit Test case class for Web related tests.
 
     Allows tests to concisely interact with the WebEngine
     and the requests module. Abstracts away some otherwise inevitable
@@ -24,21 +24,24 @@ class NIOWebTestCase(NIOTestCase):
     Example:
     server = self.add_server("foo", {"socket_port": 8182})
     server.add_handler(SomeHandler(<route>, <target>))
+    self.start_engine()
+
     target = "http://%s:%d/foo" % (self.get_conf_host(), self.get_conf_port())
-    self.start_server()
     self.assertResponseStatus('GET', target, 200)
 
-    This adds a server and a handler, starts the CherryPy engine, and confirms
-    that a get request to the appropriate url returns HTTP Status Code 200.
+    The above example adds a server and a handler, starts the CherryPy engine,
+    and confirms that a GET request to the appropriate url returns HTTP Status
+    Code 200.
 
     """
 
     def get_test_modules(self):
+        """ Adds 'web' and 'security' to default modules """
         return super().get_test_modules() | {'web', 'security'}
 
     def setUp(self):
         super().setUp()
-        # Check Servers were cleaned between tests
+        # Check Servers were removed between tests
         self.assertEqual(0, len(WebEngine.get_servers()))
         self.servers = []
 
@@ -49,54 +52,75 @@ class NIOWebTestCase(NIOTestCase):
         super().tearDown()
 
     def start_engine(self, callback=None):
+        """ Starts the web engine
+
+        Args:
+            callback: optional engine entry point
+
+        """
         WebEngine.start(callback)
 
-    def add_server(self, port, config={}, host="127.0.0.1", auto_start=True):
-        web_server = WebEngine.get(port, host, config)
+    def add_server(self, port, config=None, host="127.0.0.1", auto_start=True):
+        """ Adds and starts a web server (if auto_start is True)
+
+        Args:
+            port (int): web server port
+            config (dict): server configuration parameters
+            host (str): web server host
+            auto_start (bool): if True server is started
+
+        """
+        web_server = WebEngine.get(port, host,
+                                   config if config is not None else {})
         self.servers.append(web_server)
         if auto_start:
             web_server.start()
         return web_server
 
     def remove_server(self, server):
+        """ Removes a web server
+
+        Args:
+            server: web server
+
+        """
         self.servers.remove(server)
         WebEngine.remove_server(server)
 
     def get_conf_host(self):
-        """ Returns default host.
-
-        """
+        """ Returns default host """
         return '127.0.0.1'
 
     def get_conf_port(self):
-        """ Returns default port.
-
-        """
+        """ Returns default port """
         return 8181
 
     def get_response(self, method, url, **kwargs):
-        """ Get a response object for a given resource. """
+        """ Get a response object for a given resource
+
+        Args:
+            method (str): e.g. GET, POST, etc.
+            url (str): Complete target for the request
+            kwargs (dict): Payload for POST/PUT
+
+        """
         return requests.request(method, url, **kwargs)
 
     def assertResponseStatus(self, method, url, status, **kwargs):
-        """ Checks that the specified request returns the specified
-        status.
+        """ Checks that the specified request returns the specified status.
 
         Args:
             method (str): e.g. GET, POST, etc.
             url (str): Complete target for the request
             status (int): The expected status for the response.
-            data (dict): Payload for POST/PUT
-
-        Returns:
-            None
+            kwargs (dict): Payload for POST/PUT
 
         """
         response = self.get_response(method, url, **kwargs)
         self.assertEqual(response.status_code, status)
 
     def assertResponseJSON(self, method, url, key, value=None, data=None):
-        """ Assert that the specified response returns some JSON containing
+        """ Assert that the specified response returns a JSON containing
         the specified key and (optionally) value.
 
         Args:
@@ -105,9 +129,6 @@ class NIOWebTestCase(NIOTestCase):
             key (str): The JSON response is expected to contain this key.
             value (str): If set, asserts that (key, value) is in the response.
             data (str): Payload for POST/PUT requests.
-
-        Returns:
-            None
 
         """
         response = self.get_response(method, url, data=data)
@@ -119,17 +140,14 @@ class NIOWebTestCase(NIOTestCase):
 
     def assertResponseJSONValue(self, method, url, value, data=None,
                                 status=200):
-        """ Assert that the specified response returns some JSON matching a
-        dict passed as param
+        """ Assert that the specified response returns a JSON matching a
+        value passed as param
 
         Args:
             method (str): e.g. GET, POST, etc.
             url (str): Complete target for the request
-            value (str): Http Response
+            value (dict): Expected Http Response
             data (str): Payload for POST/PUT requests.
-
-        Returns:
-            None
 
         """
         response = self.get_response(method, url, data=data)

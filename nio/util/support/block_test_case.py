@@ -13,7 +13,12 @@ from nio.signal.status import StatusSignal
 
 class TestBlockRouter(BlockRouter):
 
+    """ Supports block tests by keeping track of signal counts per block and
+    block status as provided by management signals.
+    """
+
     def __init__(self):
+        """ Creates a new TestBlockRouter instance """
         super().__init__()
         self._test_case = None
         self._block_signal_counts = {}
@@ -21,9 +26,26 @@ class TestBlockRouter(BlockRouter):
         self._block_status = {}
 
     def configure(self, test_case):
+        """ Configures router by saving the test case being supported
+
+        Args:
+            test_case (NIOTestCase): test case to call when notifying signals
+
+        """
         self._test_case = test_case
 
     def notify_signals(self, block, signals, output_id):
+        """ Receives block signals.
+
+         Keeps track of the signal count per block and per output id
+         Forwards notification to test_case's 'signals_notified' method
+
+        Args:
+            block (Block): notifier block
+            signals (list): signals being notified
+            output_id: output identifier
+
+        """
         if output_id is None:
             output_id = DEFAULT_TERMINAL
 
@@ -34,20 +56,37 @@ class TestBlockRouter(BlockRouter):
 
         self._block_signal_counts[block] = \
             self._block_signal_counts.get(block) or defaultdict(int)
-
         self._block_signal_counts[block][output_id] += len(signals)
-        self._test_case.signals_notified(signals, output_id)
+
+        self._test_case.signals_notified(block, signals, output_id)
 
     def notify_management_signal(self, block, signal):
+        """ Receives management signal.
+
+        Keeps track of the signal count per block
+        Forwards notification to test_case's 'management_signal_notified' method
+
+        Args:
+            block (Block): notifier block
+            signal (Signal): signal being notified
+
+        """
         if isinstance(signal, StatusSignal):
             self._block_status[block] = signal.status
+
         self._block_mgmt_signal_counts[block] += 1
-        self._test_case.management_signal_notified(signal)
+        self._test_case.management_signal_notified(block, signal)
 
     def get_signals_from_block(self, block=None, output_id=DEFAULT_TERMINAL):
-        """Returns the number of signals a block has notified.
+        """ Provides signal count per block or for all blocks
 
-        If block is None, return the total number of signals notified.
+        Args:
+            block (Block): block instance
+            output_id: output identifier
+
+        Returns:
+            The number of signals a block has notified.
+            If block is None, return the total number of signals notified
 
         """
         if block is None:
@@ -91,7 +130,14 @@ class NIOBlockTestCase(NIOTestCase):
     def tearDown(self):
         super().tearDown()
 
-    def configure_block(self, block, block_properties, hooks=None):
+    def configure_block(self, block, block_properties):
+        """ Configures block by assigning properties and router to given block
+
+        Args:
+            block (Block): block instance
+            block_properties (dict): properties to assign
+
+        """
         # Blocks should always have a 'name', but we'll let it pass in tests
         block_properties["name"] = block_properties.get("name", "default")
         block.configure(BlockContext(
@@ -100,26 +146,32 @@ class NIOBlockTestCase(NIOTestCase):
             'TestSuite',
             ''))
 
-    def signals_notified(self, signals, output_id):
-        """Method to be overridden by sub-classed tests.
+    def signals_notified(self, block, signals, output_id):
+        """ Receives block signals notification
 
-        This method will get called with the signals that the block notifies.
+        Args:
+            block (Block): notifying block
+            signals (list): signals being notified
+            output_id: output identifier
+
         """
         self.last_notified[output_id].extend(signals)
 
-    def management_signal_notified(self, signal):
-        """Method to be overridden by sub-classed tests.
+    def management_signal_notified(self, block, signal):
+        """ Receives block management signal notification
 
-        This method will get called with the management signals that the
-        block notifies.
+        Args:
+            block (Block): notifying block
+            signal (Signal): signal being notified
         """
         pass
 
     def assert_num_signals_notified(self, num, block=None,
                                     output_id=DEFAULT_TERMINAL):
-        """Assert that the number of signals notified is a certain number.
+        """ Assert that the number of signals notified is a certain number.
 
-        Keyword Args:
+        Args:
+            num (int): number to check against
             block (Block): the block which should have notified. If not
                 included, all blocks will be considered.
             output_id: The output id of the block to consider.
@@ -128,9 +180,10 @@ class NIOBlockTestCase(NIOTestCase):
         self.assertEqual(num, signals)
 
     def assert_num_mgmt_signals_notified(self, num, block=None):
-        """Assert the number of management signals notified is a number.
+        """ Assert the number of management signals notified is a number.
 
-        Keyword Args:
+        Args:
+            num (int): number to check against
             block (Block): the block which should have notified. If not
                 included, all blocks will be considered.
         """
@@ -147,7 +200,7 @@ class NIOBlockTestCase(NIOTestCase):
         Blocks will have a status of '' if they have not had a status
         reported yet.
 
-        Keyword Args:
+        Args:
             block (Block): The block to check the status of
             status (BlockStatus.xxx): The BlockStatus enum value to have
         """
