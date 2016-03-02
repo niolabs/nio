@@ -5,9 +5,9 @@ from .int import IntProperty
 from .float import FloatProperty
 from .list import ListProperty
 from .object import ObjectProperty
+from .property import Property
 from .select import SelectProperty
 from .string import StringProperty
 from .timedelta import TimeDeltaProperty
-from .var import VarProperty
 from .version import VersionProperty
 from .file import FileProperty

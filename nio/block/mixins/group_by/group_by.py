@@ -1,6 +1,6 @@
 from copy import copy
 from collections import defaultdict, Hashable
-from nio.properties.var import VarProperty
+from nio.properties import Property
 from nio.util.ensure_types import ensure_list
 
 
@@ -28,7 +28,7 @@ class GroupBy(object):
 
     """
 
-    group_by = VarProperty(name="Group By", default=None, allow_none=True)
+    group_by = Property(name="Group By", default=None, allow_none=True)
 
     def __init__(self):
         super().__init__()
