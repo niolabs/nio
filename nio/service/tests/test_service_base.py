@@ -8,12 +8,6 @@ from nio.service.context import ServiceContext
 from nio.signal.base import Signal
 from nio.util.support.test_case import NIOTestCaseNoModules
 
-class Block1(Block):
-    pass
-
-class Block2(Block):
-    pass
-
 
 class TestBaseService(NIOTestCaseNoModules):
 
@@ -31,6 +25,12 @@ class TestBaseService(NIOTestCaseNoModules):
     def test_start_stop(self):
         """Makes sure service and blocks update statuses accordingly """
         service = Service()
+
+        class Block1(Block):
+            pass
+
+        class Block2(Block):
+            pass
 
         blocks = [{"type": Block1,
                    "properties": {'name': 'block1'}},
