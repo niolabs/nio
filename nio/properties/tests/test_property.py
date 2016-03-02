@@ -1,13 +1,12 @@
-from nio.properties import PropertyHolder
-from nio.properties import VarProperty
+from nio.properties import PropertyHolder, Property
 from nio.util.support.test_case import NIOTestCaseNoModules
 
 
 class SampleClass(PropertyHolder):
-    var_property = VarProperty(allow_none=True)
+    var_property = Property(allow_none=True)
 
 
-class TestVarProperty(NIOTestCaseNoModules):
+class TestProperty(NIOTestCaseNoModules):
 
     def test_initialization(self):
         """Make sure we can initialize and have the property."""

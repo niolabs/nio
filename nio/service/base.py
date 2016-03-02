@@ -4,7 +4,7 @@ from nio.command.holder import CommandHolder
 from nio import discoverable
 from nio.util.versioning.dependency import DependsOn
 from nio.properties import PropertyHolder, VersionProperty, \
-    BoolProperty, ListProperty, StringProperty, VarProperty, SelectProperty
+    BoolProperty, ListProperty, StringProperty, Property, SelectProperty
 from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.modules.persistence import Persistence
@@ -22,7 +22,7 @@ class BlockExecution(PropertyHolder):
     the sending block, to forward signals to its receivers
     """
     name = StringProperty()
-    receivers = VarProperty()
+    receivers = Property()
 
 
 class BlockMapping(PropertyHolder):
