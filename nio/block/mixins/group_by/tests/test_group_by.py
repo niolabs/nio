@@ -181,3 +181,18 @@ class TestGroupBy(NIOBlockTestCase):
 
         out = block.for_each_group(target_func)
         self.assertEqual(sorted(out), ["bar", "foo"])
+
+    def test_require_process_group_signals_implementation(self):
+        """ Make sure that a block implements process_group_signals """
+
+        class NoProcessGroupBlock(GroupBy, Block):
+            pass
+
+        block = NoProcessGroupBlock()
+        self.configure_block(block, {})
+        block.start()
+        # Block didn't implement process_group_signals but wants to use the
+        # default implementation of process_signals. This is not allowed
+        with self.assertRaises(NotImplementedError):
+            block.process_signals([Signal])
+        block.stop()

@@ -109,7 +109,7 @@ class GroupBy(object):
         a list of signals or an individual signal out of this method to have
         them notified out of the block.
         """
-        pass  # pragma: no cover
+        raise NotImplementedError
 
     def _group_signals(self, signals):
         """ Groups the provided signals according to the configuration
