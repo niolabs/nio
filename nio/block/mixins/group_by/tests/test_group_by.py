@@ -110,26 +110,6 @@ class TestGroupBy(NIOBlockTestCase):
         self.assertEqual(len(block._data["[1]"]), 1)
         self.assertEqual(block._group_count, 3)
 
-    def test_for_each_return(self):
-        """ Test that for each group returns the list of return values """
-        block = GroupingBlock()
-        self.configure_block(block, {
-            "group_by": "{{$foo}}"
-        })
-        signals = [
-            Signal({"foo": "wozzle", "val": 1}),
-            Signal({"foo": "bar", "val": 2}),
-            Signal({"foo": "pity", "val": 3}),
-            Signal({"foo": "bar", "val": 4})
-        ]
-
-        def target_func(signals, group_key):
-            """ Sum all values in signals """
-            return [sum([s.val for s in signals])]
-
-        out = block.for_each_group(target_func, signals)
-        self.assertEqual(sorted(out), [1, 3, 6])
-
     def test_for_each_return_list(self):
         """ Test that for each group returns the extended list of returns """
         block = GroupingBlock()
@@ -150,6 +130,26 @@ class TestGroupBy(NIOBlockTestCase):
         out = block.for_each_group(target_func, signals)
         self.assertEqual(sorted(out), [1, 2, 3, 4])
 
+    def test_for_each_return_non_list(self):
+        """ Test that for each group can return a non-list of return values """
+        block = GroupingBlock()
+        self.configure_block(block, {
+            "group_by": "{{$foo}}"
+        })
+        signals = [
+            Signal({"foo": "wozzle", "val": 1}),
+            Signal({"foo": "bar", "val": 2}),
+            Signal({"foo": "pity", "val": 3}),
+            Signal({"foo": "bar", "val": 4})
+        ]
+
+        def target_func(signals, group_key):
+            """ Return the actual sum this time, not a list """
+            return sum([s.val for s in signals])
+
+        out = block.for_each_group(target_func, signals)
+        self.assertEqual(sorted(out), [1, 3, 6])
+
     def test_for_each_without_signals_return_list(self):
         """ Test that for each w/o signals returns the extended list """
         block = GroupingBlock()
@@ -160,7 +160,24 @@ class TestGroupBy(NIOBlockTestCase):
         block._groups = {"bar", "foo"}
 
         def target_func(group_key):
+            # Return a single item, wrapped in a list
             return [group_key]
+
+        out = block.for_each_group(target_func)
+        self.assertEqual(sorted(out), ["bar", "foo"])
+
+    def test_for_each_without_signals_return_non_list(self):
+        """ Test that for each w/o signals can return individual items """
+        block = GroupingBlock()
+        self.configure_block(block, {
+            "group_by": "{{$foo}}"
+        })
+        # Simulate some fake groups being added
+        block._groups = {"bar", "foo"}
+
+        def target_func(group_key):
+            # Return a single item, no list
+            return group_key
 
         out = block.for_each_group(target_func)
         self.assertEqual(sorted(out), ["bar", "foo"])

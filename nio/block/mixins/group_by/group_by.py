@@ -1,6 +1,7 @@
 from copy import copy
 from collections import defaultdict, Hashable
 from nio.properties.var import VarProperty
+from nio.util.ensure_types import ensure_list
 
 
 class GroupBy(object):
@@ -52,10 +53,10 @@ class GroupBy(object):
             args, kwargs : Additional arguments to be passed to target
 
         Returns:
-            list: A list of the return values of each call to the
+            list(Signal): A list of the return signals of each call to the
                 target function. If the target function returns a list, the
                 output list will be a concatenation of results.
-                So [1,2,3,4,5] not [[1,2],[3],[4,5]]
+                So [Signal, Signal, Signal] not [[Signal, Signal],[Signal]]]
         """
         output = []
         # if there are no signals, assume that the target function has
@@ -67,16 +68,16 @@ class GroupBy(object):
             # function alters the groups list it doesn't affect iteration
             for group in copy(self._groups):
                 result = target(group, *args, **kwargs)
-                if result and isinstance(result, list):
-                    output.extend(result)
+                if result:
+                    output.extend(ensure_list(result))
 
         # otherwise, assume that the target function has two arguments,
         # the signal and its group key
         else:
             for group, group_sigs in self._group_signals(signals).items():
                 result = target(group_sigs, group, *args, **kwargs)
-                if result and isinstance(result, list):
-                    output.extend(result)
+                if result:
+                    output.extend(ensure_list(result))
 
         return output
 
@@ -105,8 +106,8 @@ class GroupBy(object):
 
         If you wish to make use of the default implementation of
         process_signals then override this method. If you wish, you may return
-        a list of signals out of this method to have them notified out of
-        the block.
+        a list of signals or an individual signal out of this method to have
+        them notified out of the block.
         """
         pass  # pragma: no cover
 
