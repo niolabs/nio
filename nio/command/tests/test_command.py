@@ -24,7 +24,7 @@ from nio.util.support.block_test_case import NIOBlockTestCase
 @command('lip_sing', StringParameter("song"), method="real_sing")
 class CommandBlock(Block):
 
-    # TODO: test what happens when a caommand defines a parameter that doesn't
+    # TODO: test what happens when a command defines a parameter that doesn't
     # exist on the method. (example: ftimes)
     def talk(self, phrase, times):
         for i in range(times):

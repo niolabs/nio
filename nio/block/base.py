@@ -52,6 +52,8 @@ class Base(PropertyHolder, CommandHolder, Runner):
 
         self._block_router = None
         self._service_name = None
+        self._default_input = Terminal.get_default_terminal_on_class(
+            self.__class__, TerminalType.input)
         self._default_output = Terminal.get_default_terminal_on_class(
             self.__class__, TerminalType.output)
 
@@ -149,8 +151,6 @@ class Base(PropertyHolder, CommandHolder, Runner):
         if isinstance(signal, BlockStatusSignal):
             # set service block is part of
             signal.service_name = self._service_name
-            # TODO: create unit test for this. the following passes tests:
-            # signal.block_name = self.name
             signal.block_name = self.name()
             self.status.add(signal.status)
         self._block_router.notify_management_signal(self, signal)

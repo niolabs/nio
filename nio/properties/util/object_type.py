@@ -10,7 +10,6 @@ class ObjectType(Type):
         if value is not None:
             if isinstance(value, dict):
                 # Good to go if it's already a dict
-                # TODO: why would this ever happen?
                 return value
             else:
                 # but to_dict if we're serialzing the PropertyHolder

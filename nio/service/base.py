@@ -144,8 +144,6 @@ class Service(PropertyHolder, CommandHolder, Runner):
         self.logger.setLevel(self.log_level())
 
         # configure the Persistence module with the service name
-        # TODO: unit test for the following
-        # Persistence.configure(self.name)
         Persistence.configure(self.name())
 
         # instantiate block router
@@ -163,9 +161,6 @@ class Service(PropertyHolder, CommandHolder, Runner):
             block = self._create_and_configure_block(
                 block_definition['type'],
                 block_context)
-
-            # TODO: write a unit test for this. they also pass with:
-            # self._blocks[block.name] = block
             self._blocks[block.name()] = block
 
         # populate router context and configure block router
