@@ -56,7 +56,7 @@ class ContainerClass(PropertyHolder):
 
     list_property1 = ListProperty(ContainedClass, default=[ContainedClass()])
     list_property2 = ListProperty(ContainedClass)
-    list_property3 = ListProperty(int, default=[1])
+    list_property3 = ListProperty(IntType, default=[1])
     list_property_default_env_variable = \
         ListProperty(ContainedClass, default='[[ENV_VARIABLE]]')
 

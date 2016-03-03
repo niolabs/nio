@@ -9,7 +9,7 @@ from nio.properties import ObjectProperty
 from nio.properties import PropertyHolder
 from nio.properties import StringProperty
 from nio.properties import TimeDeltaProperty
-from nio.types import Type
+from nio.types import Type, IntType
 from nio.util.support.test_case import NIOTestCaseNoModules
 
 
@@ -277,8 +277,8 @@ class TestProperties(NIOTestCaseNoModules):
         self.assertIn('float_property',
                       description['list_property']['template'])
 
-        alist = ListProperty(int)
-        self.assertEqual('int', alist.description['template'])
+        alist = ListProperty(IntType)
+        self.assertEqual('IntType', alist.description['template'])
 
     def test_additional_property_description(self):
         """Additional kwargs can be added to property description."""
