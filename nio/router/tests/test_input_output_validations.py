@@ -18,12 +18,12 @@ class OutputBlock(Block):
         self.name = self.__class__.__name__.lower()
 
 
-@output("first")
+@output("first", default=True)
 class FirstOutputBlock(OutputBlock):
     pass
 
 
-@output("second")
+@output("second", default=True)
 class SecondOutputBlock(Block):
     pass
 
@@ -39,12 +39,12 @@ class InputBlock(Block):
         self.signal_cache.append(signals)
 
 
-@input("first")
+@input("first", default=True)
 class FirstInputBlock(InputBlock):
     pass
 
 
-@input("second")
+@input("second", default=True)
 class SecondInputBlock(InputBlock):
     pass
 
