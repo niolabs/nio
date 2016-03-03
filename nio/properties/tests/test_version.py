@@ -43,6 +43,10 @@ class TestVersion(NIOTestCaseNoModules):
             with self.assertRaises(InvalidVersionFormat):
                 instance.version = invalid_version
 
+        instance = ClassWithVersion()
+        with self.assertRaises(InvalidVersionFormat):
+            instance.from_dict({"version": "1.k.3"})
+
     def test_serialize_matching(self):
         """Version property serialize then deserialize like other props."""
         properties_to_set = {"version": "1.4.1"}

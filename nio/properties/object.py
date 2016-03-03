@@ -37,14 +37,7 @@ class ObjectProperty(BaseProperty):
 
     def _prepare_template(self, **kwargs):
         # add object description
-        try:
-            sub_description = self.kwargs["obj_type"]().get_description()
-        except:
-            try:
-                sub_description = self.kwargs["obj_type"].__name__
-            except AttributeError:
-                sub_description = str(self.kwargs["obj_type"])
-        return {"template": sub_description}
+        return {"template": self.kwargs["obj_type"]().get_description()}
 
     def _prepare_default(self, **kwargs):
         """ default in description should be serializable """
