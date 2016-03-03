@@ -121,9 +121,6 @@ class PropertyHolder(object):
         for (property_name, prop) in class_properties.items():
             if property_name in properties:
                 setattr(self, property_name, properties[property_name])
-                if hasattr(prop, "deprecated") and logger:
-                    # TODO: test and document "deprecated" flag
-                    logger.info("Property: {0} is deprecated")
 
     @classmethod
     def get_description(cls):

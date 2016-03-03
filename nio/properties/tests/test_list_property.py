@@ -130,3 +130,9 @@ class TestListProperties(NIOTestCaseNoModules):
                          [{'string_property': 'str',
                            'int_property': 5,
                            'expression_property' : '{{ $value }}'}])
+
+    def test_list_object_property_with_invalid_obj_type(self):
+        """Raise TypeError when list obj_type is invalid."""
+        with self.assertRaises(TypeError):
+            class Holder(PropertyHolder):
+                type_list = ListProperty(int, default=[1])
