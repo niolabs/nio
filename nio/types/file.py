@@ -67,4 +67,6 @@ class FileType(Type):
             mode = kwargs.get('mode', None)
             return FileHolder(value, mode)
         except:
-            raise TypeError("Unable to cast value to a file: {}".format(value, **kwargs))
+            raise TypeError(
+                "Unable to cast value to a file: {}".format(
+                    value, **kwargs))

@@ -21,7 +21,7 @@ class DefaultMatching(object):
                 return False
 
             # if subscriber does not specified values for given key,
-            # it is assumed that it is interested in everything published by key
+            # assume that it is interested in everything published by key
             if not len(sub_values):
                 continue
 

@@ -182,8 +182,8 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
         """ Asserts that data can be passed from a default output to a block
         that has one input overriding default using old receiver format
 
-        OutputBlock has DEFAULT_TERMINAL since it inherits from Block and has no
-        output definitions
+        OutputBlock has DEFAULT_TERMINAL since it inherits from Block and has
+        no output definitions
 
         FirstInputBlock only input is 'first' yet it receives from 'default'
         """

@@ -31,9 +31,9 @@ class TimeDeltaType(Type):
                     'seconds': td.seconds,
                     'microseconds': td.microseconds}
         elif isinstance(td, dict):
-            default_td =  {'days': 0,
-                           'seconds': 0,
-                           'microseconds': 0}
+            default_td = {'days': 0,
+                          'seconds': 0,
+                          'microseconds': 0}
             default_td.update(td)
             return default_td
         else:

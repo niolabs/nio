@@ -33,7 +33,7 @@ class NIOThread(Thread):
         except BaseException as e:
             # first element in _args tuple contains the method to call
             self.logger.exception("Executing: {0}".
-                                   format(self._args[0].__name__))
+                                  format(self._args[0].__name__))
             self.nio_exception = e
 
     def join(self, timeout=None):

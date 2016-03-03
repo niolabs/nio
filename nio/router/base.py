@@ -73,7 +73,8 @@ class BlockRouter(Runner):
         """ Create a new block router instance """
 
         self.logger = get_nio_logger('BlockRouter')
-        super().__init__(status_change_callback=self._on_status_change_callback)
+        super().__init__(
+            status_change_callback=self._on_status_change_callback)
 
         self._receivers = None
         self._clone_signals = False

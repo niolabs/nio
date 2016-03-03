@@ -39,8 +39,8 @@ class DependsOn(object):
                             self._version))
             else:
                 self.logger.warning('Component: {0} does not contain '
-                                     'version info'.
-                                     format(self._dependency))
+                                    'version info'.
+                                    format(self._dependency))
 
         # add to list of dependencies
         attribute = DependsOn.attribute_format.format(cls.__name__)
@@ -71,7 +71,7 @@ def validate_version(component_version, dependency_version):
 
     return compare_versions(component_version,
                             dependency_version).value >= \
-           VersionCheckResult.older.value
+        VersionCheckResult.older.value
 
 
 def get_class_dependencies(cls):

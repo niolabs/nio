@@ -47,7 +47,7 @@ class SchedulerHelper(object):
                 with self._queue_lock:
                     queue_length = len(self._queue)
                     self.logger.debug('Queue contains: {0} tasks'.
-                                       format(queue_length))
+                                      format(queue_length))
 
                     if queue_length:
                         # have access to first in time to execute event
@@ -106,7 +106,7 @@ class SchedulerHelper(object):
                                 self._events.pop(event_id)
                         else:
                             self.logger.debug("Event: {0} was cancelled".
-                                               format(event_id))
+                                              format(event_id))
 
             except Exception:
                 # log any exception in this big try/except
@@ -190,5 +190,5 @@ class SchedulerHelper(object):
                 return True
             except Exception:
                 self.logger.debug('Failure to remove event {0} from queue'
-                                   ' while cancelling a job'.format(event))
+                                  ' while cancelling a job'.format(event))
         return False

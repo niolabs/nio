@@ -51,7 +51,8 @@ class Persistence(object):
         """ Save the values to persistence """
         self.logger.debug("Saving to persistence")
         for persisted_var in self.persisted_values():
-            self._persistence.store(persisted_var, getattr(self, persisted_var))
+            self._persistence.store(
+                persisted_var, getattr(self, persisted_var))
         self._persistence.save()
 
     def configure(self, context):

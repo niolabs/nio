@@ -30,6 +30,7 @@ class Target(object):
 
         return "verify this"
 
+
 class TestSpawn(NIOTestCaseNoModules):
 
     def setUp(self):

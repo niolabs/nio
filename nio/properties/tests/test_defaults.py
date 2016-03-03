@@ -137,7 +137,7 @@ class TestDefaults(NIOTestCaseNoModules):
         self.assertIsInstance(defaults['object_property'], ContainedClass)
         self.assertIsInstance(serializable['object_property'], dict)
         self.assertDictEqual(serializable["object_property"],
-                         {'string_property': 'str', 'int_property': 5})
+                             {'string_property': 'str', 'int_property': 5})
         # Test list property of objects
         self.assertIsInstance(defaults['list_property1'], list)
         self.assertIsInstance(defaults['list_property1'][0], ContainedClass)
@@ -145,7 +145,7 @@ class TestDefaults(NIOTestCaseNoModules):
         self.assertIsInstance(serializable['list_property1'][0], dict)
         self.assertEqual(len(serializable['list_property1']), 1)
         self.assertDictEqual(serializable["list_property1"][0],
-                         {'string_property': 'str', 'int_property': 5})
+                             {'string_property': 'str', 'int_property': 5})
 
     def test_block_defaults(self):
         """Testing that block defaults are retrieved and are serializable."""

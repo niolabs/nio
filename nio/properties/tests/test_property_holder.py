@@ -12,8 +12,8 @@ class MockType(Type):
 
 class MyHolder(PropertyHolder):
 
-
     class MockBaseProperty(BaseProperty):
+
         def __init__(self):
             super().__init__(MockType)
             self.serialize = MagicMock(return_value='serialized value')
@@ -26,6 +26,7 @@ class MyHolder(PropertyHolder):
 class InvalidPropertyHolder(PropertyHolder):
 
     class MockBaseProperty(BaseProperty):
+
         def __init__(self):
             super().__init__(Type)
             self.serialize = MagicMock(return_value='serialized value')

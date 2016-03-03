@@ -58,7 +58,7 @@ class TestBlockRouter(BlockRouter):
         """ Receives management signal.
 
         Keeps track of the signal count per block
-        Forwards notification to test_case's 'management_signal_notified' method
+        Forwards signal to test_case's 'management_signal_notified' method
 
         Args:
             block (Block): notifier block

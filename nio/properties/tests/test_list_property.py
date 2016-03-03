@@ -20,6 +20,7 @@ class ContainerClass(PropertyHolder):
 
 
 class TestListProperties(NIOTestCaseNoModules):
+
     def setUp(self):
         super().setUp()
         # Set up a native object list
@@ -116,7 +117,6 @@ class TestListProperties(NIOTestCaseNoModules):
     def test_expression_with_signal(self):
         """Test signal expressions for list property."""
         container = ContainerClass()
-        contained = ContainedClass()
         self.assertIsNotNone(container.holder_list)
         self.assertEqual(container.holder_list()[0].
                          expression_property(Signal({'value': 'signal'})),
@@ -129,4 +129,4 @@ class TestListProperties(NIOTestCaseNoModules):
         self.assertEqual(defaults["holder_list"],
                          [{'string_property': 'str',
                            'int_property': 5,
-                           'expression_property' : '{{ $value }}'}])
+                           'expression_property': '{{ $value }}'}])
