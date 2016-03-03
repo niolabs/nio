@@ -1,4 +1,5 @@
 from nio.properties import TimeDeltaProperty, BoolProperty
+from nio.modules.persistence import Persistence as PersistenceModule
 from nio.modules.scheduler import Job
 
 
@@ -14,11 +15,12 @@ class Persistence(object):
 
     backup_interval = TimeDeltaProperty(
         visible=False, title='Backup Interval', default={"seconds": 60 * 60})
-    use_persistence = BoolProperty(
+    load_from_persistence = BoolProperty(
         title='Load from Persistence?', default=True)
 
     def __init__(self):
         super().__init__()
+        self._persistence = None
         self._backup_job = None
 
     def persisted_values(self):
@@ -38,8 +40,8 @@ class Persistence(object):
         """ Load the values from persistence """
         self._logger.debug("Loading from persistence")
         for persisted_var in self.persisted_values():
-            if self.persistence.has_key(persisted_var):
-                loaded = self.persistence.load(persisted_var)
+            if self._persistence.has_key(persisted_var):
+                loaded = self._persistence.load(persisted_var)
                 self._logger.debug("Loaded value {} for attribute {}".format(
                     loaded, persisted_var))
                 # Set the loaded value to the attribute on this class
@@ -49,12 +51,14 @@ class Persistence(object):
         """ Save the values to persistence """
         self._logger.debug("Saving to persistence")
         for persisted_var in self.persisted_values():
-            self.persistence.store(persisted_var, getattr(self, persisted_var))
-        self.persistence.save()
+            self._persistence.store(persisted_var, getattr(self, persisted_var))
+        self._persistence.save()
 
     def configure(self, context):
         super().configure(context)
-        if self.use_persistence():
+        # Create a persistence object using the block's name
+        self._persistence = PersistenceModule(self.name())
+        if self.load_from_persistence():
             self._load()
 
     def start(self):

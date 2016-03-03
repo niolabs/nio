@@ -27,28 +27,28 @@ class TestPersistence(NIOBlockTestCase):
         """ Tests that the mixin saves the right values """
         block = PersistingBlock()
         self.configure_block(block, {})
-        block.persistence.save = MagicMock()
+        block._persistence.save = MagicMock()
         block.start()
         # Stop the block to initiate the save
         block.stop()
 
         # Make sure we called the save function
-        block.persistence.save.assert_called_once_with()
+        block._persistence.save.assert_called_once_with()
         # Make sure the right data was saved
-        self.assertTrue(block.persistence.has_key('_to_be_saved'))
-        self.assertTrue(block.persistence.has_key('_to_be_saved_again'))
-        self.assertEqual(len(block.persistence._values), 2)
-        self.assertEqual(block.persistence.load('_to_be_saved'), 'value')
-        self.assertEqual(block.persistence.load('_to_be_saved_again'),
+        self.assertTrue(block._persistence.has_key('_to_be_saved'))
+        self.assertTrue(block._persistence.has_key('_to_be_saved_again'))
+        self.assertEqual(len(block._persistence._values), 2)
+        self.assertEqual(block._persistence.load('_to_be_saved'), 'value')
+        self.assertEqual(block._persistence.load('_to_be_saved_again'),
                          'another value')
 
     def test_loads_properly(self):
         """ Tests that the mixin loads into the right values """
         block = PersistingBlock()
         self.configure_block(block, {
-            'use_persistence': True
+            'load_from_persistence': True
         })
-        block.persistence._values = {
+        block._persistence._values = {
             "_to_be_saved": "saved value 1",
             "_to_be_saved_again": "saved value 2"
         }
@@ -65,7 +65,7 @@ class TestPersistence(NIOBlockTestCase):
         block = PersistingBlock()
         block._load = MagicMock()
         self.configure_block(block, {
-            'use_persistence': False
+            'load_from_persistence': False
         })
         # Make sure load wasn't called
         self.assertFalse(block._load.called)
@@ -79,7 +79,7 @@ class TestPersistence(NIOBlockTestCase):
         self.configure_block(block, {
             'backup_interval': {'seconds': 1}
         })
-        block.persistence.save = MagicMock()
+        block._persistence.save = MagicMock()
         with patch('nio.block.mixins.persistence.persistence.Job') as job_mock:
             block.start()
             # Make sure our repeatable job was created properly
@@ -92,13 +92,13 @@ class TestPersistence(NIOBlockTestCase):
         # Stop the block to initiate one more save
         block.stop()
         # We should have had 3 saves, 2 during exeuction and 1 on the stop
-        self.assertEqual(block.persistence.save.call_count, 3)
+        self.assertEqual(block._persistence.save.call_count, 3)
         # Make sure the right data was saved
-        self.assertTrue(block.persistence.has_key('_to_be_saved'))
-        self.assertTrue(block.persistence.has_key('_to_be_saved_again'))
-        self.assertEqual(len(block.persistence._values), 2)
-        self.assertEqual(block.persistence.load('_to_be_saved'), 'new_value')
-        self.assertEqual(block.persistence.load('_to_be_saved_again'),
+        self.assertTrue(block._persistence.has_key('_to_be_saved'))
+        self.assertTrue(block._persistence.has_key('_to_be_saved_again'))
+        self.assertEqual(len(block._persistence._values), 2)
+        self.assertEqual(block._persistence.load('_to_be_saved'), 'new_value')
+        self.assertEqual(block._persistence.load('_to_be_saved_again'),
                          'another value')
 
     def test_no_backup(self):

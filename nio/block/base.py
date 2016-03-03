@@ -13,7 +13,6 @@ from nio.properties import PropertyHolder, StringProperty, \
     VersionProperty, SelectProperty
 from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
-from nio.modules.persistence import Persistence
 from nio.util.runner import Runner
 from nio.signal.status import BlockStatusSignal
 from nio.signal.base import Signal
@@ -52,7 +51,6 @@ class Base(PropertyHolder, CommandHolder, Runner):
         self.type = self.__class__.__name__
 
         self._block_router = None
-        self.persistence = None
         self._service_name = None
         self._default_output = Terminal.get_default_terminal_on_class(
             self.__class__, TerminalType.output)
@@ -87,10 +85,6 @@ class Base(PropertyHolder, CommandHolder, Runner):
 
         self._logger = get_nio_logger(self.name())
         self._logger.setLevel(self.log_level())
-
-        # TODO: create unit test for this. the following passes tests:
-        # self.persistence = Persistence(self.name)
-        self.persistence = Persistence(self.name())
         self._service_name = context.service_name
 
     def start(self):
