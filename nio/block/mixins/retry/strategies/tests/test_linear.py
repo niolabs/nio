@@ -14,6 +14,10 @@ class LinearBackoffBlock(Retry, Block):
         self._multiplier = multiplier
 
     def configure(self, context):
+        # Intentionally not calling super().configure here since we don't
+        # plan on actually configuring with a BlockContext. This is just
+        # to show that we should be calling use_backoff_strategy from the
+        # block's configure method
         self.use_backoff_strategy(
             LinearBackoff, max_retries=self._max_retries,
             multiplier=self._multiplier)

@@ -18,10 +18,10 @@ class Retry(object):
         1. In your block's configure method, define your backoff strategy using
         the use_backoff_strategy method.
         2. Call execute_with_retry with the function that you want to execute.
-        If the target function fails, it will retry until it either succeeds or
-        the backoff strategy has decided it should stop retrying. If that
-        occurs, this function will raise the exception that the target function
-        raised originally.
+        If the target function raises an exception, it will retry until it
+        either succeeds or the backoff strategy has decided it should stop
+        retrying. If that occurs, execute_with_retry will raise the exception
+        that the target function raised originally.
         3. Optionally, override before_retry to write custom code that will be
         performed before attempting a retry.
     """
@@ -33,7 +33,7 @@ class Retry(object):
         self._backoff_strategy = BackoffStrategy(logger=self._logger)
 
     def execute_with_retry(self, execute_method, *args, **kwargs):
-        """ Execute a method and retry if it fails
+        """ Execute a method and retry if it raises an exception
 
         Args:
             execute_method (callable): A function to attempt to execute. The
@@ -47,6 +47,10 @@ class Retry(object):
             Exception: The exception that execute_method raised when the
                 backoff strategy decided to stop retrying.
         """
+        # Save a stringified version of the method's name
+        # If it doesn't define __name__, use however we should stringify
+        execute_method_name = getattr(
+            execute_method, '__name__', str(execute_method))
         while True:
             try:
                 result = execute_method(*args, **kwargs)
@@ -57,13 +61,15 @@ class Retry(object):
             except Exception as exc:
                 self._logger.warning(
                     "Retryable execution on method {} failed".format(
-                        getattr(execute_method, '__name__', execute_method)),
-                    exc_info=True)
+                        execute_method_name, exc_info=True))
                 self._backoff_strategy.request_failed(exc)
                 should_retry = self._backoff_strategy.next_retry()
                 if not should_retry:
                     # Backoff strategy has said we're done retrying,
                     # so re-raise the exception
+                    self._logger.exception(
+                        "Out of retries for method {}.".format(
+                            execute_method_name))
                     raise
                 else:
                     # Backoff strategy has done its waiting and has instructed
