@@ -15,7 +15,7 @@ class SelectProperty(BaseProperty):
         """ Description needs to be json serializable """
         kwargs.update(self._prepare_options(kwargs['enum']))
         kwargs.update(self._prepare_default(**kwargs))
-        kwargs['enum'] = str(kwargs['enum'])
+        kwargs['enum'] = kwargs['enum'].__name__
         return kwargs
 
     def _prepare_options(self, enum):
