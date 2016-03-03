@@ -5,8 +5,7 @@ from nio.util.support.test_case import NIOTestCaseNoModules
 class TestWebHandler(NIOTestCaseNoModules):
 
     def test_web_handler(self):
-        # asserts web handlers bare functionality
-
+        """ Asserts web handlers bare functionality """
         handler = WebHandler('/')
         with self.assertRaises(NotImplementedError):
             handler.handle(None, None)
@@ -27,4 +26,3 @@ class TestWebHandler(NIOTestCaseNoModules):
             handler.on_post(None, None)
         with self.assertRaises(NotImplementedError):
             handler.on_put(None, None)
-

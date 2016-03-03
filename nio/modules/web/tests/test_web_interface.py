@@ -5,8 +5,7 @@ from nio.util.support.test_case import NIOTestCaseNoModules
 class TestWebInterface(NIOTestCaseNoModules):
 
     def test_web_interface(self):
-        # asserts web interface bare functionality
-
+        """ Asserts web interface bare functionality """
         with self.assertRaises(NotImplementedError):
             WebEngine.configure({})
 

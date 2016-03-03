@@ -5,8 +5,7 @@ from nio.util.support.test_case import NIOTestCaseNoModules
 class TestWebServer(NIOTestCaseNoModules):
 
     def test_web_server(self):
-        # asserts web server bare functionality
-
+        """ Asserts web server bare functionality """
         web_server = WebServer()
 
         self.assertIsNone(web_server.host)
