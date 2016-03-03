@@ -32,7 +32,7 @@ class ObjectProperty(BaseProperty):
         """ Description needs to be json serializable """
         kwargs.update(self._prepare_default(**kwargs))
         kwargs.update(self._prepare_template(**kwargs))
-        kwargs['obj_type'] = str(kwargs['obj_type'])
+        kwargs['obj_type'] = kwargs['obj_type'].__name__
         return kwargs
 
     def _prepare_template(self, **kwargs):
@@ -42,7 +42,7 @@ class ObjectProperty(BaseProperty):
         except:
             try:
                 sub_description = self.kwargs["obj_type"].__name__
-            except:
+            except AttributeError:
                 sub_description = str(self.kwargs["obj_type"])
         return {"template": sub_description}
 
