@@ -1,5 +1,6 @@
 import re
 
+from nio.properties.exceptions import InvalidEvaluationCall
 from nio.properties.util.parser import Parser
 from nio.signal.base import Signal
 
@@ -8,10 +9,6 @@ class TemporarySignal(Signal):
 
     def __getattribute__(self, name):
         raise InvalidEvaluationCall
-
-
-class InvalidEvaluationCall(Exception):
-    pass
 
 
 class Evaluator:

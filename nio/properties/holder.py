@@ -1,27 +1,9 @@
+from nio.properties.exceptions import NoClassVersion, NoInstanceVersion, \
+    OlderThanMinVersion
 from nio.util.versioning.check import compare_versions, \
     VersionCheckResult, InvalidVersionFormat, is_version_valid, \
     get_major_version
 from nio.properties.base import BaseProperty
-from nio.properties.util.property_value import PropertyValue
-
-
-class NoClassVersion(Exception):
-    pass
-
-
-class NoInstanceVersion(Exception):
-
-    def __init__(self, class_version):
-        super().__init__()
-        self.class_version = class_version
-
-
-class OlderThanMinVersion(Exception):
-
-    def __init__(self, instance_version, min_version):
-        super().__init__()
-        self.instance_version = instance_version
-        self.min_version = min_version
 
 
 class PropertyHolder(object):
