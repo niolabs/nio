@@ -53,6 +53,10 @@ class TestPropertyHolder(NIOTestCaseNoModules):
     def test_from_dict(self):
         """PropertyHolder.from_dict sets each property."""
         property_holder = MyHolder()
+
+        with self.assertRaises(TypeError):
+            property_holder.from_dict(None)
+
         with patch('nio.properties.tests.test_property_holder.MyHolder.'
                    'MockBaseProperty.__set__') as mocked_property:
             property_holder.from_dict({"property": "new value"})
