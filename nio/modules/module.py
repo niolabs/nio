@@ -51,8 +51,7 @@ class Module(object):
         return maxsize
 
     def prepare_core_context(self):
-        """ Override this method to set the ModuleContext to use
-        to initialize the module in the core process
+        """ Prepare a ModuleContext in the core process
 
         Returns:
             ModuleContext: core module context
@@ -60,11 +59,11 @@ class Module(object):
         return ModuleContext()
 
     def prepare_service_context(self, service_context=None):
-        """ Override this method to set the ModuleContext to use
-        to initialize the module in the service process
+        """ Prepare a ModuleContext for the service process
 
-        Takes a service context so it can know information about the service
-        This method will be called in the core process
+        Takes a service context so it can know information about the service.
+        This method will be called in the core process, but the context
+        returned will be applied to the module in the service process.
 
         Args:
             service_context (ServiceContext): Service context (same context

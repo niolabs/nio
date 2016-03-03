@@ -1,3 +1,4 @@
+import json
 from nio.types.base import Type
 
 
@@ -14,7 +15,6 @@ class DictType(Type):
         try:
             # if a string is passed, attempt to convert it to a dict
             if isinstance(value, str):
-                import json
                 return json.loads(value)
             else:
                 return dict(value)

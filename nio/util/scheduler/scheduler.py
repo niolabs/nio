@@ -5,10 +5,7 @@ from nio.util.scheduler.scheduler_thread import SchedulerThread
 
 class Scheduler(object):
 
-    """Singleton class to maintain and interact with an underlying
-    Scheduler object, shared by the various blocks/components in a
-    given process.
-    """
+    """Singleton class to maintain and interact with an underlying Scheduler"""
 
     _scheduler_thread = None
     logger = None
@@ -44,7 +41,7 @@ class Scheduler(object):
             kwargs: Keyword arguments to be passed to 'target'.
 
         Returns:
-            job (APScheduler Job): The APScheduler-internal Job object.
+            job (Job): The Job object.
 
         """
         if cls._scheduler_thread is None:

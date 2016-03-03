@@ -1,5 +1,4 @@
 from enum import Enum
-
 from nio.types.base import Type
 
 
@@ -28,6 +27,5 @@ class SelectType(Type):
             if name == value or member.value == value:
                 return member
 
-        raise TypeError(
-            "{0} does not match enum type: {1}".format(
-                value, kwargs.get('enum')))
+        raise TypeError("{} does not match enum type: {}".format(
+            value, kwargs.get('enum')))

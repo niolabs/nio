@@ -1,4 +1,5 @@
 from nio.router.context import RouterContext
+from nio.block.context import BlockContext
 from nio.command import command
 from nio.command.holder import CommandHolder
 from nio import discoverable
@@ -149,8 +150,8 @@ class Service(PropertyHolder, CommandHolder, Runner):
 
         # instantiate block router
         self.logger.debug("Instantiating block router: {0}.{1}".
-                           format(context.block_router_type.__module__,
-                                  context.block_router_type.__name__))
+                          format(context.block_router_type.__module__,
+                                 context.block_router_type.__name__))
         self._block_router = context.block_router_type()
 
         # create and configure blocks
@@ -180,9 +181,6 @@ class Service(PropertyHolder, CommandHolder, Runner):
         """ Populates block context, which will serve as a basis
          for a future block configuration
         """
-
-        from nio.block.context import BlockContext
-
         return BlockContext(
             self._block_router,
             block_properties,
