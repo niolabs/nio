@@ -26,7 +26,7 @@ class RetryBlock(Retry, Block):
                     signal=signal))
             except:
                 # Execution failed even with retry
-                self._logger.exception("Aborting retries")
+                self.logger.exception("Aborting retries")
         self.notify_signals(output)
         self._num_processes_count += 1
         if self._num_processes_count >= self._num_processes_total:

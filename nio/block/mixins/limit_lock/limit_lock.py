@@ -50,7 +50,7 @@ class LimitLock(object):
                 that can wait for the lock.
         """
         if self._number_of_locks >= max_locks:
-            self._logger.warning(
+            self.logger.warning(
                 "Currently {} locks waiting to be acquired. This is more than "
                 "the max. Aborting call to method in this thread.".format(
                     self._number_of_locks))

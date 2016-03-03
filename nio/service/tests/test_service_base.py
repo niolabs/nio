@@ -20,7 +20,7 @@ class TestBaseService(NIOTestCaseNoModules):
         ))
         # Make sure the name property got set properly
         self.assertEqual(service.name(), "ServiceName")
-        self.assertIsNotNone(service.get_logger())
+        self.assertIsNotNone(service.logger)
 
     def test_start_stop(self):
         """Makes sure service and blocks update statuses accordingly """

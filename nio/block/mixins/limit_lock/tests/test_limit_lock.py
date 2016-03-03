@@ -102,7 +102,7 @@ class TestLock(NIOBlockTestCase):
         def execute_method():
             raise Exception
         block = LimitLock()
-        block._logger = MagicMock()
+        block.logger = MagicMock()
         self.assertRaises(Exception,
                           block.execute_with_lock, execute_method, 1)
         # The lock needs to be released after the exception
@@ -113,7 +113,7 @@ class TestLock(NIOBlockTestCase):
         def execute_method():
             pass
         block = LimitLock()
-        block._logger = MagicMock()
+        block.logger = MagicMock()
         # max locks is 0 so it will always be full
         self.assertRaises(LockQueueFull,
                           block.execute_with_lock, execute_method, 0)
@@ -125,7 +125,7 @@ class TestLock(NIOBlockTestCase):
             self.assertEqual(arg1, 1)
             self.assertEqual(arg2, 2)
         block = LimitLock()
-        block._logger = MagicMock()
+        block.logger = MagicMock()
         block.execute_with_lock(execute_method, 1, 1, 2)
         self.assertEqual(block._number_of_locks, 0)
 
@@ -135,7 +135,7 @@ class TestLock(NIOBlockTestCase):
             self.assertEqual(arg1, 1)
             self.assertEqual(arg2, 2)
         block = LimitLock()
-        block._logger = MagicMock()
+        block.logger = MagicMock()
         block.execute_with_lock(execute_method, 1, arg1=1, arg2=2)
         self.assertEqual(block._number_of_locks, 0)
 
@@ -147,6 +147,6 @@ class TestLock(NIOBlockTestCase):
             self.assertEqual(arg3, -3)
             self.assertEqual(arg4, 4)
         block = LimitLock()
-        block._logger = MagicMock()
+        block.logger = MagicMock()
         block.execute_with_lock(execute_method, 1, 1, 2, arg4=4)
         self.assertEqual(block._number_of_locks, 0)

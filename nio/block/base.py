@@ -43,7 +43,7 @@ class Base(PropertyHolder, CommandHolder, Runner):
 
         # We will replace the block's logger with its own name once we learn
         # what that name is during configure()
-        self._logger = get_nio_logger('default')
+        self.logger = get_nio_logger('default')
 
         super().__init__(status_change_callback=status_change_callback)
 
@@ -79,12 +79,12 @@ class Base(PropertyHolder, CommandHolder, Runner):
         self._block_router = context.block_router
 
         # load the configuration as class variables
-        self.from_dict(context.properties, self._logger)
+        self.from_dict(context.properties, self.logger)
         # verify that block properties are valid
         self.validate()
 
-        self._logger = get_nio_logger(self.name())
-        self._logger.setLevel(self.log_level())
+        self.logger = get_nio_logger(self.name())
+        self.logger.setLevel(self.log_level())
         self._service_name = context.service_name
 
     def start(self):
@@ -220,11 +220,6 @@ class Base(PropertyHolder, CommandHolder, Runner):
             bool: True if the output ID exists on this block
         """
         return output_id in [o.id for o in self.__class__.outputs()]
-
-    def get_logger(self):
-        """ Provides block logger
-        """
-        return self._logger
 
 
 @input(DEFAULT_TERMINAL, default=True, label="default")

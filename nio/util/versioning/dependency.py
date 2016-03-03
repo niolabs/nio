@@ -19,7 +19,7 @@ class DependsOn(object):
 
         """
 
-        self._logger = get_nio_logger("Dependency")
+        self.logger = get_nio_logger("Dependency")
         self._dependency = dependency
         self._version = version
 
@@ -32,13 +32,13 @@ class DependsOn(object):
             if hasattr(m, "__version__"):
                 component_version = m.__version__
                 if not validate_version(component_version, self._version):
-                    self._logger.warning(
+                    self.logger.warning(
                         "'{}' dependency: '{}' not satisfied, version: '{}' "
                         "is installed and '{}' was requested".format(
                             cls.__name__, self._dependency, component_version,
                             self._version))
             else:
-                self._logger.warning('Component: {0} does not contain '
+                self.logger.warning('Component: {0} does not contain '
                                      'version info'.
                                      format(self._dependency))
 

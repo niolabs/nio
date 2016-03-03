@@ -127,7 +127,7 @@ class GroupBy(object):
 
             # Need to make sure that the key is a hashable object
             if not isinstance(key, Hashable):
-                self._logger.warning(
+                self.logger.warning(
                     "{} is not hashable cannot be grouped by. Using str "
                     "representation instead".format(key))
                 key = str(key)

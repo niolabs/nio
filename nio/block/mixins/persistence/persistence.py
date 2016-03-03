@@ -38,18 +38,18 @@ class Persistence(object):
 
     def _load(self):
         """ Load the values from persistence """
-        self._logger.debug("Loading from persistence")
+        self.logger.debug("Loading from persistence")
         for persisted_var in self.persisted_values():
             if self._persistence.has_key(persisted_var):
                 loaded = self._persistence.load(persisted_var)
-                self._logger.debug("Loaded value {} for attribute {}".format(
+                self.logger.debug("Loaded value {} for attribute {}".format(
                     loaded, persisted_var))
                 # Set the loaded value to the attribute on this class
                 setattr(self, persisted_var, loaded)
 
     def _save(self):
         """ Save the values to persistence """
-        self._logger.debug("Saving to persistence")
+        self.logger.debug("Saving to persistence")
         for persisted_var in self.persisted_values():
             self._persistence.store(persisted_var, getattr(self, persisted_var))
         self._persistence.save()

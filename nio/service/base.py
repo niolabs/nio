@@ -78,7 +78,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
         constructor.
         """
 
-        self._logger = get_nio_logger('service')
+        self.logger = get_nio_logger('service')
         super().__init__(status_change_callback=status_change_callback)
 
         # store service type so that it gets serialized
@@ -133,14 +133,14 @@ class Service(PropertyHolder, CommandHolder, Runner):
                 block included in the service execution.
         """
         # populate service properties
-        self.from_dict(context.properties, self._logger)
+        self.from_dict(context.properties, self.logger)
         # verify that service properties are valid
         self.validate()
 
         # reset logger after modules initialization
         # and properties setting
-        self._logger = get_nio_logger("service")
-        self._logger.setLevel(self.log_level())
+        self.logger = get_nio_logger("service")
+        self.logger.setLevel(self.log_level())
 
         # configure the Persistence module with the service name
         # TODO: unit test for the following
@@ -148,7 +148,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
         Persistence.configure(self.name())
 
         # instantiate block router
-        self._logger.debug("Instantiating block router: {0}.{1}".
+        self.logger.debug("Instantiating block router: {0}.{1}".
                            format(context.block_router_type.__module__,
                                   context.block_router_type.__name__))
         self._block_router = context.block_router_type()
@@ -174,11 +174,6 @@ class Service(PropertyHolder, CommandHolder, Runner):
                                        context.mgmt_signal_handler)
         self._block_router.do_configure(router_context)
         self.mgmt_signal_handler = context.mgmt_signal_handler
-
-    def get_logger(self):
-        """ Provides service logger
-        """
-        return self._logger
 
     def _create_block_context(self, block_type, block_properties,
                               service_context):

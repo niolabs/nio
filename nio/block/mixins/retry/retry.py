@@ -44,7 +44,7 @@ class Retry(object):
             try:
                 return execute_method(**kwargs)
             except Exception as e:
-                self._logger.warning(
+                self.logger.warning(
                     "On attempt {}, failed to execute method {}".format(
                         retry_count+1, execute_method.__name__),
                     exc_info=True)
@@ -68,11 +68,11 @@ class Retry(object):
             bool: True if a retry should be attempted.
 
         """
-        self._logger.debug("Determining if a retry should be attempted")
+        self.logger.debug("Determining if a retry should be attempted")
         if retry_count >= self.num_retries:
             return False
         else:
-            self._logger.debug(
+            self.logger.debug(
                 "Waiting {} seconds before retrying execute method".format(
                     retry_count))
             sleep(retry_count)

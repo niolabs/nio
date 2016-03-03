@@ -31,6 +31,8 @@ class Runner(object):
         self._status = FlagsEnum(RunnerStatus,
                                  status_change_callback=status_change_callback)
         self.status.set(RunnerStatus.created)
+        # This can be overridden in subclasses if desired
+        self.logger = get_nio_logger(self.__class__.__name__)
 
     def configure(self, context):
         """Overrideable method to be called when the runnable is configured
@@ -47,10 +49,6 @@ class Runner(object):
     def stop(self):
         """Overrideable method to be called when the runnable stops"""
         pass  # pragma: no cover
-
-    @property
-    def logger(self):
-        return self.get_logger()
 
     @property
     def status(self):
@@ -118,6 +116,3 @@ class Runner(object):
         except Exception:
             self.logger.exception("Failed to stop")
             self.status.add(RunnerStatus.error)
-
-    def get_logger(self):
-        return get_nio_logger(self.__class__.__name__)

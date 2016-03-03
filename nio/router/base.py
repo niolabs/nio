@@ -72,7 +72,7 @@ class BlockRouter(Runner):
     def __init__(self):
         """ Create a new block router instance """
 
-        self._logger = get_nio_logger('BlockRouter')
+        self.logger = get_nio_logger('BlockRouter')
         super().__init__(status_change_callback=self._on_status_change_callback)
 
         self._receivers = None
@@ -95,7 +95,7 @@ class BlockRouter(Runner):
         self._clone_signals = \
             context.settings.get("clone_signals", False)
         if self._clone_signals:
-            self._logger.info('Set to clone signals for multiple receivers')
+            self.logger.info('Set to clone signals for multiple receivers')
         self._check_signal_type = \
             context.settings.get("check_signal_type", True)
 
@@ -124,7 +124,7 @@ class BlockRouter(Runner):
                     if not sender_block.is_output_valid(output_id):
                         msg = "Invalid output: {0} for block: {1}".format(
                             output_id, sender_block_name)
-                        self._logger.error(msg)
+                        self.logger.error(msg)
                         raise InvalidBlockOutput(msg)
 
                     parsed_receivers = \
@@ -184,7 +184,7 @@ class BlockRouter(Runner):
                 input_id = receiver["input"]
                 receiver_name = receiver["name"]
             except KeyError:
-                self._logger.exception("Invalid format while processing block "
+                self.logger.exception("Invalid format while processing block "
                                        "receiver: {0}".format(receiver))
                 raise
         else:
@@ -201,7 +201,7 @@ class BlockRouter(Runner):
         try:
             receiver_block = blocks[receiver_name]
         except KeyError as e:
-            self._logger.exception(
+            self.logger.exception(
                 "Missing block for receiver: {0}".format(receiver_name))
             raise MissingBlock(e)
 
@@ -217,7 +217,7 @@ class BlockRouter(Runner):
         return receiver_data
 
     def _on_status_change_callback(self, old_status, new_status):
-        self._logger.info("Block Router status changed from: {0} to: {1}".
+        self.logger.info("Block Router status changed from: {0} to: {1}".
                           format(old_status.name, new_status.name))
 
     def notify_management_signal(self, block, signal):
@@ -288,13 +288,13 @@ class BlockRouter(Runner):
 
             for receiver_data in self._receivers[block.name()]:
                 if receiver_data.block.status.is_set(RunnerStatus.error):
-                    self._logger.debug(
+                    self.logger.debug(
                         "Block '{0}' has status 'error'. Not delivering "
                         "signals from '{1}'...".format(
                             receiver_data.block.name, block.name))
                     continue
                 elif receiver_data.block.status.is_set(RunnerStatus.warning):
-                    self._logger.debug(
+                    self.logger.debug(
                         "Block '{0}' has status 'warning'. Delivering signals"
                         " anyway from '{1}...".format(receiver_data.block.name,
                                                       block.name))
@@ -308,7 +308,7 @@ class BlockRouter(Runner):
                     except:
                         # if deepcopy fails, send original signals
                         signals_to_send = signals
-                        self._logger.info("'deepcopy' operation failed while "
+                        self.logger.info("'deepcopy' operation failed while "
                                           "sending signals originating from "
                                           "block: {0}".format(block.name),
                                           exc_info=True)
@@ -316,15 +316,15 @@ class BlockRouter(Runner):
                     self.deliver_signals(receiver_data, signals_to_send)
 
         elif self.status.is_set(RunnerStatus.stopped):
-            self._logger.info("Block Router is stopped, discarding signal"
+            self.logger.info("Block Router is stopped, discarding signal"
                               " notification from block: {0}".
                               format(block.name))
         elif self.status.is_set(RunnerStatus.stopping):
-            self._logger.debug("Block Router is stopping, discarding signal"
+            self.logger.debug("Block Router is stopping, discarding signal"
                                " notification from block: {0}".
                                format(block.name))
         else:
-            self._logger.warning("Block Router is not started, discarding "
+            self.logger.warning("Block Router is not started, discarding "
                                  "signal notification from block: {0}".
                                  format(block.name))
             raise BlockRouterNotStarted()

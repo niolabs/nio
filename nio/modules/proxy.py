@@ -66,7 +66,7 @@ class ModuleProxy(object):
     proxied = False
     _impl_class = None
     _unproxied_methods = defaultdict(dict)
-    _logger = get_nio_logger('ModuleProxy')
+    logger = get_nio_logger('ModuleProxy')
 
     def __init__(self, *args, **kwargs):
         """ Handling the instantiation of a ModuleProxy
@@ -109,7 +109,7 @@ class ModuleProxy(object):
                 continue
 
             interface_member = getattr(cls, name, None)
-            cls._logger.debug("Proxying member {0} from {1}".format(
+            cls.logger.debug("Proxying member {0} from {1}".format(
                 name, class_to_proxy.__name__))
             # Save a reference to the original member to replace during unproxy
             cls._unproxied_methods[cls.__name__][name] = interface_member

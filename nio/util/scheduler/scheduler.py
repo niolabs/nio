@@ -11,16 +11,16 @@ class Scheduler(object):
     """
 
     _scheduler_thread = None
-    _logger = None
+    logger = None
 
     _sched_min_delta = 0.1
     _sched_resolution = 0.1
 
     @classmethod
     def _get_logger(cls):
-        if cls._logger is None:
-            cls._logger = get_nio_logger("NIOScheduler")
-        return cls._logger
+        if cls.logger is None:
+            cls.logger = get_nio_logger("NIOScheduler")
+        return cls.logger
 
     @classmethod
     def configure(cls, context):
