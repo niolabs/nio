@@ -1,12 +1,15 @@
 from collections import defaultdict
+from unittest.mock import patch
+
 from nio.block.base import Block
 from nio.block.context import BlockContext
 from nio.block.terminals import input, output, DEFAULT_TERMINAL
 from nio.signal.base import Signal
 from nio.router.context import RouterContext
 from nio.router.base import BlockRouter, InvalidBlockOutput, \
-    InvalidBlockInput
+    InvalidBlockInput, MissingBlock, BlockRouterNotStarted
 from nio.service.base import BlockExecution
+from nio.util.runner import RunnerStatus
 from nio.util.support.test_case import NIOTestCaseNoModules
 
 
@@ -310,6 +313,243 @@ class TestBaseRouter(NIOTestCaseNoModules):
         self.assertEqual(len(dest.signals_received["test_input_1"]), 0)
         self.assertEqual(len(dest.signals_received["test_input_2"]), 2)
         router.do_stop()
+
+    def test_invalid_signals(self):
+        """ Test router only accepts a signals iterable """
+
+        class SourceBlock(Block):
+            pass
+
+        class DestBlock(Block):
+            pass
+
+        source, dest, router = self._configure_router(
+            SourceBlock, DestBlock)
+
+        router.do_start()
+        # Notify invalid signal
+        with self.assertRaises(TypeError):
+            router.notify_signals(source, Signal(), DEFAULT_TERMINAL)
+        router.do_stop()
+
+    def test_receiver_missing_block(self):
+        """ Validates execution receiver block """
+
+        class SourceBlock(Block):
+            pass
+
+        class DestBlock(Block):
+            pass
+
+        router = BlockRouter()
+        context = BlockContext(router, {})
+        source = SourceBlock()
+        source.name = "source"
+        source.configure(context)
+        dest = DestBlock()
+        dest.name = "dest"
+        dest.configure(context)
+
+        blocks = {
+            "source": source,
+            "dest": dest
+        }
+
+        source_execution = BlockExecution()
+        source_execution.name = "source"
+        # block receiver name is invalid, it expects a valid block name
+        source_execution.receivers = ["invalid"]
+
+        router_context = RouterContext([source_execution], blocks)
+        with self.assertRaises(MissingBlock):
+            router.do_configure(router_context)
+
+    def test_receiver_invalid_format(self):
+        """ Test receiver format validity """
+
+        class SourceBlock(Block):
+            pass
+
+        class DestBlock(Block):
+            pass
+
+        router = BlockRouter()
+        context = BlockContext(router, {})
+        source = SourceBlock()
+        source.name = "source"
+        source.configure(context)
+        dest = DestBlock()
+        dest.name = "dest"
+        dest.configure(context)
+
+        blocks = {
+            "source": source,
+            "dest": dest
+        }
+
+        source_execution = BlockExecution()
+        source_execution.name = "source"
+        # make receivers format invalid
+        source_execution.receivers = [{
+            "input": DEFAULT_TERMINAL,
+            "invalid": "invalid"
+        }]
+
+        router_context = RouterContext([source_execution], blocks)
+        with self.assertRaises(KeyError):
+            router.do_configure(router_context)
+
+        # make block name invalid to cause a MissingBlock
+        source_execution.receivers = [{
+            "input": DEFAULT_TERMINAL,
+            "name": "invalid"
+        }]
+        router_context = RouterContext([source_execution], blocks)
+        with self.assertRaises(MissingBlock):
+            router.do_configure(router_context)
+
+    def test_sending_from_block_in_warning_error(self):
+        """ Asserts that router does not route signals to a block in error
+        status, but does when block is in warning status
+        """
+
+        class SourceBlock(RouterTestBlock):
+            pass
+
+        class DestBlock(RouterTestBlock):
+            pass
+
+        source, dest, router = self._configure_router(
+            SourceBlock, DestBlock)
+
+        # set dest block status to error
+        dest.status = RunnerStatus.error
+
+        router.do_start()
+        # Notify signal
+        self.assertEqual(dest.total_signals_received, 0)
+        router.notify_signals(source, [Signal()], DEFAULT_TERMINAL)
+        # assert that no signals were delivered since block was in error
+        self.assertEqual(dest.total_signals_received, 0)
+
+        # set dest block status to warning
+        dest.status = RunnerStatus.warning
+        router.notify_signals(source, [Signal()], DEFAULT_TERMINAL)
+        # assert that signals were delivered when in warning
+        self.assertEqual(dest.total_signals_received, 1)
+
+        router.do_stop()
+
+    def test_sending_router_status_changes(self):
+        """ Asserts signals delivery depending on router status """
+
+        class SourceBlock(RouterTestBlock):
+            pass
+
+        class DestBlock(RouterTestBlock):
+            pass
+
+        source, dest, router = self._configure_router(
+            SourceBlock, DestBlock)
+
+        self.assertEqual(dest.total_signals_received, 0)
+        with self.assertRaises(BlockRouterNotStarted):
+            router.notify_signals(source, [Signal()], DEFAULT_TERMINAL)
+        self.assertEqual(dest.total_signals_received, 0)
+
+        router.do_start()
+        # Notify signal
+        self.assertEqual(dest.total_signals_received, 0)
+        router.notify_signals(source, [Signal()], DEFAULT_TERMINAL)
+        self.assertEqual(dest.total_signals_received, 1)
+
+        router.status = RunnerStatus.stopping
+        router.notify_signals(source, [Signal()], DEFAULT_TERMINAL)
+        self.assertEqual(dest.total_signals_received, 1)
+
+        # force status back to started
+        router.status = RunnerStatus.started
+
+        router.notify_signals(source, [Signal()], DEFAULT_TERMINAL)
+        # assert that signals were delivered again
+        self.assertEqual(dest.total_signals_received, 2)
+
+        router.do_stop()
+
+        # after stopping router, no signals are delivered
+        router.notify_signals(source, [Signal()], DEFAULT_TERMINAL)
+        # assert that signals were delivered again
+        self.assertEqual(dest.total_signals_received, 2)
+
+    def test_cloning_error(self):
+        """ Test router only accepts a signals iterable """
+
+        class SourceBlock(RouterTestBlock):
+            pass
+
+        class DestBlock1(RouterTestBlock):
+            pass
+
+        class DestBlock2(RouterTestBlock):
+            pass
+
+        router = BlockRouter()
+        context = BlockContext(router, {})
+        source = SourceBlock()
+        source.name = "source"
+        source.configure(context)
+
+        dest1 = DestBlock1()
+        dest1.name = "dest1"
+        dest1.configure(context)
+
+        dest2 = DestBlock2()
+        dest2.name = "dest2"
+        dest2.configure(context)
+
+        blocks = {
+            "source": source,
+            "dest1": dest1,
+            "dest2": dest2
+        }
+
+        source_execution = BlockExecution()
+        source_execution.name = "source"
+        source_execution.receivers = ["dest1", "dest2"]
+
+        router_context = RouterContext([source_execution], blocks,
+                                       settings={"clone_signals": True})
+        router.do_configure(router_context)
+
+        router.do_start()
+        # Notify signal
+        self.assertEqual(dest1.total_signals_received, 0)
+        self.assertEqual(dest2.total_signals_received, 0)
+        signals = [Signal()]
+        router.notify_signals(source, signals, DEFAULT_TERMINAL)
+        # assert that signals were delivered
+        self.assertEqual(dest1.total_signals_received, 1)
+        self.assertEqual(dest2.total_signals_received, 1)
+        # assert that signals were deep-copied
+        self.assertNotEqual(dest1.signals_received[DEFAULT_TERMINAL], signals)
+        self.assertNotEqual(dest2.signals_received[DEFAULT_TERMINAL], signals)
+
+        # clear out signal reception
+        dest1.total_signals_received = 0
+        dest1.signals_received[DEFAULT_TERMINAL] = []
+        dest2.total_signals_received = 0
+        dest2.signals_received[DEFAULT_TERMINAL] = []
+
+        with patch('nio.router.base.deepcopy') as patched_deepcopy:
+            patched_deepcopy.side_effect = RuntimeError()
+
+            router.notify_signals(source, signals, DEFAULT_TERMINAL)
+            # assert that signals were delivered
+            self.assertEqual(dest1.total_signals_received, 1)
+            self.assertEqual(dest2.total_signals_received, 1)
+            # assert that signals were NOT deep-copied
+            self.assertEqual(dest1.signals_received[DEFAULT_TERMINAL], signals)
+            self.assertEqual(dest2.signals_received[DEFAULT_TERMINAL], signals)
 
 
 class RouterTestBlock(Block):
