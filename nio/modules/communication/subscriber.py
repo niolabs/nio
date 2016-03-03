@@ -3,9 +3,7 @@ from nio.modules.proxy import ModuleProxy
 
 class Subscriber(ModuleProxy):
 
-    """ This class encapsulates the user-facing interface to NIO's
-    subscriber.
-    """
+    """ An interface for a generic Subscriber in the communication module """
 
     def __init__(self, handler, matching_provider=None, **topics):
         """ Create a new subscriber instance.

@@ -34,11 +34,11 @@ class Target(object):
 class TestSpawn(NIOTestCaseNoModules):
 
     def setUp(self):
+        super().setUp()
         self._exception_thrown = False
 
     def test_spawn(self):
-        """ Asserts that arguments are passed correctly
-        """
+        """ Asserts that arguments are passed correctly """
         receiver_event = Event()
         target = Target(receiver_event)
         thread = spawn(target.receiver, "1", "2",
@@ -57,9 +57,7 @@ class TestSpawn(NIOTestCaseNoModules):
         self.assertEqual(result, "verify this")
 
     def test_spawn_kw_defaults(self):
-        """ Asserts that when keyword arguments are not specified,
-        defaults are received
-        """
+        """ Asserts that when kwargs are not given, defaults are received """
         receiver_event = Event()
         target = Target(receiver_event)
         spawn(target.receiver, "1", "2")
@@ -73,9 +71,12 @@ class TestSpawn(NIOTestCaseNoModules):
         self.assertEqual(target.kwargs[1], "key2_default")
 
     def test_spawn_exception_no_join(self):
-        # asserts that, when no join is executed, the caller does not
-        # get affected (default python behaviour), yet if really
-        # looking the exception is stored in thread instance
+        """ Asserts caller not affected if join isn't called
+
+        Asserts that, when no join is executed, the caller does not
+        get affected (default python behaviour), yet if really
+        looking the exception is stored in thread instance
+        """
         thread = spawn(self.throw_exception, "arg1", kwarg1="2")
         # allow time for thread to execute
         sleep(0.1)
@@ -83,14 +84,14 @@ class TestSpawn(NIOTestCaseNoModules):
         self.assertIsNotNone(thread.nio_exception)
 
     def test_spawn_exception_and_join1(self):
-        # assert that exception is thrown when joining the thread
+        """ Assert that exception is thrown when joining the thread """
         thread = spawn(self.throw_exception)
         with self.assertRaises(MyException):
             thread.join()
         self.assertTrue(self._exception_thrown)
 
     def test_spawn_exception_and_join2(self):
-        # asserts that spawn exception comes with arguments
+        """ Asserts that spawn exception comes with arguments """
         try:
             thread = spawn(self.throw_exception, "arg1", kwarg1="2")
             thread.join()

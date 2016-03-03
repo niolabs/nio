@@ -29,9 +29,10 @@ class InvalidProcessSignalsSignature(Exception):
 
 class BlockReceiverData(object):
 
-    """ A class that defines block receiver information,
-    An instance of this class is created for each block
-    receiver and accessed when delivering signals
+    """ A class that defines block receiver information.
+
+    An instance of this class is created for each block receiver and accessed
+    when delivering signals
     """
 
     def __init__(self, block, input_id, output_id):
@@ -61,7 +62,9 @@ class BlockReceiverData(object):
 
 class BlockRouter(Runner):
 
-    """A Block Router receives service block execution information, processes
+    """ A class that can route signals between blocks in a service.
+
+    A Block Router receives service block execution information, processes
     it and becomes ready to receive signals from any participating block in
     the service execution.
 
@@ -100,15 +103,13 @@ class BlockRouter(Runner):
         self._check_signal_type = \
             context.settings.get("check_signal_type", True)
 
-        """ Go through list of receivers for a given block as
-        defined in "execution" entry, and parses out needed information
-        to be used when delivering signals.
-        """
-
         # cache receivers to avoid searches during signal delivery by
         # creating a dictionary of the form
         # {block_name: block instance receivers list}
         self._receivers = {}
+        # Go through list of receivers for a given block as
+        # defined in "execution" entry, and parses out needed information
+        # to be used when delivering signals.
         for block_execution in context.execution:
             # block_execution should be an instance of BlockExecution
             sender_block_name = block_execution.name()
@@ -167,8 +168,7 @@ class BlockRouter(Runner):
         return receivers_list
 
     def _process_block_receiver(self, receiver, blocks, output_id):
-        """ Process a receiver component from within a list of receivers
-        a block may have
+        """ Process a receiver component from a list of a block's receivers
 
         Args:
             receiver: Receiver definition

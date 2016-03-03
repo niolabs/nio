@@ -1,7 +1,8 @@
 class Parameter(object):
 
-    """ A typed command parameter. Base class for other params
-    (e.g. Int*, String*).
+    """ A typed command parameter. Base class for other parameters
+
+    Examples of other command parameters are IntParameter, StringParameter, etc
 
     Args:
         type (Type): The type of data of this parameter.

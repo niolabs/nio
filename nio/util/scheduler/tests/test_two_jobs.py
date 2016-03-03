@@ -21,10 +21,7 @@ class Dummy(object):
 class TestScheduler(NIOTestCase):
 
     def test_two_jobs(self):
-        """ Asserts that independently of the order, the right task is
-        executed first
-        """
-
+        """ Asserts that the right task is executed first """
         dummy = Dummy()
         self.job1 = Job(dummy.foo1, timedelta(milliseconds=500), False)
         self.job2 = Job(dummy.foo2, timedelta(milliseconds=100), False)
@@ -33,8 +30,9 @@ class TestScheduler(NIOTestCase):
         self.assertEqual(dummy.foo2_called, True)
 
     def test_two_jobs_reverse_order(self):
-        """ Asserts that independently of the order, the right task is
-        executed first, same as above test but calls are reversed
+        """ Asserts that the right task is executed first
+
+        This is the  same as above test but calls are reversed
         """
         dummy = Dummy()
         self.job2 = Job(dummy.foo2, timedelta(milliseconds=100), False)

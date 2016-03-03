@@ -21,9 +21,7 @@ def lineno():
 class TestCache(NIOTestCase):
 
     def test_cache(self):
-        """ Asserts that cache from different lines removes elements
-        as expected
-        """
+        """ Asserts that cache from different lines removes elements """
         log_cache = LogCache(expire_interval=0.1)
 
         # when logging from different lines, message text is not relevant
@@ -46,9 +44,7 @@ class TestCache(NIOTestCase):
         self.assertTrue(log_cache.process_record(record2))
 
     def test_cache_same_line(self):
-        """ Asserts that cache from same line removes/updates elements
-        as expected
-        """
+        """ Asserts that cache from same line removes/updates elements """
         log_cache = LogCache(expire_interval=0.1)
 
         record1 = self._get_log_record("1")

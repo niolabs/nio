@@ -52,8 +52,9 @@ class Scheduler(object):
 
     @classmethod
     def unschedule(cls, job):
-        """Remove a job from the schedule. If the given job is not
-        currently scheduled, this method has no effect.
+        """Remove a job from the scheduler.
+
+        If the given job is not currently scheduled, this method has no effect.
 
         Args:
             job (APScheduler Job): The job to remove.

@@ -1,9 +1,10 @@
 from enum import Enum
 import re
 
-""" A valid version are three dotted with the format
-(mayor.minor.build) where mayor and minor accept only digits and build
-accept characters (accommodating for beta, release candidate (rc), etc)
+""" A valid version are three dotted with the format (major.minor.build)
+
+Major and minor accept only digits and build accept characters (
+accommodating for beta, release candidate (rc), etc)
 """
 _version_regex = "^(?:(\d+)\.)?(?:(\d+)\.)?(\*|[a-zA-Z0-9]+)$"
 _compiled_version_regex = re.compile(_version_regex)
@@ -56,6 +57,7 @@ def compare_versions(a, b, separators=_separators, ignore_case=True):
 
 def get_major_version(version, separator="."):
     """ Figures out a major version from a regular version.
+
     It does so by constructing a version starting from the major digit and
     adding zero's to it.
 
@@ -73,8 +75,7 @@ def get_major_version(version, separator="."):
 
 
 def _pre_process(version, separators, ignore_case):
-    """ Converts incoming version into a list based on separator and
-    digit/character composition.
+    """ Converts incoming version into a list based on separator
 
     Args:
         version: version to process

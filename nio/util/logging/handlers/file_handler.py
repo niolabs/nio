@@ -1,3 +1,4 @@
+from threading import RLock
 from logging.handlers import RotatingFileHandler
 from os import path, makedirs
 
@@ -22,8 +23,7 @@ class NIOFileHandler(RotatingFileHandler):
                          backupCount=backup_count)
 
     def _construct_fname(self):
-        """ Private method for building the log-file name based on the date
-        and the name of the logger.
+        """ Build the log-file name based on date and the name of logger.
 
         Args:
             name (str): the name of the logger to which this handler is
@@ -56,7 +56,6 @@ class NIOShareFileHandler(NIOFileHandler):
 
     def __init__(self, dirname='.', filename='log_placeholder',
                  max_bytes=MAX_FILE_SIZE, backup_count=1):
-        from threading import RLock
         self._lock = RLock()
         super().__init__(dirname, filename, max_bytes, backup_count)
 
@@ -67,9 +66,10 @@ class NIOShareFileHandler(NIOFileHandler):
         super().doRollover()
 
     def _open(self):
-        """ Caches an open stream to a file so the file can be rollover
-         and renamed. In windows opening multiple streams for writing to a file
-         causes a
+        """ Open the file used for logging
+
+        Caches an open stream to a file so the file can be rollover
+        and renamed.
         """
         with self._lock:
             stream = self.__class__.file_handlers.get(self.baseFilename)

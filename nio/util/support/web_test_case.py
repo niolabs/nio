@@ -120,8 +120,7 @@ class NIOWebTestCase(NIOTestCase):
         self.assertEqual(response.status_code, status)
 
     def assertResponseJSON(self, method, url, key, value=None, data=None):
-        """ Assert that the specified response returns a JSON containing
-        the specified key and (optionally) value.
+        """ Assert that the specified response returns a JSON with a value
 
         Args:
             method (str): e.g. GET, POST, etc.
@@ -140,8 +139,7 @@ class NIOWebTestCase(NIOTestCase):
 
     def assertResponseJSONValue(self, method, url, value, data=None,
                                 status=200):
-        """ Assert that the specified response returns a JSON matching a
-        value passed as param
+        """ Assert that the specified response returns a JSON matching a value
 
         Args:
             method (str): e.g. GET, POST, etc.

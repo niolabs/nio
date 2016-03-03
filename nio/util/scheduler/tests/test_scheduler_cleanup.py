@@ -11,8 +11,10 @@ from nio.util.support.test_case import NIOTestCase
 class TestSchedulerCleanUp(NIOTestCase):
 
     def test_scheduler_cleanup(self):
-        """ Asserts that scheduler cleans up its list once a non-repeatable
-        task is executed, and also when a repeatable task is cancelled
+        """ Asserts that scheduler cleans up its list properly.
+
+        This should occur once a non-repeatable task is executed, and also
+        when a repeatable task is cancelled
         """
 
         scheduler = Scheduler._scheduler_thread._scheduler
@@ -53,8 +55,7 @@ class TestSchedulerCleanUp(NIOTestCase):
         pass
 
     def test_scheduler_cancel_from_callback(self):
-        """ Asserts that scheduler accepts callbacks that cancel jobs.
-        """
+        """ Asserts that scheduler accepts callbacks that cancel jobs.  """
 
         scheduler = Scheduler._scheduler_thread._scheduler
 

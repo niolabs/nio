@@ -1,8 +1,8 @@
 class LooseMatching(object):
+
     @classmethod
     def matches(cls, sub_topics, pub_topics):
-        """ Finds out if there is a match between subscriber and publisher
-        topics.
+        """ Finds out if there is a match between sub and pub topics
 
         Args:
             sub_topics: subscriber topics

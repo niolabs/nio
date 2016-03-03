@@ -15,7 +15,9 @@ from nio.util.runner import Runner, RunnerStatus
 
 class BlockExecution(PropertyHolder):
 
-    """ Defines a single block execution within a potential execution graph
+    """ An object containing a block and its receivers
+
+    Defines a single block execution within a potential execution graph
     A block execution is defined by a block name (name) and a set of block
     receivers where each receiver is identified by a block name.
 
@@ -28,7 +30,9 @@ class BlockExecution(PropertyHolder):
 
 class BlockMapping(PropertyHolder):
 
-    """ Allows a mapping of a given block based on another block
+    """ An obejct containing a block and its alias in the service
+
+    Allows a mapping of a given block based on another block
     This information is parsed/used internally by the core system
     """
     name = StringProperty()
@@ -173,9 +177,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
 
     def _create_block_context(self, block_type, block_properties,
                               service_context):
-        """ Populates block context, which will serve as a basis
-         for a future block configuration
-        """
+        """Populates block context to pass to the block's configure method"""
         return BlockContext(
             self._block_router,
             block_properties,
@@ -199,7 +201,6 @@ class Service(PropertyHolder, CommandHolder, Runner):
     @classmethod
     def get_description(cls):
         """ Retrieves a service description based on properties and commands
-        it exposes
 
         Returns:
             Service description
@@ -223,13 +224,11 @@ class Service(PropertyHolder, CommandHolder, Runner):
         return self.status
 
     def runproperties(self):
-        """ Returns service runtime properties
-        """
+        """ Returns service runtime properties """
         return self.to_dict()
 
     def full_status(self):
-        """ Returns service plus block statuses for each block in the service
-        """
+        """Returns service plus block statuses for each block in the service"""
         status = {"service": self.status.name}
         for name in self._blocks:
             status.update({name: self._blocks[name].status.name})

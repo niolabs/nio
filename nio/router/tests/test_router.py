@@ -418,7 +418,8 @@ class TestBaseRouter(NIOTestCaseNoModules):
 
     def test_sending_from_block_in_warning_error(self):
         """ Asserts that router does not route signals to a block in error
-        status, but does when block is in warning status
+
+        But it should route when block is in warning status
         """
 
         class SourceBlock(RouterTestBlock):

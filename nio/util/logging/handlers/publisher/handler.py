@@ -36,8 +36,7 @@ class PublisherHandler(logging.Handler):
         PublisherProxy.init(topics)
 
     def emit(self, record):
-        """ Method called from within Python's infrastructure whenever a
-        log record is to be 'logged'
+        """ Publish the log record on the opened publisher
 
         Args:
             record (LogRecord): record to be logged.

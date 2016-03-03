@@ -10,14 +10,15 @@ from nio.block.terminals import DEFAULT_TERMINAL
 from nio.signal.status import StatusSignal
 
 
-class TestBlockRouter(BlockRouter):
+class BlockRouterForTesting(BlockRouter):
 
-    """ Supports block tests by keeping track of signal counts per block and
+    """ A testing router to be used in block test cases.
+
+    Supports block tests by keeping track of signal counts per block and
     block status as provided by management signals.
     """
 
     def __init__(self):
-        """ Creates a new TestBlockRouter instance """
         super().__init__()
         self._test_case = None
         self._block_signal_counts = {}
@@ -114,7 +115,7 @@ class NIOBlockTestCase(NIOTestCase):
 
     def __init__(self, methodName='runTests'):
         super().__init__(methodName)
-        self._router = TestBlockRouter()
+        self._router = BlockRouterForTesting()
         self.last_notified = defaultdict(list)
 
     def setUp(self):

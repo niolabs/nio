@@ -5,8 +5,7 @@ class ClassAttributes(object):
 
     @classmethod
     def is_attr(cls, attr_value):
-        """ Determine if an attribute value obtained using 'getattr'
-        is a 'data' attribute.
+        """ Determine if an attribute value is a 'data' attribute.
 
         Args:
             attr_value: Attribute value to check against

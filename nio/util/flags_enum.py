@@ -260,8 +260,10 @@ class FlagsEnum(object):
         return True
 
     def __getstate__(self):
-        """ Allows control over pickling, removes callback field
-        which is not pickable.
+        """ Make sure the object is able to be pickled.
+
+        This method allows control over pickling, removes callback field
+        which is not picklable.
 
         Returns:
             Fields to serialize

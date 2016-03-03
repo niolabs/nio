@@ -8,8 +8,7 @@ from nio.util.support.test_case import NIOTestCase
 class TestCache(NIOTestCase):
 
     def test_add(self):
-        """ Adding an item that overrides duration
-        """
+        """ Adding an item that overrides duration """
         cache = Cache(0.5)
 
         key = 1
@@ -21,9 +20,7 @@ class TestCache(NIOTestCase):
         self.assertIsNone(cache.get(key))
 
     def test_duration_not_specified(self):
-        """ Adding an item that does not specifies duration
-        """
-
+        """ Adding an item that does not specifies duration """
         cache = Cache(0.1)
 
         key = 1
@@ -35,9 +32,7 @@ class TestCache(NIOTestCase):
         self.assertIsNone(cache.get(key))
 
     def test_no_duration(self):
-        """ Verifies that when duration is 0 nothing gets added
-        """
-
+        """ Verifies that when duration is 0 nothing gets added """
         cache = Cache(0)
 
         key = 1
@@ -47,8 +42,9 @@ class TestCache(NIOTestCase):
         self.assertIsNone(cache.get(key))
 
     def test_item_with_zero_duration(self):
-        """ Verifies that when the item is added with 0 duration
-        nothing is added (default duration does not apply)
+        """ Verifies that when the item is added with 0 duration nothing added
+
+        (default duration does not apply)
         """
 
         cache = Cache(2)
@@ -60,9 +56,7 @@ class TestCache(NIOTestCase):
         self.assertIsNone(cache.get(key))
 
     def test_default_when_item_is_missing(self):
-        """ Verifies that when the item does not exists and a default
-        return is specified, such default is retrieved
-        """
+        """ Verifies that when item does not exist the default is returned """
 
         cache = Cache(2)
         self.assertEqual(cache.get("not existant", "default to be retrieved"),
@@ -87,9 +81,7 @@ class TestCache(NIOTestCase):
 
     def test_adding_same_key(self):
         """ Make sure item for a given key can be overriden before it expires
-        and that it is correctly retrieved
         """
-
         cache = Cache(0.4)
 
         key = 1

@@ -137,8 +137,7 @@ class RESTHandler(WebHandler):
         raise NotImplementedError()
 
     def on_options(self, request, response):
-        """ Allows the client to determine the options and/or requirements
-        associated with a resource
+        """ Allows the client to respond to OPTIONS requests
 
         Args:
             request: web request

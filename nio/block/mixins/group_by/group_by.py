@@ -6,8 +6,7 @@ from nio.util.ensure_types import ensure_list
 
 class GroupBy(object):
 
-    """ Use this base class to extend block functionality to groups
-    of signal objects.
+    """ Use this base class to extend block functionality to groups of signals
 
     Use NIO's native expression syntax to configure a value by which to
     group signals. In your block's 'process_signals' method, pass the

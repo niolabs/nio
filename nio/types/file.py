@@ -4,8 +4,7 @@ from nio.types.base import Type
 
 
 class FileHolder(object):
-    """ Instance received when assigning this property to a variable
-    """
+    """ Instance received when assigning this property to a variable """
 
     def __init__(self, value, mode):
         # actual property value
@@ -16,9 +15,7 @@ class FileHolder(object):
         self._mode = mode
 
     def __enter__(self):
-        """ Give back a file stream when a a valid file
-        can be gathered from property value
-        """
+        """ Return a file stream when a a valid file exists """
         real_file = self.file
         if real_file is not None:
             # specify mode only when it is user defined, otherwise
@@ -28,8 +25,7 @@ class FileHolder(object):
             return self._stream
 
     def __exit__(self, _type, value, tb):
-        """ close file stream
-        """
+        """ Close file stream """
         if self._stream:
             self._stream.close()
             self._stream = None
