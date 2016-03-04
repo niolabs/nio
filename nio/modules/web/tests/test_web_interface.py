@@ -1,5 +1,5 @@
 from nio.modules.web import WebEngine
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class TestWebInterface(NIOTestCaseNoModules):

@@ -3,7 +3,7 @@ from datetime import timedelta
 from nio.block.mixins.collector.collector import Collector
 from nio.block.base import Block
 from nio.signal.base import Signal
-from nio.util.support.block_test_case import NIOBlockTestCase
+from nio.testing.block_test_case import NIOBlockTestCase
 
 
 class CollectingBlock(Collector, Block):

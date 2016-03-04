@@ -10,7 +10,7 @@ from nio.router.base import BlockRouter, InvalidBlockOutput, \
     InvalidBlockInput, MissingBlock, BlockRouterNotStarted
 from nio.service.base import BlockExecution
 from nio.util.runner import RunnerStatus
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class TestBaseRouter(NIOTestCaseNoModules):

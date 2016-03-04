@@ -1,7 +1,7 @@
 from nio.signal.base import Signal
 from nio.properties import ObjectProperty, PropertyHolder, \
     StringProperty
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class ContainedClass(PropertyHolder):

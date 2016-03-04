@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 from nio.properties.base import BaseProperty
 from nio.properties.holder import PropertyHolder
 from nio.types.base import Type
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class MockType(Type):

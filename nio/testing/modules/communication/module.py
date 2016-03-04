@@ -1,5 +1,5 @@
-from nio.util.support.modules.communication.publisher import Publisher
-from nio.util.support.modules.communication.subscriber import Subscriber
+from nio.testing.modules.communication.publisher import Publisher
+from nio.testing.modules.communication.subscriber import Subscriber
 from nio.modules.communication.module import CommunicationModule
 
 

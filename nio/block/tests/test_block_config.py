@@ -2,7 +2,7 @@ from nio.block.base import Block
 from nio.block.context import BlockContext
 from nio.router.base import BlockRouter
 from nio.properties import StringProperty
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 CONFIG_KEY = "attr_1"
 CONFIG_VAL = "attr_1_val"

@@ -1,6 +1,6 @@
 from nio.modules.security.decorator import protected_access, _set_user
 from nio.modules.security.authorizer import Authorizer, Unauthorized
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class AuthorizerImpl(object):

@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 from nio.util.runner import Runner, RunnerStatus
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class A(object):

@@ -1,5 +1,5 @@
 from nio.properties import PropertyHolder, Property
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class SampleClass(PropertyHolder):

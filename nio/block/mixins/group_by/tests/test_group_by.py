@@ -1,7 +1,7 @@
 from nio.block.mixins.group_by.group_by import GroupBy
 from nio.block.base import Block, DEFAULT_TERMINAL
 from nio.signal.base import Signal
-from nio.util.support.block_test_case import NIOBlockTestCase
+from nio.testing.block_test_case import NIOBlockTestCase
 
 
 class GroupingBlock(GroupBy, Block):

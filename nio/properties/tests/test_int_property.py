@@ -1,6 +1,6 @@
 from nio.signal.base import Signal
 from nio.properties import IntProperty, PropertyHolder
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class ContainerClass(PropertyHolder):

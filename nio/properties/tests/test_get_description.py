@@ -1,6 +1,6 @@
 from nio.properties import PropertyHolder
 from nio.properties import StringProperty
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class ClassWithoutVersion(PropertyHolder):

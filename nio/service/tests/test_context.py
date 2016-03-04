@@ -1,5 +1,5 @@
 from nio.service.context import ServiceContext
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class TestServiceContext(NIOTestCase):

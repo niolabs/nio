@@ -1,5 +1,5 @@
 from nio.util.class_attributes import ClassAttributes
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 def function():

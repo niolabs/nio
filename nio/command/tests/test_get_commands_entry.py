@@ -3,7 +3,7 @@ from nio.block.base import Block
 from nio.command import command
 from nio.command.params.string import StringParameter
 from nio.command.params.int import IntParameter
-from nio.util.support.block_test_case import NIOBlockTestCase
+from nio.testing.block_test_case import NIOBlockTestCase
 
 
 @command('talk',

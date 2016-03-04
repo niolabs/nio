@@ -4,7 +4,7 @@ from nio.command.base import InvalidCommandArg
 from nio.command.params.int import IntParameter
 from nio.command.params.float import FloatParameter
 from nio.command.params.string import StringParameter
-from nio.util.support.block_test_case import NIOBlockTestCase
+from nio.testing.block_test_case import NIOBlockTestCase
 
 
 @command('dance',

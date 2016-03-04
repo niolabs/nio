@@ -4,7 +4,7 @@ from nio.block.context import BlockContext
 from nio.block.terminals import DEFAULT_TERMINAL
 from nio.service.base import BlockExecution
 from nio.router.context import RouterContext
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class SenderBlock(Block):

@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 from nio.modules.web import WebEngine
 from nio.modules.web.module import WebModule
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class TestWebModule(NIOTestCaseNoModules):

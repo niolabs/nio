@@ -1,5 +1,5 @@
 from nio.modules.communication.matching.loose import LooseMatching
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 Pub_A = {'type': ['A'], "source": ['C']}
 Pub_B = {'type': ['A'], "source": ['D']}

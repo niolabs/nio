@@ -5,7 +5,7 @@ from threading import RLock
 from nio.util.scheduler.scheduler import Scheduler
 from nio.modules.scheduler.job import Job
 from nio.util.threading import spawn
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class TestSchedulerCleanUp(NIOTestCase):

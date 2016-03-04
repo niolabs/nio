@@ -1,6 +1,6 @@
 from nio.block.base import Block
 from nio.util.versioning.dependency import DependsOn, get_class_dependencies
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 @DependsOn("nio", "2.0.1")

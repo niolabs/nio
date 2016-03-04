@@ -3,7 +3,7 @@
 
 """
 from collections import defaultdict
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 from nio.router.base import BlockRouter
 from nio.block.context import BlockContext
 from nio.block.terminals import DEFAULT_TERMINAL

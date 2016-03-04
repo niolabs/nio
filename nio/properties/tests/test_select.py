@@ -3,7 +3,7 @@ from enum import Enum
 
 from nio.properties import PropertyHolder
 from nio.properties import SelectProperty
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class SampleEnum(Enum):

@@ -6,7 +6,7 @@ from nio.router.base import BlockRouter, BlockReceiverData, \
     InvalidProcessSignalsSignature
 from nio.router.context import RouterContext
 from nio.service.base import BlockExecution
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 # CONFIGURATION to follow for unittests understanding
 """

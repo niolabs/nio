@@ -1,5 +1,5 @@
 from nio.block.base import Block
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 from nio.block.terminals import input, output, Terminal, TerminalType, \
     DEFAULT_TERMINAL
 

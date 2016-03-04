@@ -6,7 +6,7 @@ from nio.command.params.string import StringParameter
 from nio.modules.security.authorizer import Authorizer, Unauthorized
 from nio.modules.security.task import SecureTask
 from nio.modules.security.user import User
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 @command('unsecure', tasks=[])

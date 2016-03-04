@@ -5,7 +5,7 @@ from nio.properties.exceptions import OlderThanMinVersion, NoClassVersion, \
     NoInstanceVersion
 from nio.properties.version import VersionProperty, \
     InvalidVersionFormat
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class ClassWithNoVersion(PropertyHolder):

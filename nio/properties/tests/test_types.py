@@ -16,7 +16,7 @@ from nio.types import ListType
 from nio.types import SelectType
 from nio.types import StringType
 from nio.types import TimeDeltaType
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class ContainedClass(PropertyHolder):

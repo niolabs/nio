@@ -2,7 +2,7 @@ import inspect
 from time import sleep
 
 from nio.util.logging.handlers.publisher.cache import LogCache
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class LogRecord(object):

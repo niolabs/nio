@@ -1,5 +1,5 @@
 from nio.util.ensure_types import ensure_is, ensure_list
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class TestEnsure(NIOTestCase):

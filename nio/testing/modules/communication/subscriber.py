@@ -1,4 +1,4 @@
-from nio.util.support.modules.communication.manager import PubSubManager
+from nio.testing.modules.communication.manager import PubSubManager
 
 
 class Subscriber(object):

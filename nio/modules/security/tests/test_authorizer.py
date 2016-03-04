@@ -1,5 +1,5 @@
 from nio.modules.security.authorizer import Authorizer, Unauthorized
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class AuthorizerImpl(object):
