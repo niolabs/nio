@@ -1,7 +1,8 @@
 import json
 
-from nio.properties.holder import PropertyHolder, \
-    OlderThanMinVersion, NoClassVersion, NoInstanceVersion
+from nio.properties.holder import PropertyHolder
+from nio.properties.exceptions import OlderThanMinVersion, NoClassVersion, \
+    NoInstanceVersion
 from nio.properties.version import VersionProperty, \
     InvalidVersionFormat
 from nio.util.support.test_case import NIOTestCaseNoModules
@@ -26,6 +27,7 @@ class ClassVersionInitialize(PropertyHolder):
 
 
 class TestVersion(NIOTestCaseNoModules):
+
     def test_valid_versions(self):
         """Version property suppoerts specific value formats."""
         instance = ClassWithVersion()

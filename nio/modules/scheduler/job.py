@@ -3,9 +3,7 @@ from nio.modules.proxy import ModuleProxy
 
 class Job(ModuleProxy):
 
-    """ This class encapsulates the user-facing interface to NIO's
-    scheduling facilities.
-    """
+    """A scheduled job in the scheduler module """
 
     def __init__(self, target, delta, repeatable, *args, **kwargs):
         """ Create a new job instance.

@@ -23,8 +23,10 @@ class TestSchedulerHelper(NIOTestCase):
         super().tearDown()
 
     def test_add_and_cancel(self):
-        """ Asserts that a repeatable scheduling is called at least two
-        times and after it is cancelled, no more calls are issued
+        """ Asserts that a repeatable scheduling actually repeats.
+
+        This means is called at least two times and after it is cancelled no
+        more calls are issued
         """
 
         interval = timedelta(seconds=0.2)
@@ -50,8 +52,7 @@ class TestSchedulerHelper(NIOTestCase):
         self.fired_times += 1
 
     def test_invalid_time(self):
-        """ Asserts that an invalid time data type is not allowed
-        """
+        """ Asserts that an invalid time data type is not allowed """
 
         with self.assertRaises(AttributeError):
             self._scheduler.add(self._test_invalid_time_callback,
@@ -62,10 +63,7 @@ class TestSchedulerHelper(NIOTestCase):
         assert False
 
     def test_min_interval(self):
-        """ Asserts that a minimal interval is expected when doing
-        repeatable tasks
-        """
-
+        """ Asserts that a minimal interval is expected """
         self.fired_times = 0
         self._scheduler.add(self._test_fired_times_callback,
                             timedelta(seconds=0.0001), repeatable=True)
@@ -74,10 +72,7 @@ class TestSchedulerHelper(NIOTestCase):
         self.assertEquals(self.fired_times, 1)
 
     def test_min_interval_non_repeatable(self):
-        """ Asserts that it is ok to pass a very small time when it is not
-        repeatable
-        """
-
+        """ Asserts that it is ok to pass a small time when not repeatable """
         self.fired_times = 0
         self._scheduler.add(self._test_fired_times_callback,
                             timedelta(seconds=0.0001), repeatable=False)
@@ -95,9 +90,7 @@ class TestSchedulerHelper(NIOTestCase):
             self._fired_times = times
 
     def test_invalid_cancel(self):
-        """ Asserts that trying to cancel an invalid job returns False
-        """
-
+        """ Asserts that trying to cancel an invalid job returns False """
         event_id = self._scheduler.add(self._test_fired_times_callback,
                                        timedelta(seconds=0.1), repeatable=True)
         self.assertFalse(self._scheduler.cancel("invalid_id"))

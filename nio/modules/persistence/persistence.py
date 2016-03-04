@@ -50,8 +50,7 @@ class Persistence(ModuleProxy):
         raise NotImplementedError()
 
     def has_key(self, key):
-        """ Check whether a particular key exists in the persistence
-        key/val store.
+        """ Check whether a particular key exists in the persistence store
 
         Args:
             key: The key in question.
@@ -63,9 +62,10 @@ class Persistence(ModuleProxy):
         raise NotImplementedError()
 
     def clear(self, key):
-        """ Remove the given key and associated value from the in-mem
-        k/v store. As above, this will not be reflected permanently
-        until Persistence.save is called.
+        """ Remove the given key and associated value from the store
+
+        As above, this will not be reflected permanently until
+        Persistence.save is called.
 
         Args:
             key: The key pointing to the data to clear.
@@ -73,8 +73,10 @@ class Persistence(ModuleProxy):
         raise NotImplementedError()
 
     def save(self):
-        """ Save the in-memory store permanently. This allows the data therein
-        to persist between instance/service restarts.
+        """ Save the in-memory store to persistence.
+
+        This allows the data therein to persist between instance/service
+        restarts.
         """
         raise NotImplementedError()
 
@@ -96,7 +98,8 @@ class Persistence(ModuleProxy):
     @classmethod
     def configure(cls, service_name):
         """ Class method to configure the Persistence class with a service
-        name. This allows us to have a service-by-service namespace for
+
+        This allows us to have a service-by-service namespace for
         persisted block data.
 
         Args:

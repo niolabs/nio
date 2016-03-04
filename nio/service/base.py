@@ -1,4 +1,5 @@
 from nio.router.context import RouterContext
+from nio.block.context import BlockContext
 from nio.command import command
 from nio.command.holder import CommandHolder
 from nio import discoverable
@@ -14,7 +15,9 @@ from nio.util.runner import Runner, RunnerStatus
 
 class BlockExecution(PropertyHolder):
 
-    """ Defines a single block execution within a potential execution graph
+    """ An object containing a block and its receivers
+
+    Defines a single block execution within a potential execution graph
     A block execution is defined by a block name (name) and a set of block
     receivers where each receiver is identified by a block name.
 
@@ -27,7 +30,9 @@ class BlockExecution(PropertyHolder):
 
 class BlockMapping(PropertyHolder):
 
-    """ Allows a mapping of a given block based on another block
+    """ An obejct containing a block and its alias in the service
+
+    Allows a mapping of a given block based on another block
     This information is parsed/used internally by the core system
     """
     name = StringProperty()
@@ -78,7 +83,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
         constructor.
         """
 
-        self._logger = get_nio_logger('service')
+        self.logger = get_nio_logger('service')
         super().__init__(status_change_callback=status_change_callback)
 
         # store service type so that it gets serialized
@@ -133,24 +138,22 @@ class Service(PropertyHolder, CommandHolder, Runner):
                 block included in the service execution.
         """
         # populate service properties
-        self.from_dict(context.properties, self._logger)
+        self.from_dict(context.properties, self.logger)
         # verify that service properties are valid
         self.validate()
 
         # reset logger after modules initialization
         # and properties setting
-        self._logger = get_nio_logger("service")
-        self._logger.setLevel(self.log_level())
+        self.logger = get_nio_logger("service")
+        self.logger.setLevel(self.log_level())
 
         # configure the Persistence module with the service name
-        # TODO: unit test for the following
-        # Persistence.configure(self.name)
         Persistence.configure(self.name())
 
         # instantiate block router
-        self._logger.debug("Instantiating block router: {0}.{1}".
-                           format(context.block_router_type.__module__,
-                                  context.block_router_type.__name__))
+        self.logger.debug("Instantiating block router: {0}.{1}".
+                          format(context.block_router_type.__module__,
+                                 context.block_router_type.__name__))
         self._block_router = context.block_router_type()
 
         # create and configure blocks
@@ -162,9 +165,6 @@ class Service(PropertyHolder, CommandHolder, Runner):
             block = self._create_and_configure_block(
                 block_definition['type'],
                 block_context)
-
-            # TODO: write a unit test for this. they also pass with:
-            # self._blocks[block.name] = block
             self._blocks[block.name()] = block
 
         # populate router context and configure block router
@@ -175,19 +175,9 @@ class Service(PropertyHolder, CommandHolder, Runner):
         self._block_router.do_configure(router_context)
         self.mgmt_signal_handler = context.mgmt_signal_handler
 
-    def get_logger(self):
-        """ Provides service logger
-        """
-        return self._logger
-
     def _create_block_context(self, block_type, block_properties,
                               service_context):
-        """ Populates block context, which will serve as a basis
-         for a future block configuration
-        """
-
-        from nio.block.context import BlockContext
-
+        """Populates block context to pass to the block's configure method"""
         return BlockContext(
             self._block_router,
             block_properties,
@@ -211,7 +201,6 @@ class Service(PropertyHolder, CommandHolder, Runner):
     @classmethod
     def get_description(cls):
         """ Retrieves a service description based on properties and commands
-        it exposes
 
         Returns:
             Service description
@@ -235,13 +224,11 @@ class Service(PropertyHolder, CommandHolder, Runner):
         return self.status
 
     def runproperties(self):
-        """ Returns service runtime properties
-        """
+        """ Returns service runtime properties """
         return self.to_dict()
 
     def full_status(self):
-        """ Returns service plus block statuses for each block in the service
-        """
+        """Returns service plus block statuses for each block in the service"""
         status = {"service": self.status.name}
         for name in self._blocks:
             status.update({name: self._blocks[name].status.name})

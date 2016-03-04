@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from nio import Block
 from nio.properties.exceptions import AllowNoneViolation
@@ -14,13 +14,17 @@ class TestBaseService(NIOTestCaseNoModules):
     def test_configure(self):
         """Make sure a service can be configured"""
         service = Service()
-        service.configure(ServiceContext(
-            {"name": "ServiceName", "log_level": "WARNING"},
-            block_router_type=BlockRouter
-        ))
+        with patch('nio.service.base.Persistence') as persist:
+            service.configure(ServiceContext(
+                {"name": "ServiceName", "log_level": "WARNING"},
+                block_router_type=BlockRouter
+            ))
+            # Make sure our persistence would have been configured with our
+            # service name
+            persist.configure.assert_called_once_with('ServiceName')
         # Make sure the name property got set properly
         self.assertEqual(service.name(), "ServiceName")
-        self.assertIsNotNone(service.get_logger())
+        self.assertIsNotNone(service.logger)
 
     def test_start_stop(self):
         """Makes sure service and blocks update statuses accordingly """

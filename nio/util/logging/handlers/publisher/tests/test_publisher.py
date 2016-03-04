@@ -9,10 +9,6 @@ from nio.util.support.test_case import NIOTestCase
 
 class TestPublisherBase(NIOTestCase):
 
-    """ Base class for logging publisher tests
-
-    """
-
     def get_test_modules(self):
         return super().get_test_modules() | {'communication'}
 
@@ -59,9 +55,7 @@ class TestPublisherBase(NIOTestCase):
 class TestPublisher(TestPublisherBase):
 
     def test_log_to_publisher(self):
-        """ Asserts that logged messages at different levels are received or
-        not (debug level) as expected """
-
+        """ Asserts that logged messages at different levels are handled """
         debug_messages = ["debug message1", "debug message2"]
         warning_messages = ["warning message1", "warning message2"]
         error_messages = ["error message1", "error message2"]

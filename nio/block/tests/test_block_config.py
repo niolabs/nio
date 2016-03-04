@@ -40,9 +40,7 @@ class TestBlockConfig(NIOTestCase):
         self.assertEqual(getattr(block, CONFIG_KEY)(), CONFIG_VAL)
 
     def test_no_load_config(self):
-        """Test that with no configuration the attribute exists,
-            but is not set.
-        """
+        """Test that with no configuration the attribute exists, but not set"""
         block = DummyBlock()
         block.configure(BlockContext(BlockRouter(),
                                      dict()))

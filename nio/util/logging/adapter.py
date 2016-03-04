@@ -15,14 +15,13 @@ class NIOAdapter(logging.LoggerAdapter):
         super().__init__(logger, extra)
 
     def setLevel(self, level):
-        """
-        Set the specified level on the underlying logger.
-        """
+        """ Set the specified level on the underlying logger.  """
         log_level = level.value if isinstance(level, Enum) else level
         super().setLevel(log_level)
 
     def exception(self, msg, *args, **kwargs):
-        """
+        """ Log an exception inside of a handler.
+
         Delegate an exception call to the underlying logger and log exception
         or error depending of running flag "detail_errors"
         """
@@ -36,11 +35,7 @@ class NIOAdapter(logging.LoggerAdapter):
 
     @classmethod
     def exc_info(cls, ex):
-        """ Returns string information for an exception.
-        """
-
-        """ Returns string information for an exception.
-        """
+        """ Returns string information for an exception.  """
         try:
             if isinstance(ex, Exception) and hasattr(ex, 'message'):
                 ex_str = "{0}{1}{2}".format(type(ex).__name__,
@@ -55,9 +50,7 @@ class NIOAdapter(logging.LoggerAdapter):
         return ex_str
 
     def process(self, msg, kwargs):
-        """ Overrides LoggerAdapter.process.
-        Adds some custom context to the adapter. Called when a log entry
-        is processed.
+        """ Add some additional context to our log record
 
         Args:
             msg (str): The message to be logged.

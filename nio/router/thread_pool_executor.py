@@ -3,8 +3,9 @@ from concurrent.futures.thread import ThreadPoolExecutor
 
 
 class ThreadedPoolExecutorRouter(BlockRouter):
-    """ A router that delivers signals asynchronously and caps the number of
-    threads used for block's signal receiving.
+    """ A router that delivers signals asynchronously in a thread pool
+
+    This router caps the number of threads used for block's signal receiving.
     """
 
     def __init__(self):

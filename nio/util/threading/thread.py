@@ -12,7 +12,7 @@ class NIOThread(Thread):
 
         """
         super().__init__(**kwargs)
-        self._logger = get_nio_logger("NIOThread")
+        self.logger = get_nio_logger("NIOThread")
         self.nio_result = None
         self.nio_exception = None
 
@@ -32,8 +32,8 @@ class NIOThread(Thread):
             self.nio_result = self._target(*self._args, **self._kwargs)
         except BaseException as e:
             # first element in _args tuple contains the method to call
-            self._logger.exception("Executing: {0}".
-                                   format(self._args[0].__name__))
+            self.logger.exception("Executing: {0}".
+                                  format(self._args[0].__name__))
             self.nio_exception = e
 
     def join(self, timeout=None):

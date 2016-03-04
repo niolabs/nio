@@ -5,22 +5,19 @@ from nio.util.scheduler.scheduler_thread import SchedulerThread
 
 class Scheduler(object):
 
-    """Singleton class to maintain and interact with an underlying
-    Scheduler object, shared by the various blocks/components in a
-    given process.
-    """
+    """Singleton class to maintain and interact with an underlying Scheduler"""
 
     _scheduler_thread = None
-    _logger = None
+    logger = None
 
     _sched_min_delta = 0.1
     _sched_resolution = 0.1
 
     @classmethod
     def _get_logger(cls):
-        if cls._logger is None:
-            cls._logger = get_nio_logger("NIOScheduler")
-        return cls._logger
+        if cls.logger is None:
+            cls.logger = get_nio_logger("NIOScheduler")
+        return cls.logger
 
     @classmethod
     def configure(cls, context):
@@ -44,7 +41,7 @@ class Scheduler(object):
             kwargs: Keyword arguments to be passed to 'target'.
 
         Returns:
-            job (APScheduler Job): The APScheduler-internal Job object.
+            job (Job): The Job object.
 
         """
         if cls._scheduler_thread is None:
@@ -55,8 +52,9 @@ class Scheduler(object):
 
     @classmethod
     def unschedule(cls, job):
-        """Remove a job from the schedule. If the given job is not
-        currently scheduled, this method has no effect.
+        """Remove a job from the scheduler.
+
+        If the given job is not currently scheduled, this method has no effect.
 
         Args:
             job (APScheduler Job): The job to remove.

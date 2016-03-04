@@ -19,17 +19,14 @@ class NoDepBlock(Block):
 class TestClassDependencies(NIOTestCase):
 
     def test_class_dependencies(self):
-        """ Asserts that dependencies are correctly saved at the
-        class level
-        """
+        """Asserts that dependencies are correctly saved at the class level"""
         dependencies = get_class_dependencies(ParentBlock)
         self.assertIsNotNone(dependencies)
         self.assertIn("nio", dependencies)
         self.assertEqual(dependencies["nio"][1], "2.0.1")
 
     def test_dependency_inheritance(self):
-        """ Asserts that dependencies are inherited
-        """
+        """ Asserts that dependencies are inherited """
         dependencies = get_class_dependencies(InheritedBlock)
         self.assertIsNotNone(dependencies)
         self.assertIn("nio", dependencies)

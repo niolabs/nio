@@ -42,8 +42,7 @@ class TestBaseBlock(NIOTestCaseNoModules):
                                                            "log_level": 42}))
 
     def test_notify_management_signal(self):
-        """Test the block can notify management signals properly to
-        block router"""
+        """Test the block can notify management signals properly to router """
         blk = Block()
         blk.configure(BlockContext(
             BlockRouter(),
@@ -56,8 +55,7 @@ class TestBaseBlock(NIOTestCaseNoModules):
                 blk, my_sig)
 
     def test_service_notify_management_signal(self):
-        """ Test the block can notify management signals properly by making it
-        all the way to service mgmt handler """
+        """ Test the block can notify management signals to the service """
         blk = Block()
         service_mgmt_signal_handler = Mock()
         block_router = BlockRouter()

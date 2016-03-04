@@ -62,8 +62,7 @@ class CommandHolder(object):
         if isinstance(command, Command):
             class_commands[command.name] = command
         else:
-            # TODO: log error
-            pass
+            raise TypeError("Added command must be an instance of Command")
 
     @classmethod
     def get_command_description(cls):

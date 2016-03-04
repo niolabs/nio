@@ -30,7 +30,7 @@ class Retry(object):
         super().__init__()
         # Use the placeholder backoff strategy in case the block developer
         # doesn't define one. Note, this strategy will never retry
-        self._backoff_strategy = BackoffStrategy(logger=self._logger)
+        self._backoff_strategy = BackoffStrategy(logger=self.logger)
 
     def execute_with_retry(self, execute_method, *args, **kwargs):
         """ Execute a method and retry if it raises an exception
@@ -59,7 +59,7 @@ class Retry(object):
                 self._backoff_strategy.request_succeeded()
                 return result
             except Exception as exc:
-                self._logger.warning(
+                self.logger.warning(
                     "Retryable execution on method {} failed".format(
                         execute_method_name, exc_info=True))
                 self._backoff_strategy.request_failed(exc)
@@ -67,7 +67,7 @@ class Retry(object):
                 if not should_retry:
                     # Backoff strategy has said we're done retrying,
                     # so re-raise the exception
-                    self._logger.exception(
+                    self.logger.exception(
                         "Out of retries for method {}.".format(
                             execute_method_name))
                     raise
@@ -91,7 +91,7 @@ class Retry(object):
         if not issubclass(strategy, BackoffStrategy):
             raise TypeError("Backoff strategy must subclass BackoffStrategy")
         self._backoff_strategy = strategy(*args, **kwargs)
-        self._backoff_strategy.use_logger(self._logger)
+        self._backoff_strategy.use_logger(self.logger)
 
     def before_retry(self, *args, **kwargs):
         """ Perform any actions before the next retry occurs.

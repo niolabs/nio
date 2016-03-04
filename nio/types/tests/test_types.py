@@ -1,7 +1,5 @@
 import datetime
 from enum import Enum
-import inspect
-import sys
 from nio.types import BoolType, DictType, FileType, FloatType,  IntType, \
     ListType, SelectType, StringType, TimeDeltaType
 from nio.types.base import Type
@@ -18,6 +16,7 @@ class SampleEnum(Enum):
 
 
 class NotStringable(object):
+
     def __str__(self):
         raise Exception('This is not a string')
 
@@ -38,8 +37,8 @@ class TestTypes(NIOTestCase):
             FileType: [],
             FloatType: [(1.23, 1.23), (1, 1.0)],
             IntType: [(1, 1), (2, 2), (3, 3)],
-            ListType: [], # tested seperately because of list_obj_type kwarg
-            SelectType: [], # tested seperately because of enum kwarg
+            ListType: [],  # tested seperately because of list_obj_type kwarg
+            SelectType: [],  # tested seperately because of enum kwarg
             StringType: [("string", "string")],
             TimeDeltaType: [
                 (NOW, NOW),
@@ -63,8 +62,8 @@ class TestTypes(NIOTestCase):
             FileType: [],
             FloatType: ['not a float'],
             IntType: ['not an int'],
-            ListType: [], # tested seperately because of list_obj_type kwarg
-            SelectType: [], # tested seperately because of enum kwarg
+            ListType: [],  # tested seperately because of list_obj_type kwarg
+            SelectType: [],  # tested seperately because of enum kwarg
             StringType: [NotStringable()],
             TimeDeltaType: [],
         }

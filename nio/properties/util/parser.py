@@ -5,8 +5,7 @@ import re
 
 class Parser:
 
-    """ Helper class for translation and evaluation of incoming
-    nio scripts.
+    """ Helper class for translation and evaluation of nio expressions
 
     Args:
         signal (Signal): Contextualizes incoming code snippets.
@@ -19,7 +18,9 @@ class Parser:
     ident_stem = re.compile(r'[_a-zA-Z][_a-zA-Z0-9]*$')
 
     def parse(self, tokens):
-        """ Traverses the 'AST' (list of tokens) recursively, transforming,
+        """ Parse a list of tokens and evaluate them.
+
+        Traverses the 'AST' (list of tokens) recursively, transforming,
         ignoring, or evaluating them as needed.
 
         Args:
@@ -51,7 +52,9 @@ class Parser:
         return result
 
     def _build_function(self, expr):
-        """ Helper function to transform incoming expressions and wrap
+        """ Build a function that evaluates an expression.
+
+        Helper function to transform incoming expressions and wrap
         them in unnamed functions. This leaves the expressions themselves
         compiled and ready to be parameterized with incoming signals
         """

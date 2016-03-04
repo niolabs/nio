@@ -5,8 +5,9 @@ from nio.properties import StringProperty
 class VersionProperty(StringProperty):
 
     """ Defines a Version property.
+
     Version property permits saving version information with
-    (mayor.minor.build) format
+    (major.minor.build) format
     """
 
     def __init__(self, version=None, **kwargs):
@@ -26,11 +27,8 @@ class VersionProperty(StringProperty):
             super().__init__(default=version, **kwargs)
 
     def __set__(self, instance, value):
-        """ Override default set so that value can be checked against version
-        valid format
-        """
-
-        # make sure value follows "mayor,minor,build" convention
+        """ Override default set to make sure it's a valid version """
+        # make sure value follows "major,minor,build" convention
         if not is_version_valid(value):
             raise InvalidVersionFormat("Version: {0} is invalid".format(value))
 

@@ -28,7 +28,7 @@ class SchedulerHelper(object):
         self._resolution = resolution
         self._min_delta = min_delta
 
-        self._logger = get_nio_logger("Custom Scheduler")
+        self.logger = get_nio_logger("Custom Scheduler")
         self._queue = []
         self._queue_lock = RLock()
         self._stop_event = Event()
@@ -46,8 +46,8 @@ class SchedulerHelper(object):
                 event = None
                 with self._queue_lock:
                     queue_length = len(self._queue)
-                    self._logger.debug('Queue contains: {0} tasks'.
-                                       format(queue_length))
+                    self.logger.debug('Queue contains: {0} tasks'.
+                                      format(queue_length))
 
                     if queue_length:
                         # have access to first in time to execute event
@@ -63,7 +63,7 @@ class SchedulerHelper(object):
                 now = time()
                 # find out if need to sleep or execute event
                 if now < event_time:
-                    self._logger.debug(
+                    self.logger.debug(
                         'Current task time has not been reached, {0} remains'.
                         format(event_time - now))
 
@@ -77,12 +77,12 @@ class SchedulerHelper(object):
                 else:
                     # time is up, execute
                     try:
-                        self._logger.debug("Executing: {0}".format(target))
+                        self.logger.debug("Executing: {0}".format(target))
                         # launch target task from a different thread thus
                         # making scheduler independent from task duration
                         spawn(target, *args, **kwargs)
                     except Exception:
-                        self._logger.exception('Calling: {0}'.format(target))
+                        self.logger.exception('Calling: {0}'.format(target))
 
                     with self._events_lock:
                         # before processing any further, make sure event has
@@ -105,13 +105,13 @@ class SchedulerHelper(object):
                                 # remove event when not repeatable
                                 self._events.pop(event_id)
                         else:
-                            self._logger.debug("Event: {0} was cancelled".
-                                               format(event_id))
+                            self.logger.debug("Event: {0} was cancelled".
+                                              format(event_id))
 
             except Exception:
                 # log any exception in this big try/except
                 # and do not leave loop
-                self._logger.exception('Exception caught')
+                self.logger.exception('Exception caught')
 
     def stop(self):
         """ Stops scheduler.
@@ -186,9 +186,9 @@ class SchedulerHelper(object):
                 with self._queue_lock:
                     self._queue.remove(event)
                     heapq.heapify(self._queue)
-                self._logger.debug('Success cancelling event')
+                self.logger.debug('Success cancelling event')
                 return True
             except Exception:
-                self._logger.debug('Failure to remove event {0} from queue'
-                                   ' while cancelling a job'.format(event))
+                self.logger.debug('Failure to remove event {0} from queue'
+                                  ' while cancelling a job'.format(event))
         return False

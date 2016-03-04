@@ -16,5 +16,5 @@ class ThreadedBlockRouter(BlockRouter):
             self.notify_signals_to_block(block_receiver, signals)
         except:
             self.status.add(RunnerStatus.error)
-            self._logger.exception(
+            self.logger.exception(
                 "{0}.process_signals failed".format(block_receiver.block.name))

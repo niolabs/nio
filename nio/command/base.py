@@ -76,13 +76,9 @@ class Command(object):
 
         This method is used iteratively in CommandHolder.get_description.
 
-        Args:
-            None
-
         Returns:
             description (dict): the title of the command and descriptions
                 of its parameters
-
         """
         description = {"title": self.title}
         params = {}
@@ -116,7 +112,6 @@ class Command(object):
         Returns:
             args (list): The list of arguments, converted and type
                 checked.
-
         """
         result = []
         result_kwargs = {}

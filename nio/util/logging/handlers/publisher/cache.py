@@ -4,7 +4,9 @@ from nio.util.cache import Cache
 
 class LogCache(object):
 
-    """ Maintains logging instructions per code source line helping
+    """ A cache of log messages to prevent logging loops.
+
+    Maintains logging instructions per code source line helping
     avoid potential infinite loops when logging from a logging handler
     subscriber.
 
@@ -22,8 +24,7 @@ class LogCache(object):
         self._cache = Cache(expire_interval)
 
     def process_record(self, record):
-        """ Processes a record determining if it is present, in addition,
-        it takes care of adding the record to the cache
+        """ Processes a record determining if it is present and add to cache
 
         Args:
             record: log record as incoming from logging module

@@ -22,9 +22,7 @@ class Dummy(object):
 class TestScheduler(NIOTestCase):
 
     def test_args(self):
-        """ Asserts that scheduler accepts args and kwargs and they
-        are passed correctly when calling the target with it"
-        """
+        """ Asserts that scheduler accepts args and kwargs """
         dummy = Dummy()
         self.job1 = Job(dummy.foo1, timedelta(milliseconds=100), False,
                         arg1_parameter, kwarg1_parameter)

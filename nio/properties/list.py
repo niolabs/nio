@@ -6,6 +6,7 @@ from nio.types import ListType, Type
 
 class ListProperty(BaseProperty):
     """ Defines a list property.
+
     List properties hold a list of object types which can contain
     properties themselves or can be nio types like IntType, etc.
 

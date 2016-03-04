@@ -2,7 +2,9 @@ from inspect import isclass
 
 
 def ensure_is(obj, types, fn, msg=None):
-    """ General method for checking an object against a
+    """ Make sure an object is of a given type
+
+    General method for checking an object against a
     list of types. If the object does not match one of the
     types in 'types', then 'fn' (parameterized by 'obj') is
     called. If 'fn' is an Exception class, then an instance
@@ -30,7 +32,9 @@ def ensure_is(obj, types, fn, msg=None):
 
 
 def ensure_list(obj, fn=lambda x: [x], msg=None):
-    """ Less general version for the common case.
+    """ Make sure an object is a list.
+
+    Less general version for the common case.
     A custom callable may be included, but the default
     parameters are convenient for checking whether an
     object is a list, wrapping it in a list if necessary.

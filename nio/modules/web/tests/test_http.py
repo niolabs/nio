@@ -6,6 +6,7 @@ from nio.modules.web.http import Request, Response, \
 class TestWebClasses(NIOTestCase):
 
     def test_request(self):
+        """ Test the request object has the correct attributes """
         the_body = 'My body'
         the_params = {'identifier': 'foo'}
         the_headers = {'content-type': 'application/json'}
@@ -17,6 +18,7 @@ class TestWebClasses(NIOTestCase):
                          the_headers['content-type'])
 
     def test_response(self):
+        """ Test the response object has the correct attributes """
         resp = Response()
         with self.assertRaises(NotImplementedError):
             resp.set_header('foo', 'bar')
@@ -28,7 +30,7 @@ class TestWebClasses(NIOTestCase):
             resp.set_body('check it out')
 
     def test_errors(self):
-
+        """ Test that the exceptions contain the correct HTTP statuses """
         try:
             raise HTTPNotImplemented()
         except Exception as e:

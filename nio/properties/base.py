@@ -163,8 +163,7 @@ class BaseProperty(object):
         try:
             # TODO: This check should actually check if the closing braces come
             # after the opening ones.
-            return "{{" in value and \
-                    "}}" in value
+            return "{{" in value and "}}" in value
         except:
             return False
 

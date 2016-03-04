@@ -28,7 +28,7 @@ class ContainerClass(PropertyHolder):
     object_property = ObjectProperty(ContainedClass, default=ContainedClass())
     typed_list_property = ListProperty(Type, default=[])
     list_property = ListProperty(ContainedClass, default=[])
-    td_property = TimeDeltaProperty(default={"seconds":0})
+    td_property = TimeDeltaProperty(default={"seconds": 0})
 
 
 class TestProperties(NIOTestCaseNoModules):
@@ -108,7 +108,7 @@ class TestProperties(NIOTestCaseNoModules):
             'td_property': {'seconds': 23}
         }
         self.assertCountEqual(container.validate_dict(deepcopy(valid_dict)),
-                             valid_dict)
+                              valid_dict)
 
         # validate object property
         valid_dict = {
@@ -119,7 +119,7 @@ class TestProperties(NIOTestCaseNoModules):
             }
         }
         self.assertCountEqual(container.validate_dict(deepcopy(valid_dict)),
-                             valid_dict)
+                              valid_dict)
 
         # make sure that the property holder passes validation
         # when there's an env var inside an object
@@ -131,7 +131,7 @@ class TestProperties(NIOTestCaseNoModules):
         }
 
         self.assertCountEqual(container.validate_dict(deepcopy(valid_dict)),
-                             valid_dict)
+                              valid_dict)
 
     def test_accept_values(self):
         """Test that valid property values can be set and called."""

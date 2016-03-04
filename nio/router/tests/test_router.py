@@ -255,6 +255,14 @@ class TestBaseRouter(NIOTestCaseNoModules):
         with self.assertRaises(InvalidBlockInput):
             self._configure_router(
                 SourceBlock, DestBlock, "test_output", "invalid_input")
+        # Configuring a router without a terminal id when there is no default
+        # raises an exception too
+        with self.assertRaises(InvalidBlockInput):
+            self._configure_router(
+                SourceBlock, DestBlock, "test_output", None)
+        with self.assertRaises(InvalidBlockOutput):
+            self._configure_router(
+                SourceBlock, DestBlock, None, "test_input")
 
     def test_notify_from_invalid_output(self):
         """ Test a block can't notify from an output that doesn't exist """
@@ -282,13 +290,13 @@ class TestBaseRouter(NIOTestCaseNoModules):
     def test_overridden_out_overridden_in(self):
         """ Test blocks can override default inputs/outputs and still route """
 
-        @output("test_output_1")
         @output("test_output_2", default=True)
+        @output("test_output_1")
         class SourceBlock(RouterTestBlock):
             pass
 
-        @input("test_input_1")
         @input("test_input_2", default=True)
+        @input("test_input_1")
         class DestBlock(RouterTestBlock):
             pass
 
@@ -410,7 +418,8 @@ class TestBaseRouter(NIOTestCaseNoModules):
 
     def test_sending_from_block_in_warning_error(self):
         """ Asserts that router does not route signals to a block in error
-        status, but does when block is in warning status
+
+        But it should route when block is in warning status
         """
 
         class SourceBlock(RouterTestBlock):

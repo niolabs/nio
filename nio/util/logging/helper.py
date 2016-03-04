@@ -1,5 +1,5 @@
 import logging
-from .adapter import NIOAdapter
+from nio.util.logging.adapter import NIOAdapter
 
 
 class LoggingHelper(object):

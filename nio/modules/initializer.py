@@ -1,6 +1,4 @@
-"""
-
-ModuleInitializer - an object that keeps track of modules and configurations.
+""" An object that keeps track of modules and configurations.
 
 A ModuleInitializer will have a list of module (nio.modules.module.Module)
 objects as well as what configuration contexts they should be initialized
@@ -19,6 +17,7 @@ class ModuleInitializer(object):
     """ A class that proxies and unproxies modules """
 
     def __init__(self):
+        super().__init__()
         self.logger = get_nio_logger('ModuleInitializer')
         self._registered_modules = []
         self._initialized_modules = []

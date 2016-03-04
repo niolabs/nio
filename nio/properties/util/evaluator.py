@@ -1,5 +1,6 @@
 import re
 
+from nio.properties.exceptions import InvalidEvaluationCall
 from nio.properties.util.parser import Parser
 from nio.signal.base import Signal
 
@@ -8,10 +9,6 @@ class TemporarySignal(Signal):
 
     def __getattribute__(self, name):
         raise InvalidEvaluationCall
-
-
-class InvalidEvaluationCall(Exception):
-    pass
 
 
 class Evaluator:
@@ -81,10 +78,7 @@ class Evaluator:
         return result
 
     def tokenize(self, expression):
-        """ Pad the (unescaped) delimiters with whitespace and split
-        the expression.
-
-        """
+        """ Pad the delimiters with whitespace and split the expression. """
         tokens = self.delimiter.split(expression)
 
         # the split includes a bunch of None's and empty strings...

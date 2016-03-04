@@ -2,8 +2,7 @@ class DefaultMatching(object):
 
     @classmethod
     def matches(cls, sub_topics, pub_topics):
-        """ Finds out if there is a match between subscriber and publisher
-        topics.
+        """ Finds out if there is a match between sub and pub topics
 
         Args:
             sub_topics: subscriber topics
@@ -21,7 +20,7 @@ class DefaultMatching(object):
                 return False
 
             # if subscriber does not specified values for given key,
-            # it is assumed that it is interested in everything published by key
+            # assume that it is interested in everything published by key
             if not len(sub_values):
                 continue
 

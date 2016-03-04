@@ -14,11 +14,11 @@ from nio.util.support.test_case import NIOTestCase
 @command('cmd_without_params')
 @command('secure_with_params', IntParameter("steps"), tasks=[SecureTask('t1')])
 @command('secure_single_task', tasks=[SecureTask('valid_john')],
-                  meet_all=True)
+         meet_all=True)
 @command('secure_any_task', tasks=[SecureTask('t1'), SecureTask('t2')],
-                  meet_all=False)
+         meet_all=False)
 @command('secure_all_tasks', tasks=[SecureTask('t1'), SecureTask('t2')],
-                  meet_all=True)
+         meet_all=True)
 class CommandHolderSecure(CommandHolder):
     pass
 

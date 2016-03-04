@@ -8,9 +8,7 @@ class PublisherError(Exception):
 
 class Publisher(ModuleProxy):
 
-    """ This class encapsulates the user-facing interface to NIO's
-    publisher.
-    """
+    """ An interface for a generic Publisher in the communication module """
 
     def __init__(self, context=None, **topics):
         """ Create a new publisher instance.

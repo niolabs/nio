@@ -63,10 +63,7 @@ class BlockExecutionTest(BlockExecution):
 class TestCloningSignals(NIOTestCase):
 
     def test_cloning(self):
-        """
-        Checking that the default router
-        delivers signals as intended
-        """
+        """ Checking that the default router delivers signals as intended """
 
         block_router = BlockRouter()
         context = BlockContext(block_router, dict())
@@ -128,8 +125,9 @@ class TestCloningSignals(NIOTestCase):
         block_router.do_stop()
 
     def test_deepcopy_failure(self):
-        """ Asserts that when deepcopy fails, signals are delivered anyways,
-        only they are not copied, and instead original signals are delivered
+        """ Asserts that when deepcopy fails, signals are delivered anyways
+
+        Only they are not copied, and instead original signals are delivered
         """
 
         block_router = BlockRouter()

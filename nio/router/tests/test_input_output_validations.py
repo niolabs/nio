@@ -1,5 +1,3 @@
-import unittest
-
 from nio import Signal
 from nio.block.base import Block
 from nio.block.context import BlockContext
@@ -18,12 +16,12 @@ class OutputBlock(Block):
         self.name = self.__class__.__name__.lower()
 
 
-@output("first")
+@output("first", default=True)
 class FirstOutputBlock(OutputBlock):
     pass
 
 
-@output("second")
+@output("second", default=True)
 class SecondOutputBlock(Block):
     pass
 
@@ -39,12 +37,12 @@ class InputBlock(Block):
         self.signal_cache.append(signals)
 
 
-@input("first")
+@input("first", default=True)
 class FirstInputBlock(InputBlock):
     pass
 
 
-@input("second")
+@input("second", default=True)
 class SecondInputBlock(InputBlock):
     pass
 
@@ -127,32 +125,6 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
                           block_router.configure,
                           router_context)
 
-    @unittest.skip('old constraint no longer enforceable, 03172015 changes')
-    def test_invalid_input_valid_output1(self):
-        block_router = BlockRouter()
-        context = BlockContext(block_router, dict())
-
-        # create blocks
-        sender_block = FirstOutputBlock()
-        sender_block.configure(context)
-        receiver_block = SecondInputBlock()
-        receiver_block.configure(context)
-
-        # create context initialization data
-        blocks = dict(secondinputblock=receiver_block,
-                      firstoutputblock=sender_block)
-
-        execution = [
-            BlockExecutionTest(name="FirstOutputBlock".lower(),
-                               receivers={"first": [
-                                   {"name": "SecondInputBlock".lower(),
-                                    "input": "second"}]})]
-        router_context = RouterContext(execution, blocks)
-
-        self.assertRaises(InvalidBlockInput,
-                          block_router.configure,
-                          router_context)
-
     def test_invalid_input_valid_output2(self):
         block_router = BlockRouter()
         context = BlockContext(block_router, dict())
@@ -179,11 +151,10 @@ class TestInputOutputValidations(NIOTestCaseNoModules):
                           router_context)
 
     def test_one_input_default_output(self):
-        """ Asserts that data can be passed from a default output to a block
-        that has one input overriding default using old receiver format
+        """ Asserts that data can be passed from a default output to 1 input
 
-        OutputBlock has DEFAULT_TERMINAL since it inherits from Block and has no
-        output definitions
+        OutputBlock has DEFAULT_TERMINAL since it inherits from Block and has
+        no output definitions
 
         FirstInputBlock only input is 'first' yet it receives from 'default'
         """

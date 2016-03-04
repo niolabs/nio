@@ -18,7 +18,8 @@ class TestModuleInterface(Module):
         # Append this module's name to the list of modules
         # We will use this for the order of modules
         self._initialized_modules = getattr(context, "init_module_order", [])
-        self._finalized_modules = getattr(context, "finalized_module_order", [])
+        self._finalized_modules = getattr(
+            context, "finalized_module_order", [])
 
         self._initialized_modules.append(self.__class__.__name__)
 
