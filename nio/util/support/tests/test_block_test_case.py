@@ -17,6 +17,8 @@ class TestBlockTestCase(NIOBlockTestCase):
     def management_signal_notified(self, block, signal):
         """ Override a management signal notification handler """
         self._management_notified = True
+        self.assertEqual(signal.block_name, block.name())
+        self.assertEqual(signal.service_name, block._service_name)
 
     def test_allows_signal_notify(self):
         """ Makes sure a test can assert how many signals were notified """
