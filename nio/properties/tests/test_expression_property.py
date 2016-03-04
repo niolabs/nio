@@ -2,7 +2,7 @@ from inspect import isclass
 from unittest import skip
 
 from nio.block.base import Block
-from nio.util.support.block_test_case import NIOBlockTestCase
+from nio.testing.block_test_case import NIOBlockTestCase
 from nio.signal.base import Signal
 from nio.properties import BaseProperty
 from nio.types import Type

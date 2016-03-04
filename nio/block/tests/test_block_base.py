@@ -8,7 +8,7 @@ from nio.properties.exceptions import AllowNoneViolation
 from nio.signal.base import Signal
 from nio.router.base import BlockRouter
 from nio.router.context import RouterContext
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class TestBaseBlock(NIOTestCaseNoModules):

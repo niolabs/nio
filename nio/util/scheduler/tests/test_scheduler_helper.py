@@ -5,7 +5,7 @@ from datetime import timedelta
 from nio.util.scheduler.scheduler_thread import SchedulerThread
 from nio.util.scheduler.scheduler_helper import SchedulerHelper
 from time import sleep
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class TestSchedulerHelper(NIOTestCase):

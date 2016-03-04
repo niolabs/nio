@@ -3,7 +3,7 @@ from time import sleep
 from nio.modules.scheduler.job import Job
 from unittest.mock import MagicMock
 from datetime import timedelta
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class Dummy(object):

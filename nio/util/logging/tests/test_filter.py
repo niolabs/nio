@@ -1,7 +1,7 @@
 from logging import LogRecord
 import logging
 from nio.util.logging.filter import NIOFilter
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class TestFilter(NIOTestCaseNoModules):

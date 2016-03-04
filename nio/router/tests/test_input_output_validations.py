@@ -5,7 +5,7 @@ from nio.router.base import BlockRouter, InvalidBlockOutput, \
     InvalidBlockInput
 from nio.router.context import RouterContext
 from nio.service.base import BlockExecution
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 from nio.block.terminals import input, output, DEFAULT_TERMINAL
 
 

@@ -1,4 +1,4 @@
-from nio.util.support.modules.persistence import Persistence
+from nio.testing.modules.persistence import Persistence
 from nio.modules.persistence.module import PersistenceModule
 
 

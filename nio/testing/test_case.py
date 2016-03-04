@@ -9,13 +9,13 @@ from unittest import TestCase
 from nio.modules.initializer import ModuleInitializer
 
 # Testing module implementations
-from nio.util.support.modules.scheduler.module import TestingSchedulerModule
-from nio.util.support.modules.persistence.module \
+from nio.testing.modules.scheduler.module import TestingSchedulerModule
+from nio.testing.modules.persistence.module \
     import TestingPersistenceModule
-from nio.util.support.modules.communication.module \
+from nio.testing.modules.communication.module \
     import TestingCommunicationModule
-from nio.util.support.modules.security.module import TestingSecurityModule
-from nio.util.support.modules.web.module import TestingWebModule
+from nio.testing.modules.security.module import TestingSecurityModule
+from nio.testing.modules.web.module import TestingWebModule
 
 
 class NIOTestCase(TestCase):

@@ -7,7 +7,7 @@ from nio.router.base import BlockRouter
 from nio.router.context import RouterContext
 from nio.service.base import BlockExecution
 from nio.signal.base import Signal
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class SenderBlock(Block):

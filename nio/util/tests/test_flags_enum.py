@@ -2,7 +2,7 @@ from enum import Enum
 from unittest.mock import Mock
 
 from nio.util.flags_enum import FlagsEnum, InvalidFlag
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class Status(Enum):

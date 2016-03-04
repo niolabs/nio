@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 from nio.util.logging.helper import LoggingHelper
 
 

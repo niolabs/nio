@@ -4,7 +4,7 @@ from nio.util.logging.handlers.publisher.cache_filter import CacheFilter
 from nio.util.logging.handlers.publisher.handler import PublisherHandler
 from nio.util.logging.filter import NIOFilter
 
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class TestPublisherBase(NIOTestCase):

@@ -2,7 +2,7 @@ from unittest.mock import patch
 from nio import Block
 from nio.block.mixins.retry.retry import Retry
 from nio.block.mixins.retry.strategies.linear import LinearBackoff
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class LinearBackoffBlock(Retry, Block):

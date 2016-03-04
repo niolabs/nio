@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from nio.properties import FileProperty
 from nio.properties import PropertyHolder
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class FileContainerClass(PropertyHolder):

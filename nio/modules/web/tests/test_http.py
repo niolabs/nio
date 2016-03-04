@@ -1,4 +1,4 @@
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 from nio.modules.web.http import Request, Response, \
     HTTPNotImplemented, HTTPUnauthorized, HTTPNotFound
 

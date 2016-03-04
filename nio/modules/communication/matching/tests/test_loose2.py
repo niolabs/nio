@@ -1,5 +1,5 @@
 from nio.modules.communication.matching.loose import LooseMatching
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 PUB_A_AND_B = {'type': ['A', 'B']}
 PUB_TYPE_EMPTY = {'type': []}

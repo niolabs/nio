@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 from nio.properties import BaseProperty
 from nio.properties.util.property_value import PropertyValue
 from nio.types import Type
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class TestBaseProperty(NIOTestCaseNoModules):

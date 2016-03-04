@@ -1,5 +1,5 @@
-from nio.util.support.modules.security.authenticator import Authenticator
-from nio.util.support.modules.security.authorizer import Authorizer
+from nio.testing.modules.security.authenticator import Authenticator
+from nio.testing.modules.security.authorizer import Authorizer
 from nio.modules.security.module import SecurityModule
 
 

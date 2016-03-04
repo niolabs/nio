@@ -3,7 +3,7 @@ from enum import Enum
 from nio.types import BoolType, DictType, FileType, FloatType,  IntType, \
     ListType, SelectType, StringType, TimeDeltaType
 from nio.types.base import Type
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 NOW = datetime.datetime.utcnow()

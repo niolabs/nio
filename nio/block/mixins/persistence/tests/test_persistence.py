@@ -2,7 +2,7 @@ from datetime import timedelta
 from unittest.mock import MagicMock, patch
 from nio.block.mixins.persistence.persistence import Persistence
 from nio.block.base import Block
-from nio.util.support.block_test_case import NIOBlockTestCase
+from nio.testing.block_test_case import NIOBlockTestCase
 
 
 class PersistingBlock(Persistence, Block):

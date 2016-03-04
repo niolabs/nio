@@ -5,7 +5,7 @@ from nio.properties.holder import PropertyHolder
 from nio.properties.util.property_value import PropertyValue
 from nio.signal.base import Signal
 from nio.types.base import Type
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class SampleHolder(PropertyHolder):

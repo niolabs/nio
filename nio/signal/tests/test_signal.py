@@ -1,7 +1,7 @@
 import copy
 import datetime
 from nio.signal.base import Signal
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class TestSignal(NIOTestCase):

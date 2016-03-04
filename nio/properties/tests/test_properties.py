@@ -10,7 +10,7 @@ from nio.properties import PropertyHolder
 from nio.properties import StringProperty
 from nio.properties import TimeDeltaProperty
 from nio.types import Type, IntType
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class ContainedClass(PropertyHolder):

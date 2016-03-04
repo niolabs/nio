@@ -1,7 +1,7 @@
 from nio.properties.util.evaluator import Evaluator
 from nio.properties.exceptions import InvalidEvaluationCall
 from nio.signal.base import Signal
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class TestEvaluator(NIOTestCaseNoModules):

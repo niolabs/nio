@@ -3,7 +3,7 @@ from nio.modules.initializer import ModuleInitializer
 from nio.modules.proxy import ProxyNotProxied, ProxyAlreadyProxied
 from nio.modules.context import ModuleContext
 from nio.modules.module import Module
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class TestModuleInterface(Module):

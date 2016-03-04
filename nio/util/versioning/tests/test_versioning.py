@@ -3,7 +3,7 @@ from nio.util.versioning.check import get_major_version
 from nio.util.versioning.dependency import validate_version
 from nio.util.versioning.tests import module_version, \
     block_b_module_version, block_a_module_version
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class TestVersioning(NIOTestCase):

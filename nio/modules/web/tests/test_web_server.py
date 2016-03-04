@@ -1,5 +1,5 @@
 from nio.modules.web import WebServer
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class TestWebServer(NIOTestCaseNoModules):

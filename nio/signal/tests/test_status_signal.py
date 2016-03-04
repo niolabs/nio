@@ -1,6 +1,6 @@
 from nio.util.runner import RunnerStatus
 from nio.signal.status import ServiceStatusSignal, BlockStatusSignal
-from nio.util.support.test_case import NIOTestCase
+from nio.testing.test_case import NIOTestCase
 
 
 class TestStatusSignal(NIOTestCase):

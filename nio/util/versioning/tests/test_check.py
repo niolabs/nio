@@ -1,6 +1,6 @@
 from nio.util.versioning.check import is_version_valid, \
     compare_versions, VersionCheckResult
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class TestVersionCheck(NIOTestCaseNoModules):

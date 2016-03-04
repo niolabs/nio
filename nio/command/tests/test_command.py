@@ -9,7 +9,7 @@ from nio.command.params.float import FloatParameter
 from nio.command.params.dict import DictParameter
 from nio.command.params.list import ListParameter
 from nio.types import DictType
-from nio.util.support.block_test_case import NIOBlockTestCase
+from nio.testing.block_test_case import NIOBlockTestCase
 
 
 @command('talk',

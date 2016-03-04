@@ -6,7 +6,7 @@ from nio.router.base import BlockRouter
 from nio.service.base import Service
 from nio.service.context import ServiceContext
 from nio.signal.base import Signal
-from nio.util.support.test_case import NIOTestCaseNoModules
+from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class TestBaseService(NIOTestCaseNoModules):
