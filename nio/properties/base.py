@@ -135,7 +135,8 @@ class BaseProperty(object):
             merged_kwargs = self.kwargs.copy()
             merged_kwargs.update(**kwargs)
             if value is None and not self.allow_none:
-                raise AllowNoneViolation("Property value None is not allowed")
+                raise AllowNoneViolation("Property value None is not allowed, "
+                                         "Hint: check default value")
             return self.type.deserialize(value, **merged_kwargs)
         return value
 
