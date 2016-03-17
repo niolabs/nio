@@ -33,4 +33,5 @@ class ObjectType(Type):
             else:
                 raise Exception
         except:
-            raise TypeError("Unable to cast value to object: {}".format(value))
+            raise TypeError("Unable to cast value: {0} to ObjectType".
+                            format(value))

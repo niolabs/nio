@@ -1,5 +1,6 @@
 from nio.properties.exceptions import NoClassVersion, NoInstanceVersion, \
     OlderThanMinVersion
+from nio.util.exception_message import add_message_to_exception
 from nio.util.versioning.check import compare_versions, \
     VersionCheckResult, InvalidVersionFormat, is_version_valid, \
     get_major_version
@@ -74,7 +75,14 @@ class PropertyHolder(object):
             if property_name in properties:
                 value = properties[property_name]
                 # Deserialize to check for AllowNoneViolation and TypeError
-                prop.deserialize(value)
+                try:
+                    prop.deserialize(value)
+                except Exception as e:
+                    details = " for property: '{0}' with description: {1}".\
+                        format(property_name, prop.description)
+                    add_message_to_exception(e, details)
+                    raise
+
                 # Return the serialized version of the input dictionary
                 serialized_value = prop.type.serialize(value, **prop.kwargs)
                 properties[property_name] = serialized_value
