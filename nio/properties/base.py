@@ -15,13 +15,14 @@ class BaseProperty(object):
 
     Attributes:
         type (Type): The type of data held in this property.
+        title (str): The property title.
         description (dict): Property settings.
     """
 
-    def __init__(self, _type, title=None,
+    def __init__(self, title, _type,
                  visible=True, allow_none=False, default=None, **kwargs):
-        self.type = _type
         self.title = title
+        self.type = _type
         self.visible = visible
         self.allow_none = allow_none
         self.kwargs = kwargs
@@ -135,7 +136,8 @@ class BaseProperty(object):
             merged_kwargs = self.kwargs.copy()
             merged_kwargs.update(**kwargs)
             if value is None and not self.allow_none:
-                raise AllowNoneViolation("Property value None is not allowed")
+                raise AllowNoneViolation("Property: '{0}' does not allow None".
+                                         format(self.title))
             return self.type.deserialize(value, **merged_kwargs)
         return value
 

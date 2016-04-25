@@ -4,5 +4,5 @@ from nio.types import BoolType
 
 class BoolProperty(BaseProperty):
 
-    def __init__(self, **kwargs):
-        super().__init__(BoolType, **kwargs)
+    def __init__(self, title, **kwargs):
+        super().__init__(title, BoolType, **kwargs)

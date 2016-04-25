@@ -10,9 +10,9 @@ CONFIG_VAL = "attr_1_val"
 
 class DummyBlock(Block):
     # Create a dummy block with my configurable attribute
-    attr_1 = StringProperty(allow_none=True)
+    attr_1 = StringProperty("attr_1", allow_none=True)
     # For this test only, allow name to be None
-    name = StringProperty(allow_none=True)
+    name = StringProperty("name", allow_none=True)
 
 
 class TestBlockConfig(NIOTestCase):

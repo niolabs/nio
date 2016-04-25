@@ -12,7 +12,7 @@ class ListProperty(BaseProperty):
 
     """
 
-    def __init__(self, list_obj_type, **kwargs):
+    def __init__(self, title, list_obj_type, **kwargs):
         """ Initializes the property.
 
         Args:
@@ -28,7 +28,7 @@ class ListProperty(BaseProperty):
         else:
             raise TypeError("Specified list object type must be a "
                             "PropertyHolder or a nio Type")
-        super().__init__(ListType, **kwargs)
+        super().__init__(title, ListType, **kwargs)
         self.description.update(self._get_description(**kwargs))
 
     def _get_description(self, **kwargs):

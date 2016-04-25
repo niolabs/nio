@@ -4,8 +4,8 @@ from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class ContainerClass(PropertyHolder):
-    property = FloatProperty()
-    default = FloatProperty(default=1.23)
+    property = FloatProperty("property")
+    default = FloatProperty("default", default=1.23)
 
 
 class TestFloatProperty(NIOTestCaseNoModules):

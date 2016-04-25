@@ -6,9 +6,9 @@ from nio.types import SelectType
 
 class SelectProperty(BaseProperty):
 
-    def __init__(self, enum, **kwargs):
+    def __init__(self, title, enum, **kwargs):
         kwargs['enum'] = enum
-        super().__init__(SelectType, **kwargs)
+        super().__init__(title, SelectType, **kwargs)
         self.description.update(self._get_description(**kwargs))
 
     def _get_description(self, **kwargs):

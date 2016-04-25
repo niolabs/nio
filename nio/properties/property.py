@@ -6,5 +6,5 @@ class Property(BaseProperty):
 
     """ A property that can assume any type """
 
-    def __init__(self, **kwargs):
-        super().__init__(Type, **kwargs)
+    def __init__(self, title, **kwargs):
+        super().__init__(title, Type, **kwargs)

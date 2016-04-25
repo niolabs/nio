@@ -15,20 +15,21 @@ from nio.testing.test_case import NIOTestCaseNoModules
 
 class ContainedClass(PropertyHolder):
     # Note, property name and receiving property have to match
-    string_property = StringProperty(default="str")
-    int_property = IntProperty(default=5)
-    float_property = FloatProperty(default=5.0)
+    string_property = StringProperty("string_property", default="str")
+    int_property = IntProperty("int_property", default=5)
+    float_property = FloatProperty("float_property", default=5.0)
 
 
 class ContainerClass(PropertyHolder):
     # Note, property name and receiving property have to match
-    string_property = StringProperty(default='')
-    int_property = IntProperty(default=0)
-    float_property = FloatProperty(default=0.0)
-    object_property = ObjectProperty(ContainedClass, default=ContainedClass())
-    typed_list_property = ListProperty(Type, default=[])
-    list_property = ListProperty(ContainedClass, default=[])
-    td_property = TimeDeltaProperty(default={"seconds": 0})
+    string_property = StringProperty("string_property", default='')
+    int_property = IntProperty("int_property", default=0)
+    float_property = FloatProperty("float_property", default=0.0)
+    object_property = ObjectProperty("object_property", ContainedClass,
+                                     default=ContainedClass())
+    typed_list_property = ListProperty("typed_list_property", Type, default=[])
+    list_property = ListProperty("list_property", ContainedClass, default=[])
+    td_property = TimeDeltaProperty("td_property", default={"seconds": 0})
 
 
 class TestProperties(NIOTestCaseNoModules):
@@ -277,7 +278,7 @@ class TestProperties(NIOTestCaseNoModules):
         self.assertIn('float_property',
                       description['list_property']['template'])
 
-        alist = ListProperty(IntType)
+        alist = ListProperty("alist", IntType)
         self.assertEqual('IntType', alist.description['template'])
 
     def test_additional_property_description(self):
@@ -286,7 +287,7 @@ class TestProperties(NIOTestCaseNoModules):
         # test that anything we add to the property definition
         # find its way to the description
         class AdditionalDescriptionClass(PropertyHolder):
-            property1 = StringProperty(bold=True,
+            property1 = StringProperty("property1", bold=True,
                                        italics=True)
 
         description = AdditionalDescriptionClass.get_description()
@@ -302,6 +303,6 @@ class TestProperties(NIOTestCaseNoModules):
 
     def test_print_property_info(self):
         """Property __str__ is overridden."""
-        prop_info = str(StringProperty())
+        prop_info = str(StringProperty("prop_info"))
         from nio.types import StringType
         self.assertIn("type is: {}, args are".format(StringType), prop_info)

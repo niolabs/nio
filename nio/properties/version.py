@@ -10,7 +10,7 @@ class VersionProperty(StringProperty):
     (major.minor.build) format
     """
 
-    def __init__(self, version=None, **kwargs):
+    def __init__(self, title, version=None, **kwargs):
         """ Initializes a version property.
 
         Keyword Args:
@@ -22,9 +22,9 @@ class VersionProperty(StringProperty):
                 # hmm, both version and default specified,
                 # version argument overrides
                 kwargs["default"] = version
-            super().__init__(**kwargs)
+            super().__init__(title, **kwargs)
         else:
-            super().__init__(default=version, **kwargs)
+            super().__init__(title, default=version, **kwargs)
 
     def __set__(self, instance, value):
         """ Override default set to make sure it's a valid version """

@@ -5,11 +5,12 @@ from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class ContainedClass(PropertyHolder):
-    sub_property = StringProperty(default='')
+    sub_property = StringProperty("sub_property", default='')
 
 
 class ContainerClass(PropertyHolder):
-    property = ObjectProperty(ContainedClass, default=ContainedClass())
+    property = \
+        ObjectProperty("property", ContainedClass, default=ContainedClass())
 
 
 class TestObjectProperty(NIOTestCaseNoModules):
@@ -43,7 +44,7 @@ class TestObjectProperty(NIOTestCaseNoModules):
         """Raise TypeError when obj_type is invalid."""
         with self.assertRaisesRegexp(TypeError, 'not a PropertyHolder'):
             class Holder(PropertyHolder):
-                property = ObjectProperty(str)
+                property = ObjectProperty("property", str)
         with self.assertRaisesRegexp(TypeError, 'not a PropertyHolder'):
             class Holder(PropertyHolder):
-                property = ObjectProperty('not a property holder')
+                property = ObjectProperty('property', 'not a property holder')

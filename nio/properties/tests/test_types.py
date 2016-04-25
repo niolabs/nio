@@ -20,8 +20,8 @@ from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class ContainedClass(PropertyHolder):
-    string_property = StringProperty(default="str")
-    int_property = IntProperty(default=5)
+    string_property = StringProperty("string_property", default="str")
+    int_property = IntProperty("int_property", default=5)
 
 
 class SampleEnum(Enum):
@@ -31,42 +31,56 @@ class SampleEnum(Enum):
 
 
 class ContainerClass(PropertyHolder):
-    string_property = StringProperty(default="string1")
+    string_property = StringProperty("string_property", default="string1")
     string_property_default_env_variable = \
-        StringProperty(default='[[ENV_VARIABLE]]')
+        StringProperty("string_property_default_env_variable",
+                       default='[[ENV_VARIABLE]]')
 
-    expression_property = StringProperty(default='Default to {{$v1}}')
+    expression_property = \
+        StringProperty("expression_property", default='Default to {{$v1}}')
     expression_property_default_env_variable = \
-        StringProperty(default='[[ENV_VARIABLE]]')
+        StringProperty("expression_property_default_env_variable",
+                       default='[[ENV_VARIABLE]]')
 
-    bool_property = BoolProperty(default=False)
+    bool_property = BoolProperty("bool_property", default=False)
     bool_property_default_env_variable = \
-        BoolProperty(default='[[ENV_VARIABLE]]')
+        BoolProperty("bool_property_default_env_variable",
+                     default='[[ENV_VARIABLE]]')
 
-    int_property = IntProperty(default=8)
-    int_property_default_env_variable = IntProperty(default='[[ENV_VARIABLE]]')
+    int_property = IntProperty("int_property", default=8)
+    int_property_default_env_variable = \
+        IntProperty("int_property_default_env_variable",
+                    default='[[ENV_VARIABLE]]')
 
-    float_property = FloatProperty(default=8)
+    float_property = FloatProperty("float_property", default=8)
     float_property_default_env_variable = \
-        FloatProperty(default='[[ENV_VARIABLE]]')
+        FloatProperty("float_property_default_env_variable",
+                      default='[[ENV_VARIABLE]]')
 
-    object_property = ObjectProperty(ContainedClass)
+    object_property = ObjectProperty("object_property", ContainedClass)
     object_property_default_env_variable = \
-        ObjectProperty(ContainedClass, default='[[ENV_VARIABLE]]')
+        ObjectProperty("object_property_default_env_variable",
+                       ContainedClass,
+                       default='[[ENV_VARIABLE]]')
 
-    list_property1 = ListProperty(ContainedClass, default=[ContainedClass()])
-    list_property2 = ListProperty(ContainedClass)
-    list_property3 = ListProperty(IntType, default=[1])
+    list_property1 = ListProperty("list_property1", ContainedClass,
+                                  default=[ContainedClass()])
+    list_property2 = ListProperty("list_property2", ContainedClass)
+    list_property3 = ListProperty("list_property3", IntType, default=[1])
     list_property_default_env_variable = \
-        ListProperty(ContainedClass, default='[[ENV_VARIABLE]]')
+        ListProperty("list_property_default_env_variable", ContainedClass,
+                     default='[[ENV_VARIABLE]]')
 
-    timedelta_property = TimeDeltaProperty(default={"seconds": 9})
-    timedelta_property_no_default = TimeDeltaProperty()
+    timedelta_property = TimeDeltaProperty("timedelta_property",
+                                           default={"seconds": 9})
+    timedelta_property_no_default = \
+        TimeDeltaProperty("timedelta_property_no_default")
 
     select_property = SelectProperty(
-        SampleEnum, default=SampleEnum.option2)
+        "select_property", SampleEnum, default=SampleEnum.option2)
     select_property_default_env_variable = \
-        SelectProperty(SampleEnum, default='[[ENV_VARIABLE]]')
+        SelectProperty("select_property_default_env_variable", SampleEnum,
+                       default='[[ENV_VARIABLE]]')
 
 
 class TestTypes(NIOTestCaseNoModules):

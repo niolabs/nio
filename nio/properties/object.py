@@ -12,7 +12,7 @@ class ObjectProperty(BaseProperty):
 
     """
 
-    def __init__(self, obj_type, **kwargs):
+    def __init__(self, title, obj_type, **kwargs):
         """ Initializes the property.
 
         Args:
@@ -25,7 +25,7 @@ class ObjectProperty(BaseProperty):
                 "Specified object type {} is not a PropertyHolder".format(
                     obj_type.__class__))
         kwargs['obj_type'] = obj_type
-        super().__init__(ObjectType, **kwargs)
+        super().__init__(title, ObjectType, **kwargs)
         self.description.update(self._get_description(**kwargs))
 
     def _get_description(self, **kwargs):

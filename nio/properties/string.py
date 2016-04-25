@@ -4,5 +4,5 @@ from nio.types import StringType
 
 class StringProperty(BaseProperty):
 
-    def __init__(self, **kwargs):
-        super().__init__(StringType, **kwargs)
+    def __init__(self, title, **kwargs):
+        super().__init__(title, StringType, **kwargs)

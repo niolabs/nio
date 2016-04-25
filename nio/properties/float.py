@@ -4,5 +4,5 @@ from nio.types import FloatType
 
 class FloatProperty(BaseProperty):
 
-    def __init__(self, **kwargs):
-        super().__init__(FloatType, **kwargs)
+    def __init__(self, title, **kwargs):
+        super().__init__(title, FloatType, **kwargs)
