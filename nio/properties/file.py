@@ -4,5 +4,5 @@ from nio.types import FileType
 
 class FileProperty(BaseProperty):
 
-    def __init__(self, **kwargs):
-        super().__init__(FileType, **kwargs)
+    def __init__(self, title, **kwargs):
+        super().__init__(title, FileType, **kwargs)

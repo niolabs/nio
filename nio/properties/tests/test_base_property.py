@@ -11,7 +11,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
     def test_set(self):
         """Set a value and store a PropertyValue in Base._values."""
         mocked_instance = MagicMock()
-        property = BaseProperty(Type)
+        property = BaseProperty("property", Type)
         # Initially, _values is empty
         self.assertEqual(len(property._values), 0)
         set_values = ["", "string", 1, {}, []]
@@ -27,7 +27,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
         """Get the PropertyValue from Base._values for the given instance."""
         mocked_instance = MagicMock()
         mocked_property_value = MagicMock(spec=PropertyValue)
-        property = BaseProperty(Type)
+        property = BaseProperty("property", Type)
         # Pre-populate _values with a value for this instance
         property._values[mocked_instance] = mocked_property_value
         self.assertEqual(len(property._values), 1)
@@ -41,7 +41,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
         """Get the default PropertyValue when a value is not yet set."""
         mocked_instance = MagicMock()
         default_value = MagicMock()
-        property = BaseProperty(Type, default=default_value)
+        property = BaseProperty("property", Type, default=default_value)
         self.assertEqual(len(property._values), 0)
         # The property value's value is the property default value
         property_value = property.__get__(mocked_instance, MagicMock())
@@ -52,7 +52,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
     def test_set_and_get_value(self):
         """Test the whole set, get, and call process."""
         mocked_instance = MagicMock()
-        property = BaseProperty(Type)
+        property = BaseProperty("property", Type)
         set_values = ["", "string", 1, {}, []]
         get_values = []
         for set_value in set_values:
@@ -65,7 +65,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
     def test_allow_none_is_false(self):
         """None is allowed to be set but raises an exception when used."""
         mocked_instance = MagicMock()
-        property = BaseProperty(Type, allow_none=False)
+        property = BaseProperty("property", Type, allow_none=False)
         set_value = None
         property.__set__(mocked_instance, set_value)
         property_value = property.__get__(mocked_instance, MagicMock())
@@ -75,7 +75,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
     def test_allow_none_is_true(self):
         """None values are alowed when allow_none is True."""
         mocked_instance = MagicMock()
-        property = BaseProperty(Type, allow_none=True)
+        property = BaseProperty("property", Type, allow_none=True)
         set_value = None
         property.__set__(mocked_instance, set_value)
         property_value = property.__get__(mocked_instance, MagicMock())
@@ -86,7 +86,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
         """Call Type.serialize and return the serialized value."""
         mocked_serialized_value = MagicMock()
         mocked_instance = MagicMock()
-        property = BaseProperty(Type)
+        property = BaseProperty("property", Type)
         property.is_expression = MagicMock(return_value=False)
         property.is_env_var = MagicMock(return_value=False)
         property._values[mocked_instance] = MagicMock()
@@ -99,7 +99,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
         """Return the raw default value if a value is not yet set."""
         mocked_instance = MagicMock()
         default_value = MagicMock()
-        property = BaseProperty(Type, default=default_value)
+        property = BaseProperty("property", Type, default=default_value)
         property.is_expression = MagicMock(return_value=False)
         property.is_env_var = MagicMock(return_value=False)
         serialized_value = property.serialize(mocked_instance)
@@ -109,7 +109,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
         """Return raw PropertyValue.value if it's an expression."""
         mocked_serialized_value = MagicMock()
         mocked_instance = MagicMock()
-        property = BaseProperty(Type)
+        property = BaseProperty("property", Type)
         property.is_expression = MagicMock(return_value=True)
         property.is_env_var = MagicMock(return_value=False)
         mocked_property_value = MagicMock()
@@ -123,7 +123,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
         """Return raw PropertyValue.value if it's an environment variable."""
         mocked_serialized_value = MagicMock()
         mocked_instance = MagicMock()
-        property = BaseProperty(Type)
+        property = BaseProperty("property", Type)
         property.is_expression = MagicMock(return_value=False)
         property.is_env_var = MagicMock(return_value=True)
         mocked_property_value = MagicMock()
@@ -135,7 +135,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
 
     def test_deserialize_with_normal_value(self):
         """Call Type.deserialize and return the deserialized value."""
-        property = BaseProperty(Type)
+        property = BaseProperty("property", Type)
         property.is_expression = MagicMock(return_value=False)
         property.is_env_var = MagicMock(return_value=False)
         mocked_value = MagicMock()
@@ -148,7 +148,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
 
     def test_deserialize_with_expression_value(self):
         """Return unmodified value if it's an expression."""
-        property = BaseProperty(Type)
+        property = BaseProperty("property", Type)
         property.is_expression = MagicMock(return_value=True)
         property.is_env_var = MagicMock(return_value=False)
         mocked_value = MagicMock()
@@ -161,7 +161,7 @@ class TestBaseProperty(NIOTestCaseNoModules):
 
     def test_deserialize_with_env_var_value(self):
         """Return unmodified value if it's an environment variable."""
-        property = BaseProperty(Type)
+        property = BaseProperty("property", Type)
         property.is_expression = MagicMock(return_value=False)
         property.is_env_var = MagicMock(return_value=True)
         mocked_value = MagicMock()

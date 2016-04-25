@@ -16,10 +16,10 @@ class TestProperties(unittest.TestCase):
     def test_parent_child(self):
         """get_class_properties works wth sub classes."""
         class ParentClass(PropertyHolder):
-            parent_property = StringProperty(default="str")
+            parent_property = StringProperty("parent_property", default="str")
 
         class ChildClass(ParentClass):
-            child_property = StringProperty()
+            child_property = StringProperty("child_property")
 
         child = ChildClass()
         # get class properties
@@ -31,13 +31,13 @@ class TestProperties(unittest.TestCase):
     def test_three_levels(self):
         """get_class_properties works with sub classes of sub classes."""
         class TopLevel(PropertyHolder):
-            top_property = StringProperty(default="str")
+            top_property = StringProperty("top_property", default="str")
 
         class MiddleLevel(TopLevel):
-            middle_property = StringProperty()
+            middle_property = StringProperty("middle_property")
 
         class BottomLevel(MiddleLevel):
-            bottom_property = StringProperty()
+            bottom_property = StringProperty("bottom_property")
 
         child = BottomLevel()
         # get class properties
@@ -50,16 +50,16 @@ class TestProperties(unittest.TestCase):
     def test_diamond_shape(self):
         """get_class_properties works with multiple inheritance."""
         class TopLevel(PropertyHolder):
-            top_property = StringProperty(default="str")
+            top_property = StringProperty("top_property", default="str")
 
         class MiddleLevel1(TopLevel):
-            middle1_property = StringProperty()
+            middle1_property = StringProperty("middle1_property")
 
         class MiddleLevel2(TopLevel):
-            middle2_property = StringProperty()
+            middle2_property = StringProperty("middle2_property")
 
         class BottomLevel(MiddleLevel1, MiddleLevel2):
-            bottom_property = StringProperty()
+            bottom_property = StringProperty("BottomLevel")
 
         child = BottomLevel()
         # get class properties
@@ -73,10 +73,10 @@ class TestProperties(unittest.TestCase):
     def test_parent_child_override(self):
         """get_class_properties only gets child property if it overrides."""
         class ParentClass(PropertyHolder):
-            parent_property = StringProperty(default="str")
+            parent_property = StringProperty("parent_property", default="str")
 
         class ChildClass(ParentClass):
-            parent_property = StringProperty(default="child")
+            parent_property = StringProperty("parent_property", default="child")
 
         child = ChildClass()
         # get class properties

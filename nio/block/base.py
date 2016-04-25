@@ -23,11 +23,10 @@ class Base(PropertyHolder, CommandHolder, Runner):
 
     """The base class for blocks to inherit from."""
 
-    version = VersionProperty(version='0.0.0')
-    type = StringProperty(visible=False, readonly=True)
-    name = StringProperty(visible=False)
-    log_level = SelectProperty(enum=LogLevel,
-                               title="Log Level", default="NOTSET")
+    version = VersionProperty("Version", version='0.0.0')
+    type = StringProperty("Type", visible=False, readonly=True)
+    name = StringProperty("Name", visible=False)
+    log_level = SelectProperty("Log level", LogLevel, default="NOTSET")
 
     def __init__(self, status_change_callback=None):
         """ Create a new block instance.

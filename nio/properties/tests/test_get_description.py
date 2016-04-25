@@ -4,17 +4,19 @@ from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class ClassWithoutVersion(PropertyHolder):
-    string_property = StringProperty(default="ClassWithoutVersion")
+    string_property = \
+        StringProperty("string_property", default="ClassWithoutVersion")
 
 
 class ClassWithVersion(PropertyHolder):
     __version__ = "version_test"
-    string_property = StringProperty(default="ClassWithVersion")
+    string_property = \
+        StringProperty("string_property", default="ClassWithVersion")
 
 
 class ClassWithVersionAsProperty(PropertyHolder):
     __version__ = "version_in_class"
-    version = StringProperty(default="version_as_property")
+    version = StringProperty("version", default="version_as_property")
 
 
 class TestDefaults(NIOTestCaseNoModules):

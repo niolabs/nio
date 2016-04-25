@@ -9,11 +9,13 @@ from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class FileContainerClass(PropertyHolder):
-    file_property = FileProperty(default="default_filename")
+    file_property = FileProperty("file_property",
+                                 default="default_filename")
 
 
 class FileWritableContainerClass(PropertyHolder):
-    file_property = FileProperty(mode="+w", default="default_filename")
+    file_property = FileProperty("file_property",
+                                 mode="+w", default="default_filename")
 
 
 class TestFileProperty(NIOTestCaseNoModules):

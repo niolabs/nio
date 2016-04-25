@@ -5,10 +5,13 @@ from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class Properties(PropertyHolder):
-    allow_none_property = StringProperty(default="str", allow_none=True)
-    not_allow_none_property = StringProperty(default="str", allow_none=False)
-    no_default_not_allow_none_property = StringProperty(default=None,
-                                                        allow_none=False)
+    allow_none_property = StringProperty("allow_none_property",
+                                         default="str", allow_none=True)
+    not_allow_none_property = StringProperty("not_allow_none_property",
+                                             default="str", allow_none=False)
+    no_default_not_allow_none_property = \
+        StringProperty("no_default_not_allow_none_property",
+                       default=None, allow_none=False)
 
 
 class TestAllowNone(NIOTestCaseNoModules):

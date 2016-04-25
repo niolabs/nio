@@ -13,17 +13,18 @@ class ClassWithNoVersion(PropertyHolder):
 
 
 class ClassWithVersion(PropertyHolder):
-    version = VersionProperty(default="1.1.1")
+    version = VersionProperty("version", default="1.1.1")
 
 
 class ClassWithMinVersion(PropertyHolder):
-    version = VersionProperty(default="2.2.2", min_version="1.1.1")
+    version = VersionProperty("version", default="2.2.2", min_version="1.1.1")
 
 
 class ClassVersionInitialize(PropertyHolder):
-    version_straight = VersionProperty("1.1.1")
-    version_default = VersionProperty(default="1.1.2")
-    version_both = VersionProperty("1.1.3", default="1.1.4")
+    version_straight = VersionProperty("version_straight", version="1.1.1")
+    version_default = VersionProperty("version_default", default="1.1.2")
+    version_both = VersionProperty("version_both", version="1.1.3",
+                                   default="1.1.4")
 
 
 class TestVersion(NIOTestCaseNoModules):
@@ -88,7 +89,7 @@ class TestVersion(NIOTestCaseNoModules):
 
     def test_deserialize(self):
         """Version properties cab be deserialized."""
-        prop = VersionProperty(default="1.1.1")
+        prop = VersionProperty("prop", default="1.1.1")
         self.assertEqual(prop.deserialize("1.1.1"), "1.1.1")
 
     def test_defaults(self):

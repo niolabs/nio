@@ -5,14 +5,13 @@ from nio.properties import StringProperty, BoolProperty, \
 
 
 class EnrichProperties(PropertyHolder):
-    enrich_field = StringProperty(
-        title="Results Field", default="", visible=False)
-    exclude_existing = BoolProperty(title="Exclude Existing?", default=True)
+    enrich_field = StringProperty("Results Field", default="", visible=False)
+    exclude_existing = BoolProperty("Exclude Existing?", default=True)
 
 
 class EnrichSignals(object):
 
-    enrich = ObjectProperty(EnrichProperties, title='Signal Enrichment')
+    enrich = ObjectProperty('Signal Enrichment', EnrichProperties)
 
     def get_output_signal(self, signal_data, incoming_signal, copy=True):
         """ Get an output signal based on the block configuration.

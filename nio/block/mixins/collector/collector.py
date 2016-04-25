@@ -19,8 +19,7 @@ class Collector(object):
     immediately, as if this mixin wasn't even included.
     """
 
-    collect = TimeDeltaProperty(
-        title='Collect Timeout', default={"seconds": 1})
+    collect = TimeDeltaProperty('Collect Timeout', default={"seconds": 1})
 
     def __init__(self):
         super().__init__()

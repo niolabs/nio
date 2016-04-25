@@ -13,10 +13,9 @@ class Persistence(object):
 
     """
 
-    backup_interval = TimeDeltaProperty(
-        visible=False, title='Backup Interval', default={"seconds": 60 * 60})
-    load_from_persistence = BoolProperty(
-        title='Load from Persistence?', default=True)
+    backup_interval = TimeDeltaProperty('Backup Interval', visible=False,
+                                        default={"seconds": 60 * 60})
+    load_from_persistence = BoolProperty('Load from Persistence?', default=True)
 
     def __init__(self):
         super().__init__()

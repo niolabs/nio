@@ -24,11 +24,11 @@ class ValueSignal(Signal):
 
 
 class EvaluatorBlock(Block):
-    expression = BaseProperty(Type, default='Default to {{$v1}}')
+    expression = BaseProperty("expression", Type, default='Default to {{$v1}}')
 
 
 class ExprDefaultBlock(Block):
-    expression = BaseProperty(Type)
+    expression = BaseProperty("expression", Type)
 
 
 class MyCustomException(Exception):
@@ -36,13 +36,13 @@ class MyCustomException(Exception):
 
 
 class ExprEmptyStr(Block):
-    expression = BaseProperty(Type, default='')
+    expression = BaseProperty("expression", Type, default='')
 
 
 class MultiExpression(Block):
-    e1 = BaseProperty(Type, default='')
-    e2 = BaseProperty(Type, default='')
-    e3 = BaseProperty(Type, default='')
+    e1 = BaseProperty("e1", Type, default='')
+    e2 = BaseProperty("e2", Type, default='')
+    e3 = BaseProperty("e3", Type, default='')
 
 
 class EvalSignalTestCase(NIOBlockTestCase):

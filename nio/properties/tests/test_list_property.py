@@ -9,14 +9,16 @@ from nio.testing.test_case import NIOTestCaseNoModules
 
 class ContainedClass(PropertyHolder):
     # Note, property name and receiving property have to match
-    string_property = StringProperty(default="str")
-    int_property = IntProperty(default=5)
-    expression_property = StringProperty(default='{{ $value }}')
+    string_property = StringProperty("string_property", default="str")
+    int_property = IntProperty("int_property", default=5)
+    expression_property = \
+        StringProperty("expression_property", default='{{ $value }}')
 
 
 class ContainerClass(PropertyHolder):
-    type_list = ListProperty(IntType, default=[1])
-    holder_list = ListProperty(ContainedClass, default=[ContainedClass()])
+    type_list = ListProperty("type_list", IntType, default=[1])
+    holder_list = ListProperty("holder_list", ContainedClass,
+                               default=[ContainedClass()])
 
 
 class TestListProperties(NIOTestCaseNoModules):
@@ -41,10 +43,11 @@ class TestListProperties(NIOTestCaseNoModules):
         self.holder_list_to_use = [contained_a, contained_b, ContainedClass()]
 
         # Set up a property object list
-        prop_a = IntProperty(default=1)
-        prop_b = IntProperty(default=2)
+        prop_a = IntProperty("prop_a", default=1)
+        prop_b = IntProperty("prop_b", default=2)
 
-        self.prop_list_to_use = [prop_a, prop_b, IntProperty(default=3)]
+        self.prop_list_to_use = [prop_a, prop_b,
+                                 IntProperty("prop_c", default=3)]
 
     def test_nio_type_invalid_value(self):
         """Test when a list has a nio Type with invalid values."""

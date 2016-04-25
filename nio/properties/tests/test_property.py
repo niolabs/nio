@@ -3,7 +3,7 @@ from nio.testing.test_case import NIOTestCaseNoModules
 
 
 class SampleClass(PropertyHolder):
-    var_property = Property(allow_none=True)
+    var_property = Property("var_property", allow_none=True)
 
 
 class TestProperty(NIOTestCaseNoModules):
