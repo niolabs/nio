@@ -1,5 +1,5 @@
-n.io SDK Documentation
-======================
+n.io Framework Documentation
+============================
 
 This README is intended to document how to build and deploy the documentation.
 
@@ -14,7 +14,7 @@ Building
 --------
 
 ```bash
-cd nio-sdk/docs
+cd nio/docs
 make html
 ```
 
@@ -34,6 +34,6 @@ updates will be captured by the `make` command.
 Run these command from the `docs` folder:
 
 ```bash
-rm -rf sdk/*
-sphinx-apidoc -T -f -E -M -o sdk ../nio
+rm -rf framework/*
+sphinx-apidoc -T -f -E -M -o framework ../nio
 ```

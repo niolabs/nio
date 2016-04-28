@@ -1,0 +1,5 @@
+API Conventions
+===============
+
+Authentication
+--------------
