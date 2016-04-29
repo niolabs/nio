@@ -43,7 +43,7 @@ Once you have these basic prerequisites, you can download and install nio. The b
 
 .. code-block:: bash
 
-    pip3 install nio-binary.whl
+    pip3 install <nio-binary.whl>
 
 Note: Depending on how ``pip`` was installed, the command may be slightly different. You can verify the command to call pip by trying ``pip``, ``pip3``, or ``pip3.4`` with the ``--version`` option. Also, if you have access to the web hosted nio wheels, you can use ``pip3.4 install http://<URL-of-nio-wheels>``. 
 
