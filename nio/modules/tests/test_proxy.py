@@ -51,7 +51,7 @@ class ProxyImplementation(object):
     implementation_class_variable = 20
 
     def __init__(self, my_arg=None):
-        pass
+        self.instance_variable = 1
 
     def method_a(self):
         # Don't do anything, just don't raise the NotImplemented
@@ -97,7 +97,7 @@ class TestProxy(NIOTestCaseNoModules):
 
     def test_isinstance(self):
         """Proxied classes and instances should subclass the interface"""
-        self.assertIsInstance(ProxyInterface(), ProxyInterface)
+        self.assertIsInstance(ProxyInterface(), ProxyImplementation)
         self.assertTrue(issubclass(ProxyInterface, ProxyInterface))
 
     def test_call_proxied_method(self):
@@ -166,13 +166,8 @@ class TestNoProxy(NIOTestCaseNoModules):
         """Nothing gets called without proxying"""
         # Manually set the implementation class so we can call the constructor
         ProxyInterface._impl_class = ProxyImplementation
-        not_proxied = ProxyInterface()
-        with self.assertRaises(NotImplementedError):
-            not_proxied.method_a()
-        with self.assertRaises(NotImplementedError):
-            not_proxied._protected_proxy_method()
-        with self.assertRaises(AttributeError):
-            not_proxied.own_method()
+        with self.assertRaises(ProxyNotProxied):
+            not_proxied = ProxyInterface()
 
     def test_init_called(self):
         """Make sure the implementation's constructor is called"""
@@ -209,3 +204,11 @@ class TestNoProxy(NIOTestCaseNoModules):
         ProxyInterface.proxy(ProxyImplementation)
         with self.assertRaises(ProxyAlreadyProxied):
             ProxyInterface.proxy(ProxyImplementation)
+
+    def test_instance_assignments(self):
+        ProxyInterface.proxy(ProxyImplementation)
+        proxied = ProxyInterface()
+        self.assertEqual(proxied.instance_variable, 1)
+
+        proxied.instance_variable = 26
+        self.assertEqual(proxied.instance_variable, 26)

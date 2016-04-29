@@ -81,8 +81,16 @@ class ModuleProxy(object):
         __init__ method of the proxy implementation will NOT be proxied to the
         interface.
         """
+        if not self.__class__.proxied:
+            raise ProxyNotProxied()
+
         if isclass(self._impl_class):
-            self._impl_class.__init__(self, *args, **kwargs)
+            self.__class__ = self._impl_class
+            _class = self.__class__
+
+            # Now call the constructor they were intending to call, but act
+            # like it is our constructor (pass self)
+            _class.__init__(self, *args, **kwargs)
 
     @classmethod
     def proxy(cls, class_to_proxy):
@@ -115,6 +123,25 @@ class ModuleProxy(object):
             cls._unproxied_methods[cls.__name__][name] = interface_member
             setattr(cls, name, impl_member)
 
+        # Iterate through the members of the proxy interface class
+        # and grab members that do not exist in the implementation
+        for name, v in cls.__dict__.items():
+
+            iface_member = getattr(cls, name, None)
+            # Make sure this is a method we want to proxy
+            if not cls._is_proxyable(name, iface_member):
+                continue
+
+            impl_member = getattr(class_to_proxy, name, None)
+            # add it if there is no matching member in implementation class
+            if not impl_member:
+                cls.logger.debug("Proxying member {0} from {1}".format(
+                    name, cls.__name__))
+                setattr(class_to_proxy, name, iface_member)
+
+                # Save a reference so that it gets deleted during unproxy
+                cls._unproxied_methods[class_to_proxy.__name__][name] = None
+
         # Mark the class as proxied and save the implementation class
         cls.proxied = True
         cls._impl_class = class_to_proxy
@@ -136,6 +163,18 @@ class ModuleProxy(object):
             else:
                 # We had this member originally, replace it with that one
                 setattr(cls, name, iface_member)
+
+        if cls._impl_class:
+            # were any members brought in from interface?
+            for name, iface_member in \
+                    cls._unproxied_methods[cls._impl_class.__name__].items():
+                if iface_member is None:
+                    # We didn't have this member on the original implementation
+                    delattr(cls._impl_class, name)
+                else:
+                    # We had this member originally, replace it with that one
+                    setattr(cls._impl_class, name, iface_member)
+            cls._unproxied_methods[cls._impl_class.__name__] = {}
 
         # Reset all of our cached proxy class information
         cls._unproxied_methods[cls.__name__] = {}
