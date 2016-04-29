@@ -26,6 +26,7 @@ class ProxyAlreadyProxied(Exception):
     pass
 
 
+
 class ModuleProxy(object):
 
     """ A base class for creating a ModuleProxy interface
@@ -65,7 +66,7 @@ class ModuleProxy(object):
     # Whether or not this class has already been proxied
     proxied = False
     _impl_class = None
-    _unproxied_methods = defaultdict(dict)
+    unproxied = defaultdict(dict)
     logger = get_nio_logger('ModuleProxy')
 
     def __init__(self, *args, **kwargs):
@@ -120,7 +121,7 @@ class ModuleProxy(object):
             cls.logger.debug("Proxying member {0} from {1}".format(
                 name, class_to_proxy.__name__))
             # Save a reference to the original member to replace during unproxy
-            cls._unproxied_methods[cls.__name__][name] = interface_member
+            cls.unproxied[get_namespace(cls)][name] = interface_member
             setattr(cls, name, impl_member)
 
         # Iterate through the members of the proxy interface class
@@ -132,15 +133,16 @@ class ModuleProxy(object):
             if not cls._is_proxyable(name, iface_member):
                 continue
 
-            impl_member = getattr(class_to_proxy, name, None)
-            # add it if there is no matching member in implementation class
-            if not impl_member:
+            try:
+                getattr(class_to_proxy, name)
+            except:
+                # add it if there is no matching member in implementation class
                 cls.logger.debug("Proxying member {0} from {1}".format(
                     name, cls.__name__))
                 setattr(class_to_proxy, name, iface_member)
 
                 # Save a reference so that it gets deleted during unproxy
-                cls._unproxied_methods[class_to_proxy.__name__][name] = None
+                cls.unproxied[get_namespace(class_to_proxy)][name] = None
 
         # Mark the class as proxied and save the implementation class
         cls.proxied = True
@@ -156,7 +158,7 @@ class ModuleProxy(object):
         if not cls.proxied:
             raise ProxyNotProxied()
 
-        for name, iface_member in cls._unproxied_methods[cls.__name__].items():
+        for name, iface_member in cls.unproxied[get_namespace(cls)].items():
             if iface_member is None:
                 # We didn't have this member on the original interface, delete
                 delattr(cls, name)
@@ -167,17 +169,17 @@ class ModuleProxy(object):
         if cls._impl_class:
             # were any members brought in from interface?
             for name, iface_member in \
-                    cls._unproxied_methods[cls._impl_class.__name__].items():
+                    cls.unproxied[get_namespace(cls._impl_class)].items():
                 if iface_member is None:
                     # We didn't have this member on the original implementation
                     delattr(cls._impl_class, name)
                 else:
                     # We had this member originally, replace it with that one
                     setattr(cls._impl_class, name, iface_member)
-            cls._unproxied_methods[cls._impl_class.__name__] = {}
+            cls.unproxied[get_namespace(cls._impl_class)] = {}
 
         # Reset all of our cached proxy class information
-        cls._unproxied_methods[cls.__name__] = {}
+        cls.unproxied[get_namespace(cls)] = {}
         cls._impl_class = None
         cls.proxied = False
 
@@ -192,3 +194,7 @@ class ModuleProxy(object):
         """
         return not name.startswith('__') and \
             (isfunction(member) or ismethod(member) or not isroutine(member))
+
+
+def get_namespace(_class):
+    return "{0}.{1}".format(_class.__module__, _class.__name__)
