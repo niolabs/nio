@@ -61,7 +61,7 @@ Nio configuration settings generally exist at the root of your project directory
 Nio settings
 ~~~~~~~~~~~~
 
-Most configuration exists in the file `nio.conf` at the root of your project. The configuration format is INI.
+Most configuration exists in the file ``nio.conf`` at the root of your project. The configuration format is INI.
 
 communication
 `````````````
@@ -77,7 +77,7 @@ When running a network of Nio devices, keep one as the master broker and configu
 service
 ```````
 
-If you have services that auto-start when Nio boots up and it is running on a slow device (like a Raspberry Pi), you may wan those services to start in series to help with the CPU hit:
+If you have services that auto-start when Nio boots up and it is running on a slow device (like a Raspberry Pi), you may want those services to start in series to help with the CPU hit:
 
 .. code-block:: ini
 
@@ -87,7 +87,7 @@ If you have services that auto-start when Nio boots up and it is running on a sl
 rest
 ````
 
-If you want the Nio REST API to run a different port, maybe because you have multiple Nio instances is one computer:
+If you want the Nio REST API to run on a different port, perhaps because you have multiple Nio instances on one computer:
 
 .. code-block:: ini
 
@@ -97,8 +97,20 @@ If you want the Nio REST API to run a different port, maybe because you have mul
 Nio environment variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+You can specify project specific environement variabls to be used in configuration files. These variables can used in ``nio.conf``, logging config and block and service property configurations. The values of these variables are not accessible through the Nio REST API so they are a good place for things that need to be kept private. It is common to use these environment variables so that you can run the same project in different environments and change the behavior simply by referencing a different variable file.
+
+The default environment variable file is ``nio.env`` and is located at the project root.
+
+Popular variables and their meaning:
+
+``COMHOST`` - The publically accessible IP address of the master broker.
+
+``PROJECT_ROOT`` - Automatically populated by Nio and used to reference files and directories relative to the project root.
+
 Logging
 ~~~~~~~
+
+Nio uses Python logging so the same documentation applies. By defauly, the logging file ``logging.json`` is in the ``etc`` directory of your project.
 
 Running as a Service on Linux
 -----------------------------
