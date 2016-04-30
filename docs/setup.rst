@@ -159,6 +159,16 @@ Modify accordingly for different binaries and project directories.
 Project Directory Layout
 ------------------------
 
+=====================  =====================================  =========================
+        Type                      Description                  Default Location/File
+=====================  =====================================  =========================
+Project Configuration  Settings for Nio project               [[PROJECT_ROOT]]/nio.conf
+Environment Variables  Variables to use in configuration      [[PROJECT_ROOT]]/nio.env
+Blocks                 Nio blocks available to project        [[PROJECT_ROOT]]/blocks
+Logs                   Nio core and service logs              [[PROJECT_ROOT]]/logs
+Other Configuration    Additional settings for logging, etc.  [[PROJECT_ROOT]]/etc
+=====================  =====================================  =========================
+
 Component Configuration
 -----------------------
 
