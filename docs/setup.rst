@@ -117,6 +117,34 @@ Nio uses Python logging so the same documentation applies. By defauly, the loggi
 Running as a Service on Linux
 -----------------------------
 
+Debian/Ubuntu
+~~~~~~~~~~~~~
+
+Nio can be run as a service using upstart. You'll place the job file ``nio.conf`` in ``/etc/init``.
+
+You can modify this script, but something like this will work.
+
+.. code-block:: bash
+
+    description "n.io"
+    author      "n.io"
+
+    start on filesystem or runlevel [2345]
+
+    stop on shutdown
+
+    script
+        exec /usr/local/bin/nio_full -r /home/nio/nio/projects/main > /dev/null 2>> /var/log/nio.log
+    end script
+
+    pre-start script
+        echo "[`date`] n.io server starting" >> /var/log/nio.log
+    end script
+
+    pre-stop script
+        echo "[`date`] n.io server stopping" >> /var/log/nio.log
+    end script
+
 Running as a Service on Windows
 -------------------------------
 
