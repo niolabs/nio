@@ -101,6 +101,8 @@ You can specify project specific environement variabls to be used in configurati
 
 The default environment variable file is ``nio.env`` and is located at the project root.
 
+When starting Nio, specify a non-default environment variable file with the ``-e`` flag.
+
 Popular variables and their meaning:
 
 ``COMHOST`` - The publically accessible IP address of the master broker.
