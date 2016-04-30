@@ -168,9 +168,3 @@ Blocks                 Nio blocks available to project        [[PROJECT_ROOT]]/b
 Logs                   Nio core and service logs              [[PROJECT_ROOT]]/logs
 Other Configuration    Additional settings for logging, etc.  [[PROJECT_ROOT]]/etc
 =====================  =====================================  =========================
-
-Component Configuration
------------------------
-
-Module Configuration
---------------------
