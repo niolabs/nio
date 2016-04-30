@@ -145,10 +145,16 @@ You can modify this script, but something like this will work.
         echo "[`date`] n.io server stopping" >> /var/log/nio.log
     end script
 
-Running as a Service on Windows
--------------------------------
+Auto-starting Nio on Raspberry Pi (and other Operating Systems)
+---------------------------------------------------------------
 
-TODO
+On a Raspberry Pi, get Nio to start on boot by running it in ``/etc/rc.local``. Add the following command before the last line:
+
+.. code-block:: base
+
+    /usr/local/bin/nio_full -r /home/nio/nio/projects/main > /dev/null 2>> /var/log/nio.log &
+
+Modify accordingly for different binaries and project directories.
 
 Project Directory Layout
 ------------------------
