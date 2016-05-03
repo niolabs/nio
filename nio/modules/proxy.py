@@ -66,7 +66,7 @@ class ModuleProxy(object):
     proxied = False
     _impl_class = None
     _unproxied_methods = defaultdict(dict)
-    logger = None
+    logger = get_nio_logger('ModuleProxy')
 
     def __init__(self, *args, **kwargs):
         """ Handling the instantiation of a ModuleProxy
@@ -109,7 +109,7 @@ class ModuleProxy(object):
                 continue
 
             interface_member = getattr(cls, name, None)
-            cls.get_logger().debug("Proxying member {0} from {1}".format(
+            cls.logger.debug("Proxying member {0} from {1}".format(
                 name, class_to_proxy.__name__))
             # Save a reference to the original member to replace during unproxy
             cls._unproxied_methods[cls.__name__][name] = interface_member
@@ -153,19 +153,3 @@ class ModuleProxy(object):
         """
         return not name.startswith('__') and \
             (isfunction(member) or ismethod(member) or not isroutine(member))
-
-    @classmethod
-    def get_logger(cls):
-        """ Get class level logger
-
-        If no logger has been created for class, a new logger is instantiated
-        and a reference is saved for future access.
-
-        Returns:
-            logger (NIOLoggerAdapter) A NIO logger adapter instance
-
-        """
-        if cls.logger is None:
-            cls.logger = get_nio_logger("ModuleProxy")
-
-        return cls.logger
