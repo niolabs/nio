@@ -151,7 +151,6 @@ class NIOTestCase(TestCase):
         }
 
     def setUp(self):
-        raise Exception("oops")
         super().setUp()
         try:
             multiprocessing.set_start_method('spawn')
