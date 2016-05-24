@@ -1,7 +1,7 @@
 Blocks Types API
 ================
 
-Nio blocks are the funcitonal pieces of code that generate signals and/or do work with them. Earlier we saw examples of blocks such as CounterIntervalSimulator and Logger. Information and interaction with the blocks of a running Nio instance is available through the blocks types API.
+Nio blocks are the functional pieces of code that generate signals and/or do work with them. Earlier we saw examples of blocks such as CounterIntervalSimulator and Logger. Information and interaction with the blocks of a running Nio instance is available through the blocks types API.
 
 Get API
 -------
