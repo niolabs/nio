@@ -9,9 +9,10 @@ Contents:
    getting_started
    setup
    api_conventions
-   blocks_types_api
-   blocks_api
-   services_api
+   core_apis
+   blocks_types_apis
+   blocks_apis
+   services_apis
    modules
    components
    block_development
