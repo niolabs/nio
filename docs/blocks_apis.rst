@@ -49,8 +49,26 @@ In addition to getting the details of one block configuration, specified by name
 Create API
 ----------
 
+If you're working with a n.io project from scrach, you're going to be creating and configuring blocks. Create a new configuration of a block with the create API by POSTing JSON data. When creating a new block configuration, you can optionally include the configured values of the block type properties. At a minimum, you must specify the block ``type``, the ``name`` of the new configuration and values for any required properties that do not have a default value. For example, to create the ``Log`` block of type ``Logger``:
+
+.. code-block:: bash
+
+    curl -XPOST 'http://localhost:8181/blocks' --user 'Admin:Admin' --data '{"type": "LoggerBlock", "name": "Log"}' -H 'Content-Type: applcation/json'
+
 Update API
 ----------
 
+When you want to update the configuration of a block configuration, PUT the json data to the block name. You only need to PUT the properties that you are updating:
+
+.. code-block:: bash
+
+    curl -XPUT 'http://localhost:8181/blocks/Log' --user 'Admin:Admin' --data '{"log_level": "DEBUG"}' -H 'Content-Type: applcation/json'
+
 Delete API
 ----------
+
+Naturally, you'll make mistakes or refactor and want to delete a configured block:
+
+.. code-block:: bash
+
+    curl -XDELETE 'http://localhost:8181/blocks/Log' --user 'Admin:Admin'
