@@ -141,6 +141,12 @@ class NIOBlockTestCase(NIOTestCase):
             'TestSuite',
             ''))
 
+    @staticmethod
+    def process_signals(block, signals, input_id="__UNDEFINED__"):
+        if input_id == "__UNDEFINED__":
+            input_id = block._default_input.id
+        block.process_signals(signals, input_id)
+
     def signals_notified(self, block, signals, output_id):
         """ Receives block signals notification
 
