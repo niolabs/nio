@@ -141,6 +141,24 @@ class NIOBlockTestCase(NIOTestCase):
             'TestSuite',
             ''))
 
+    @staticmethod
+    def process_signals(block, signals, input_id=DEFAULT_TERMINAL):
+        if input_id == DEFAULT_TERMINAL:
+            input_id = block._default_input.id
+        block.process_signals(signals, input_id)
+
+    def get_last_signals_notified(self, output_id=DEFAULT_TERMINAL):
+        """ Retrieves last signals notified for a given output
+
+        Args:
+            output_id: Output identifier
+
+        Returns:
+            Last signals notified
+
+        """
+        return self.last_notified[output_id]
+
     def signals_notified(self, block, signals, output_id):
         """ Receives block signals notification
 
