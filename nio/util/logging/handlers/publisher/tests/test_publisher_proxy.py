@@ -16,7 +16,7 @@ class TestPublisherProxy(NIOTestCase):
         topics = {"type": "logging"}
         # set no waiting for publisher to be ready
         max_publisher_ready_time = 0
-        publisher_ready_wait_interval_time = 0.1
+        publisher_ready_wait_interval_time = 0.01
 
         with patch('nio.util.logging.handlers.publisher.proxy.Publisher',
                    side_effect=NotImplementedError()):
@@ -37,7 +37,7 @@ class TestPublisherProxy(NIOTestCase):
         topics = {"type": "logging"}
         # set a maximum of 1 second for publisher to be ready
         max_publisher_ready_time = 1
-        publisher_ready_wait_interval_time = 0.1
+        publisher_ready_wait_interval_time = 0.01
 
         PublisherProxy.init(topics,
                             max_publisher_ready_time,
