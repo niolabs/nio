@@ -3,6 +3,7 @@ from threading import Event
 
 from nio.testing.test_case import NIOTestCaseNoModules
 from nio.util.threading import spawn
+from nio.util.threading import ThreadJoinTimeout
 
 
 class MyException(Exception):
@@ -100,6 +101,13 @@ class TestSpawn(NIOTestCaseNoModules):
             self.assertEqual(e.args, ("arg1",))
             self.assertTrue(e.kwargs["kwarg1"], "2")
         self.assertTrue(self._exception_thrown)
+
+    def test_join_timeout(self):
+        """ Asserts that a join timeout exception is raised """
+        from time import sleep
+        thread = spawn(sleep, 0.1)
+        with self.assertRaises(ThreadJoinTimeout):
+            thread.join(0.01)
 
     def throw_exception(self, *args, **kwargs):
         self._exception_thrown = True

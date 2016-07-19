@@ -2,6 +2,10 @@ from threading import Thread
 from nio.util.logging import get_nio_logger
 
 
+class ThreadJoinTimeout(Exception):
+    pass
+
+
 class NIOThread(Thread):
 
     def __init__(self, **kwargs):
@@ -49,6 +53,8 @@ class NIOThread(Thread):
         super().join(timeout)
         if self.nio_exception:
             raise self.nio_exception
+        if self.is_alive():
+            raise ThreadJoinTimeout()
         return self.nio_result
 
     def __repr__(self):
