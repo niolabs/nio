@@ -1,65 +1,58 @@
-import inspect
-from time import sleep
+from unittest.mock import Mock
 
 from nio.util.logging.handlers.publisher.cache import LogCache
 from nio.testing.test_case import NIOTestCase
-
-
-class LogRecord(object):
-
-    def __init__(self, filename, lineno, msg):
-        self.filename = filename
-        self.lineno = lineno
-        self.msg = msg
-
-
-def lineno():
-    """Returns the current line number in our program."""
-    return inspect.currentframe().f_back.f_lineno
+from nio.util.logging.handlers.publisher.tests import lineno, LogRecordTest, \
+    get_log_record_same_line
 
 
 class TestCache(NIOTestCase):
 
-    def test_cache(self):
-        """ Asserts that cache from different lines removes elements """
-        log_cache = LogCache(expire_interval=0.1)
+    def test_cache_different_lines(self):
+        """ Asserts that records from different lines are cached """
+        log_cache = LogCache(0.1)
+        log_cache._cache.add = Mock()
 
-        # when logging from different lines, message text is not relevant
-        record1 = LogRecord(__file__, lineno(), "1")
-        record2 = LogRecord(__file__, lineno(), "1")
-        self.assertFalse(log_cache.process_record(record1))
-        self.assertFalse(log_cache.process_record(record2))
+        self.assertIsNotNone(log_cache._cache)
+        self.assertEqual(log_cache._cache.add.call_count, 0)
 
-        sleep(0.06)
-        # this updates the time of the log record in the cache
-        self.assertTrue(log_cache.process_record(record1))
+        # when processing records from different lines,
+        # message text is not relevant
+        record1 = LogRecordTest(__file__, lineno(), "1")
+        log_cache.process_record(record1)
+        self.assertEqual(log_cache._cache.add.call_count, 1)
 
-        sleep(0.06)
-        # assert that is gone, and puts it back in
-        self.assertFalse(log_cache.process_record(record2))
+        record2 = LogRecordTest(__file__, lineno(), "1")
+        log_cache.process_record(record2)
+        self.assertEqual(log_cache._cache.add.call_count, 2)
 
-        sleep(0.06)
-        self.assertFalse(log_cache.process_record(record1))
-        # assert that record2 was put back in
-        self.assertTrue(log_cache.process_record(record2))
+    def test_cache_same_line_same_message(self):
+        """ Asserts that only one record from same line is cached
+        """
+        log_cache = LogCache(0.1)
 
-    def test_cache_same_line(self):
+        record1 = get_log_record_same_line("1")
+        record2 = get_log_record_same_line("1")
+
+        # add a record without a mock so that it makes it to the cache
+        log_cache.process_record(record1)
+
+        # Mock adding to the cache, then add record2 and verify
+        # that no call to add to the cache was made
+        log_cache._cache.add = Mock()
+        log_cache.process_record(record2)
+        self.assertEqual(log_cache._cache.add.call_count, 0)
+
+    def test_cache_same_line_diff_message(self):
         """ Asserts that records from same line are cached when msg differs """
-        log_cache = LogCache(expire_interval=0.1)
+        log_cache = LogCache(0.1)
+        log_cache._cache.add = Mock()
 
-        record1 = self._get_log_record("1")
-        record2 = self._get_log_record("2")
-        self.assertFalse(log_cache.process_record(record1))
-        self.assertFalse(log_cache.process_record(record2))
+        record1 = get_log_record_same_line("1")
+        record2 = get_log_record_same_line("2")
 
-        # they are present because time has not expired
-        self.assertTrue(log_cache.process_record(record1))
-        self.assertTrue(log_cache.process_record(record2))
+        log_cache.process_record(record1)
+        self.assertEqual(log_cache._cache.add.call_count, 1)
 
-        # give it time, and assert that they are gone
-        sleep(0.11)
-        self.assertFalse(log_cache.process_record(record1))
-        self.assertFalse(log_cache.process_record(record2))
-
-    def _get_log_record(self, msg):
-        return LogRecord(__file__, lineno(), msg)
+        log_cache.process_record(record2)
+        self.assertEqual(log_cache._cache.add.call_count, 2)
