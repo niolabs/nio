@@ -1,15 +1,16 @@
-from nio.router.context import RouterContext
+from nio import discoverable
 from nio.block.context import BlockContext
 from nio.command import command
 from nio.command.holder import CommandHolder
-from nio import discoverable
-from nio.util.threading import spawn
-from nio.util.versioning.dependency import DependsOn
 from nio.properties import PropertyHolder, VersionProperty, \
     BoolProperty, ListProperty, StringProperty, Property, SelectProperty
+from nio.router.context import RouterContext
+from nio.service.message.status import StatusMessage
 from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.util.runner import Runner, RunnerStatus
+from nio.util.threading import spawn
+from nio.util.versioning.dependency import DependsOn
 
 
 class BlockExecution(PropertyHolder):
@@ -70,18 +71,19 @@ class Service(PropertyHolder, CommandHolder, Runner):
     # along with any other service properties
     sys_metadata = StringProperty(title="Metadata", visible=True, default="")
 
-    def __init__(self, status_change_callback=None):
+    def __init__(self, notify_core_handler=None):
         """ Create a new service instance.
 
         Args:
-            status_change_callback: method to call when status changes
+            notify_core_handler: method to use to communicate a message to core
 
         Take care of setting up instance variables in your service's
         constructor.
         """
 
         self.logger = get_nio_logger('service')
-        super().__init__(status_change_callback=status_change_callback)
+        self._notify_core_handler = notify_core_handler
+        super().__init__(status_change_callback=self._on_status_change_callback)
 
         # store service type so that it gets serialized
         self.type = self.__class__.__name__
@@ -133,6 +135,10 @@ class Service(PropertyHolder, CommandHolder, Runner):
 
         if self._block_router:
             self._block_router.do_stop()
+
+    def _on_status_change_callback(self, _, new_status):
+        if self._notify_core_handler:
+            self._notify_core_handler(StatusMessage(new_status), False)
 
     def _execute_on_blocks_async(self, method):
         """ Performs given method on all blocks in an async manner
@@ -209,7 +215,8 @@ class Service(PropertyHolder, CommandHolder, Runner):
             block_properties,
             service_context.properties.get('name', ''),
             self._create_commandable_url(service_context.properties,
-                                         block_properties.get('name', ''))
+                                         block_properties.get('name', '')),
+            self._notify_core_handler
         )
 
     def _create_commandable_url(self, service_properties, block_alias):

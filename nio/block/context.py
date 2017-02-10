@@ -4,7 +4,8 @@
 class BlockContext(object):
 
     def __init__(self, block_router, properties,
-                 service_name='', command_url=''):
+                 service_name='', command_url='',
+                 notify_core_handler=None):
         """ Initializes information needed for a Block
 
         This BlockContext will be passed to the `configure` method on each
@@ -22,10 +23,15 @@ class BlockContext(object):
                 This URL will not have host or port information, as that may
                 be different based on public/private IP. It will look like
                 "/services/ServiceName/BlockAlias/"
-
+            notify_core_handler: method to call to communicate a message to
+                core with signature:
+                    def notify_core_handler(message, wait_for_response=True)
+                where message (object): message to communicate to core
+                      wait_for_response (bool): a response is expected
         """
 
         self.block_router = block_router
         self.properties = properties
         self.service_name = service_name
         self.command_url = command_url
+        self.notify_core_handler = notify_core_handler
