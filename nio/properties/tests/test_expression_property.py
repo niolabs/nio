@@ -2,9 +2,9 @@ from inspect import isclass
 from unittest import skip
 
 from nio.block.base import Block
-from nio.testing.block_test_case import NIOBlockTestCase
-from nio.signal.base import Signal
 from nio.properties import BaseProperty
+from nio.signal.base import Signal
+from nio.testing.block_test_case import NIOBlockTestCase
 from nio.types import Type
 
 
@@ -192,7 +192,8 @@ class TestEvalSignal(EvalSignalTestCase):
                          True, True)
         self.signal_test("{{ print $v1 }}", SyntaxError, True, True)
         self.signal_test("{{ 1 + int($_v3) }}", ValueError, True, True)
-        self.signal_test("{{ foo + str($v1) }}", NameError, True, True)
+        # foo is not defined
+        self.signal_test("{{ foo + str($v1) }}", TypeError, True, True)
 
     def test_invalid_expr(self):
         """Ill-formed eval expressions are handled predictably."""
@@ -254,13 +255,13 @@ class TestEvalSignal(EvalSignalTestCase):
 
         # this isn't a lexically valid attribute name, so, direct
         # substitution of str('signal') is performed, resulting in
-        # a name error ('signal1v' is not defined)
-        with self.assertRaises(NameError):
+        # a type error (1v is not a signal attribute)
+        with self.assertRaises(TypeError):
             self.signal_test("{{$1v}}", "stuff", True, True)
 
     def test_random(self):
-        """Ensure import on the fly is allowed."""
-        self.signal_test("{{__import__('random').randint(1,1)}}", 1,
+        """Ensure a property expression can reference a module."""
+        self.signal_test("{{random.randint(1,1)}}", 1,
                          True, False)
 
     def test_no_cache_collision(self):
