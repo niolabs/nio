@@ -8,13 +8,10 @@ from nio.testing.test_case import NIOTestCaseNoModules
 
 class TestSafeEval(NIOTestCaseNoModules):
 
-    def setUp(self):
-        super().setUp()
-        SafeEval._mapping = None
-
     def tearDown(self):
+        # restore default modules
+        SafeEval.set_modules(["datetime", "json", "math", "random", "re"])
         super().tearDown()
-        SafeEval._mapping = None
 
     def test_allowed_modules(self):
         """ Asserts operations can only reference allowed modules
