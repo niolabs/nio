@@ -10,7 +10,8 @@ class TestSafeEval(NIOTestCaseNoModules):
 
     def tearDown(self):
         # restore default modules
-        SafeEval.set_modules(["datetime", "json", "math", "random", "re"])
+        SafeEval.set_modules(["datetime", "json", "math", "random",
+                              "re", "struct"])
         super().tearDown()
 
     def test_allowed_modules(self):

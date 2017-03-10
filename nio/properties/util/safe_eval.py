@@ -25,7 +25,7 @@ class SafeEval(object):
     ]
 
     # defines default modules to allow within expressions
-    _modules = ["datetime", "json", "math", "random", "re"]
+    _modules = ["datetime", "json", "math", "random", "re", "struct"]
     # keeps eval args at instance level holding white-listed modules
     # and functions
 

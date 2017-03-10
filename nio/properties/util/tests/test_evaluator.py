@@ -117,6 +117,7 @@ class TestEvaluator(NIOTestCaseNoModules):
             "{{ math }}",
             "{{ random }}",
             "{{ re }}",
+            "{{ struct }}"
         ]
         for expression in expressions:
             evaluator = Evaluator(expression)
