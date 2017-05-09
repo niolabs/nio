@@ -1,15 +1,16 @@
 from unittest.mock import patch, Mock
+
 from nio.block.base import Block
-from nio.block.terminator_block import TerminatorBlock
-from nio.block.generator_block import GeneratorBlock
 from nio.block.context import BlockContext
+from nio.block.generator_block import GeneratorBlock
 from nio.block.terminals import DEFAULT_TERMINAL
+from nio.block.terminator_block import TerminatorBlock
 from nio.properties.exceptions import AllowNoneViolation
-from nio.signal.base import Signal
 from nio.router.base import BlockRouter
 from nio.router.context import RouterContext
-from nio.testing.test_case import NIOTestCaseNoModules
+from nio.signal.base import Signal
 from nio.signal.status import BlockStatusSignal
+from nio.testing.test_case import NIOTestCaseNoModules
 from nio.util.runner import RunnerStatus
 
 
@@ -183,3 +184,35 @@ class TestBaseBlock(NIOTestCaseNoModules):
         self.assertIsNotNone(warning.block_name)
         self.assertEqual(warning.service_name, service_name)
         self.assertEqual(warning.block_name, block_name)
+
+    def test_block_execute_command(self):
+        """ Make sure command arguments are correct
+        """
+        # instantiate and configure block
+        blk = Block()
+        service_name = 'service1'
+        block_name = "block1"
+        notify_core_handler = Mock()
+        blk.configure(BlockContext(
+            BlockRouter(),
+            {"name": block_name},
+            service_name=service_name,
+            notify_core_handler=notify_core_handler))
+
+        # define command arguments
+        command_service_name = 'service2'
+        command_block_name = "block2"
+        command_name = "command1"
+        command_args = {}
+        blk.execute_command(
+            command_service_name, command_block_name,
+            command_name, command_args)
+        self.assertEqual(notify_core_handler.call_count, 1)
+        args = notify_core_handler.call_args_list[0][0]
+        # assert command arguments
+        self.assertEqual(args[0].service_name, command_service_name)
+        self.assertEqual(args[0].block_name, command_block_name)
+        self.assertEqual(args[0].command_name, command_name)
+        self.assertDictEqual(args[0].command_args, command_args)
+        # assert that a response is required
+        self.assertTrue(args[1], command_args)

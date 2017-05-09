@@ -4,18 +4,19 @@ A block contains modular functionality to be used inside of Services. To create
 a custom block, extend this Block class and override the appropriate methods.
 """
 from nio.block.context import BlockContext
+from nio.block.message.command import CommandMessage
 from nio.block.terminals import Terminal, TerminalType, input, output, \
     DEFAULT_TERMINAL
 from nio.command import command
 from nio.command.holder import CommandHolder
-from nio.router.base import BlockRouter
 from nio.properties import PropertyHolder, StringProperty, \
     VersionProperty, SelectProperty
+from nio.router.base import BlockRouter
+from nio.signal.base import Signal
+from nio.signal.status import BlockStatusSignal
 from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.util.runner import Runner
-from nio.signal.status import BlockStatusSignal
-from nio.signal.base import Signal
 
 
 @command('properties')
@@ -52,6 +53,7 @@ class Base(PropertyHolder, CommandHolder, Runner):
 
         self._block_router = None
         self._service_name = None
+        self._notify_core_handler = None
         self._default_input = Terminal.get_default_terminal_on_class(
             self.__class__, TerminalType.input)
         self._default_output = Terminal.get_default_terminal_on_class(
@@ -79,6 +81,7 @@ class Base(PropertyHolder, CommandHolder, Runner):
             raise TypeError("Block's router must be instance of BlockRouter")
 
         self._block_router = context.block_router
+        self._notify_core_handler = context.notify_core_handler
 
         # load the configuration as class variables
         self.from_dict(context.properties, self.logger)
@@ -220,6 +223,26 @@ class Base(PropertyHolder, CommandHolder, Runner):
             bool: True if the output ID exists on this block
         """
         return output_id in [o.id for o in self.__class__.outputs()]
+
+    def execute_command(self, service_name, block_name,
+                        command_name, command_args):
+        """ Executes a command originating from a Block
+
+        Args:
+            service_name (str): Service where command will be executed
+            block_name (str): Block where command will be executed (optional),
+                use empty or None to execute a Service command
+            command_name (str): Command to be executed
+            command_args (dict): command arguments with format
+                {[arg_name]:[arg_value]}
+
+        Returns:
+            Command result if command executes successfully
+        """
+        if self._notify_core_handler:
+            message = CommandMessage(service_name, block_name,
+                                     command_name, command_args)
+            return self._notify_core_handler(message, True)
 
 
 @input(DEFAULT_TERMINAL, default=True, label="default")
