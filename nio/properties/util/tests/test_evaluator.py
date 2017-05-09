@@ -1,6 +1,8 @@
 import types
-from nio.properties.util.evaluator import Evaluator
+from unittest.mock import patch
+
 from nio.properties.exceptions import InvalidEvaluationCall
+from nio.properties.util.evaluator import Evaluator
 from nio.signal.base import Signal
 from nio.testing.test_case import NIOTestCaseNoModules
 
@@ -43,7 +45,7 @@ class TestEvaluator(NIOTestCaseNoModules):
 
     def test_valid_signals(self):
         """Valid expressions with signals return the correct value."""
-        signal = Signal({"str": "string", "int": 42})
+        signal = Signal({"str": "string", "int": 42, "bool": False})
         expressions = [
             ("{{ $ }}",
              signal),
@@ -57,6 +59,12 @@ class TestEvaluator(NIOTestCaseNoModules):
              42),
             ("{{ $.int }}",
              42),
+            ("{{$.str}},{{$.int}}",
+             'string,42'),
+            ("{{ $.bool == False }}",
+             True),
+            ("{{ $.bool }}",
+             False)
         ]
         for expression, expected_result in expressions:
             evaluator = Evaluator(expression)
@@ -109,7 +117,43 @@ class TestEvaluator(NIOTestCaseNoModules):
             "{{ math }}",
             "{{ random }}",
             "{{ re }}",
+            "{{ struct }}"
         ]
         for expression in expressions:
             evaluator = Evaluator(expression)
             self.assertTrue(isinstance(evaluator.evaluate(), types.ModuleType))
+
+    def test_modules_usage(self):
+        """Valid expressions asserting library usage syntax."""
+        signal = Signal({'two': 2})
+        expressions = [
+            ("{{ random.randrange(1, 2) }}",
+             1),
+            ("{{ math.ceil(1.8) }}",
+             2),
+        ]
+        for expression, expected_result in expressions:
+            evaluator = Evaluator(expression)
+            result = evaluator.evaluate(signal)
+            self.assertEqual(result, expected_result)
+
+    def test_expression_cache(self):
+        # assert that parser is invoked ONLY once for the same expression
+        with patch("nio.properties.util.evaluator.Parser") as parser_mock:
+            evaluator = Evaluator("{{'hello1'}}")
+            evaluator.evaluate(None)
+            self.assertEqual(parser_mock.call_count, 1)
+            # evaluate again and verify parser was not invoked again
+            evaluator.evaluate(None)
+            self.assertEqual(parser_mock.call_count, 1)
+
+            # change expression, and verify that parser was invoked
+            evaluator = Evaluator("{{'hello2'}}")
+            evaluator.evaluate(None)
+            self.assertEqual(parser_mock.call_count, 2)
+
+            # go back to former expression and verify its parsing
+            # is still cached
+            evaluator = Evaluator("{{'hello1'}}")
+            evaluator.evaluate(None)
+            self.assertEqual(parser_mock.call_count, 2)

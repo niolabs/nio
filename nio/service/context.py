@@ -11,7 +11,8 @@ class ServiceContext(object):
                  block_router_type=None, router_settings=None,
                  mgmt_signal_handler=None,
                  blocks_async_start=False,
-                 blocks_async_stop=True):
+                 blocks_async_stop=True,
+                 eval_modules=None):
         """ Initializes information needed for a Service
 
         Arguments:
@@ -27,6 +28,7 @@ class ServiceContext(object):
                 management signals, receives signal as only parameter
             blocks_async_start: If True, blocks start asynchronously
             blocks_async_stop: If True, blocks stop asynchronously
+            eval_modules (list): list of allowed modules within 'eval' calls
         """
         self.properties = properties
         self.blocks = blocks if blocks is not None else {}
@@ -35,3 +37,4 @@ class ServiceContext(object):
         self.mgmt_signal_handler = mgmt_signal_handler
         self.blocks_async_start = blocks_async_start
         self.blocks_async_stop = blocks_async_stop
+        self.eval_modules = eval_modules

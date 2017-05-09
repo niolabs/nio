@@ -1,19 +1,16 @@
-import datetime
-import json
-import math
-import random
 import re
 
 
-class Parser:
+class EvalExpression(object):
+    """ Identifies an evaluable expression
+    """
+    def __init__(self, expression):
+        self.expression = expression
+
+
+class Parser(object):
 
     """ Helper class for translation and evaluation of nio expressions
-
-    Args:
-        signal (Signal): Contextualizes incoming code snippets.
-        default (ANY): If an incoming signal does not have the
-            requested attribute, this value is interpolated instead.
-
     """
     escaped = re.compile(r'\\(\$|{{|}})')
     ident = re.compile(r'(?<!\\)\$([_A-Za-z]([_A-Za-z0-9])*)?|[^\$]*')
@@ -43,7 +40,10 @@ class Parser:
                     raise SyntaxError("Unexpected EOF while parsing")
             tokens.pop(0)
 
-            result = self._build_function(expr) + self.parse(tokens)
+            transformed = self.ident.sub(self._transform_attr, expr)
+            unescaped = self.escaped.sub(self._unescape, transformed)
+            # add it as an expression to be evaluated
+            result = [EvalExpression(unescaped)] + self.parse(tokens)
         else:
 
             # Just a raw string. Remove any escape characters and
@@ -52,23 +52,6 @@ class Parser:
             result = [_next] + self.parse(tokens)
 
         return result
-
-    def _build_function(self, expr):
-        """ Build a function that evaluates an expression.
-
-        Helper function to transform incoming expressions and wrap
-        them in unnamed functions. This leaves the expressions themselves
-        compiled and ready to be parameterized with incoming signals
-        """
-        transformed = self.ident.sub(self._transform_attr, expr)
-        unescaped = self.escaped.sub(self._unescape, transformed)
-        try:
-            return [eval("lambda signal, self: {}".format(unescaped))]
-        except Exception as e:
-            _type = type(e)
-            raise _type(
-                "Error while evaluating {}: {}".format(unescaped, str(e))
-            )
 
     def _unescape(self, match):
         return match.group(0)[1:]

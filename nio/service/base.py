@@ -1,15 +1,16 @@
-from nio.router.context import RouterContext
+from nio import discoverable
 from nio.block.context import BlockContext
 from nio.command import command
 from nio.command.holder import CommandHolder
-from nio import discoverable
-from nio.util.threading import spawn
-from nio.util.versioning.dependency import DependsOn
 from nio.properties import PropertyHolder, VersionProperty, \
     BoolProperty, ListProperty, StringProperty, Property, SelectProperty
+from nio.properties.util.safe_eval import SafeEval
+from nio.router.context import RouterContext
 from nio.util.logging import get_nio_logger
 from nio.util.logging.levels import LogLevel
 from nio.util.runner import Runner, RunnerStatus
+from nio.util.threading import spawn
+from nio.util.versioning.dependency import DependsOn
 
 
 class BlockExecution(PropertyHolder):
@@ -201,6 +202,8 @@ class Service(PropertyHolder, CommandHolder, Runner):
         self.mgmt_signal_handler = context.mgmt_signal_handler
         self._blocks_async_start = context.blocks_async_start
         self._blocks_async_stop = context.blocks_async_stop
+        if context.eval_modules:
+            SafeEval.set_modules(context.eval_modules)
 
     def _create_block_context(self, block_properties, service_context):
         """Populates block context to pass to the block's configure method"""
