@@ -59,8 +59,6 @@ class BackoffStrategy(object):
                 self.logger.warning(
                     "Done retrying - we have exceeded the maximum number "
                     "of retries ({})".format(self.max_retry))
-                # reset counter
-                self.retry_num = 0
                 return False
         # If we got here either we are retrying indefinitely or we haven't hit
         # our max yet, let's retry
