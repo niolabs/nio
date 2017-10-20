@@ -3,6 +3,7 @@ from nio.block.base import Block
 from nio.testing.block_test_case import NIOBlockTestCase
 from nio.block.mixins.retry.retry import Retry
 from nio.block.mixins.retry.strategy import BackoffStrategy
+from nio.block.mixins.retry.strategies import LinearBackoff
 
 
 class SimpleBackoffStrategy(BackoffStrategy):
@@ -19,6 +20,11 @@ class RetryingBlock(Retry, Block):
 
     def setup_backoff_strategy(self):
         self.use_backoff_strategy(SimpleBackoffStrategy)
+
+class LinearBackoffBlock(Retry, Block):
+
+    def setup_backoff_strategy(self):
+        self.use_backoff_strategy(LinearBackoff)
 
 
 class TestRetry(NIOBlockTestCase):
@@ -72,18 +78,15 @@ class TestRetry(NIOBlockTestCase):
         with self.assertRaises(TypeError):
             block.use_backoff_strategy(SimpleBackoffStrategy())
 
+class Foo(NIOBlockTestCase):
+
     def test_retry_count(self):
         """Tests that the retry count resets for each execute call"""
-        block = RetryingBlock()
-        self.configure_block(block, {})
-        # Target func will always fail
+        block = LinearBackoffBlock()
+        self.configure_block(block, {
+            'retry_options': {'multiplier': 0,'max_retry': 1}})
         target_func = MagicMock(side_effect=Exception)
-        # Our backoff strategy gives up immediately
-        block._backoff_strategy.should_retry = MagicMock(side_effect=False)
-
-        # each execute_with_retry call should begin with retry_num = 0
-        for _ in range(2):
-            self.assertEqual(block._backoff_strategy.retry_num, 0)
-            # an exception is expected when strategy gives up
+        for r in range(2):
             with self.assertRaises(Exception):
                 block.execute_with_retry(target_func)
+            self.assertEqual(target_func.call_count, (r + 1) * 2)
