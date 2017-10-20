@@ -78,9 +78,8 @@ class TestRetry(NIOBlockTestCase):
         self.configure_block(block, {})
         # Target func will always fail
         target_func = MagicMock(side_effect=Exception)
-        # Our backoff strategy will give up on the 3rd try
-        block._backoff_strategy.should_retry = MagicMock(
-            side_effect=[True, True, False])
+        # Our backoff strategy gives up immediately
+        block._backoff_strategy.should_retry = MagicMock(side_effect=False)
 
         # each execute_with_retry call should begin with retry_num = 0
         for _ in range(2):
