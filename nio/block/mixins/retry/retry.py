@@ -89,11 +89,6 @@ class Retry(object):
     retry_options = ObjectProperty(RetryOptions, title="Retry Options",
                                    visible=True, default=RetryOptions())
 
-    def configure(self, context):
-        """ This implementation will use the configured backoff strategy """
-        super().configure(context)
-        self.setup_backoff_strategy()
-
     def setup_backoff_strategy(self):
         """ Define which backoff strategy the block should use.
 
@@ -124,6 +119,7 @@ class Retry(object):
             Exception: The exception that execute_method raised when the
                 backoff strategy decided to stop retrying.
         """
+        self.setup_backoff_strategy()
         # verify incoming event type if set
         if stop_retry_event and not isinstance(stop_retry_event, Event):
             raise TypeError("stop_retry_event must be an instance of Event")
