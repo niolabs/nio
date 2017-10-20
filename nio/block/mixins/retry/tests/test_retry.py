@@ -71,3 +71,20 @@ class TestRetry(NIOBlockTestCase):
         # An instance of a backoff strategy doesn't count either
         with self.assertRaises(TypeError):
             block.use_backoff_strategy(SimpleBackoffStrategy())
+
+    def test_retry_count(self):
+        """Tests that the retry count resets for each execute call"""
+        block = RetryingBlock()
+        self.configure_block(block, {})
+        # Target func will always fail
+        target_func = MagicMock(side_effect=Exception)
+        # Our backoff strategy will give up on the 3rd try
+        block._backoff_strategy.should_retry = MagicMock(
+            side_effect=[True, True, False])
+
+        # each execute_with_retry call should begin with retry_num = 0
+        for _ in range(2):
+            self.assertEqual(block._backoff_strategy.retry_num, 0)
+            # an exception is expected when strategy gives up
+            with self.assertRaises(Exception):
+                block.execute_with_retry(target_func)
