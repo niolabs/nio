@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from nio import Block
 from nio.block.mixins.retry.retry import Retry
 from nio.testing.block_test_case import NIOBlockTestCase
@@ -28,6 +28,8 @@ class TestExponentialBackoff(NIOBlockTestCase):
                 "strategy": "exponential"
             }
         })
+        target_func = MagicMock()
+        block.execute_with_retry(target_func)
         # First failure should sleep for 1 second
         self.assert_next_retry_sleeps_for(block, 1)
         # Second failure should sleep for 2 seconds
@@ -47,6 +49,8 @@ class TestExponentialBackoff(NIOBlockTestCase):
                 "multiplier": 3.14
             }
         })
+        target_func = MagicMock()
+        block.execute_with_retry(target_func)
         # Execute 3 retries and make sure we multiply each time
         self.assert_next_retry_sleeps_for(block, 3.14)
         self.assert_next_retry_sleeps_for(block, 6.28)
@@ -63,6 +67,8 @@ class TestExponentialBackoff(NIOBlockTestCase):
                 "indefinite": True
             }
         })
+        target_func = MagicMock()
+        block.execute_with_retry(target_func)
         # Should count to three retries then keep trying, every 2**3 seconds
         self.assert_next_retry_sleeps_for(block, 1)
         self.assert_next_retry_sleeps_for(block, 2)
@@ -82,6 +88,8 @@ class TestExponentialBackoff(NIOBlockTestCase):
                 "indefinite": True
             }
         })
+        target_func = MagicMock()
+        block.execute_with_retry(target_func)
         # Should count to three retries then keep trying, every 3*2**2 seconds
         self.assert_next_retry_sleeps_for(block, 3)
         self.assert_next_retry_sleeps_for(block, 6)
@@ -98,6 +106,8 @@ class TestExponentialBackoff(NIOBlockTestCase):
                 "max_retry": 2
             }
         })
+        target_func = MagicMock()
+        block.execute_with_retry(target_func)
         # Execute 3 retries, but make sure only the first two actually sleep
         self.assert_next_retry_sleeps_for(block, 1)
         self.assert_next_retry_sleeps_for(block, 2)
