@@ -1,4 +1,7 @@
+from threading import Event
+from time import sleep
 from unittest.mock import MagicMock
+from nio.util.threading import spawn
 from nio.block.base import Block
 from nio.testing.block_test_case import NIOBlockTestCase
 from nio.block.mixins.retry.retry import Retry
@@ -11,6 +14,17 @@ class SimpleBackoffStrategy(BackoffStrategy):
     def should_retry(self):
         return True
 
+class EventDrivenBackoffStrategy(BackoffStrategy):
+
+    def __init__(self, retry_event, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._retry_event = retry_event
+
+    def wait_for_retry(self):
+        result = self._retry_event.wait(2)
+        if not result:
+            raise AssertionError('retry event not set')
+
 class RetryingBlock(Retry, Block):
 
     def setup_backoff_strategy(self):
@@ -18,8 +32,15 @@ class RetryingBlock(Retry, Block):
 
 class VanillaBlock(Retry, Block):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._retry_event = Event()
+
     def setup_backoff_strategy(self):
-        self.use_backoff_strategy(BackoffStrategy, max_retry=1)
+        self.use_backoff_strategy(
+            EventDrivenBackoffStrategy,
+            retry_event=self._retry_event,
+            max_retry=2)
 
 class TestRetry(NIOBlockTestCase):
 
@@ -36,18 +57,22 @@ class TestRetry(NIOBlockTestCase):
         self.assertEqual(target_func.call_count, 3)
 
     def test_retry_giveup(self):
-        """Tests that an exception is raised if the strategy gives up"""
+        """Tests that the exception is raised if the strategy gives up"""
         SimpleBackoffStrategy.should_retry = MagicMock(
             side_effect=[True, True, False])
         block = RetryingBlock()
         self.configure_block(block, {})
+
+        class CustomException(Exception):
+            pass
+
         # Target func will always fail
-        target_func = MagicMock(side_effect=Exception)
+        target_func = MagicMock(side_effect=CustomException)
         # Our backoff strategy will give up on the 3rd try
 
         # Assert that our function raises its exception and that the mixin
         # still called it 3 times
-        with self.assertRaises(Exception):
+        with self.assertRaises(CustomException):
             block.execute_with_retry(target_func)
         self.assertEqual(target_func.call_count, 3)
 
@@ -76,15 +101,19 @@ class TestRetry(NIOBlockTestCase):
         """Tests that the retry count resets for each execute call"""
         block = VanillaBlock()
         self.configure_block(block, {})
-        target_func = MagicMock(side_effect=Exception)
-        instances = []
-        with self.assertRaises(Exception):
-            # each execute_with_retry call should net 2 target_func calls
-            block.execute_with_retry(target_func)
-        instances.append(block._backoff_strategy)
-        self.assertEqual(target_func.call_count, 2)
-        with self.assertRaises(Exception):
-            block.execute_with_retry(target_func)
-        instances.append(block._backoff_strategy)
-        self.assertNotEqual(*instances)
-        self.assertEqual(target_func.call_count, 4)
+
+        class CustomException(Exception):
+            pass
+
+        target_func_1 = MagicMock(side_effect=CustomException)
+        target_func_2 = MagicMock(side_effect=CustomException)
+        call_1 = spawn(block.execute_with_retry, target_func_1)
+        call_2 = spawn(block.execute_with_retry, target_func_2)
+        block._retry_event.set()
+        with self.assertRaises(CustomException):
+            call_1.join()
+        with self.assertRaises(CustomException):
+            call_2.join()
+        # each execute_with_retry call should net 3 target_func calls
+        self.assertEqual(target_func_1.call_count, 3)
+        self.assertEqual(target_func_2.call_count, 3)
