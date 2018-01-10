@@ -15,10 +15,10 @@ class SleepBackoffStrategy(BackoffStrategy):
         super().__init__()
         self._sleep_time = sleep_time
 
-    def should_retry(self):
+    def should_retry(self, retry_num):
         return True
 
-    def wait_for_retry(self):
+    def wait_for_retry(self, retry_num):
         sleep(self._sleep_time)
 
 

@@ -131,19 +131,18 @@ class Retry(object):
         # If it doesn't define __name__, use however we should stringify
         execute_method_name = getattr(
             execute_method, '__name__', str(execute_method))
+        retry_num = 0
         while not stop_retry_event or not stop_retry_event.is_set():
+            self.logger.exception('{}'.format(retry_num))
             try:
                 result = execute_method(*args, **kwargs)
-                # If we got here, the request succeeded, let the backoff
-                # strategy know then return the result
-                self._backoff_strategy.request_succeeded()
                 return result
             except Exception as exc:
+                retry_num += 1
                 self.logger.warning(
                     "Retryable execution on method {} failed".format(
                         execute_method_name), exc_info=True)
-                self._backoff_strategy.request_failed(exc)
-                should_retry = self._backoff_strategy.should_retry()
+                should_retry = self._backoff_strategy.should_retry(retry_num)
                 if not should_retry:
                     # Backoff strategy has said we're done retrying,
                     # so re-raise the exception
@@ -155,7 +154,7 @@ class Retry(object):
                     # Backoff strategy has instructed us to retry again. First
                     # let the strategy do any waiting, then execute any
                     # pre-work before looping and executing the method again
-                    self._backoff_strategy.wait_for_retry()
+                    self._backoff_strategy.wait_for_retry(retry_num)
                     self.before_retry(*args, **kwargs)
 
     def use_backoff_strategy(self, strategy, *args, **kwargs):
