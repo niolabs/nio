@@ -15,7 +15,6 @@ class TestExponentialBackoff(NIOBlockTestCase):
         """Make sure that given a failure the block will sleep for some time"""
         sleep_path = 'nio.block.mixins.retry.strategies.exponential.sleep'
         with patch(sleep_path) as sleep:
-            # block._backoff_strategy.request_failed(Exception())
             if block._backoff_strategy.should_retry(retry_num):
                 block._backoff_strategy.wait_for_retry(retry_num)
             sleep.assert_called_once_with(num_seconds)
@@ -141,6 +140,5 @@ class TestExponentialBackoff(NIOBlockTestCase):
         # Last retry should return false and not sleep
         sleep_path = 'nio.block.mixins.retry.strategies.exponential.sleep'
         with patch(sleep_path) as sleep:
-            # block._backoff_strategy.request_failed(Exception())
             self.assertFalse(block._backoff_strategy.should_retry(retry_num))
             sleep.assert_not_called()

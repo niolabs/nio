@@ -14,7 +14,6 @@ class TestLinearBackoff(NIOBlockTestCase):
     def assert_next_retry_sleeps_for(self, block, retry_num, num_seconds):
         """Make sure that given a failure the block will sleep for some time"""
         with patch('nio.block.mixins.retry.strategies.linear.sleep') as sleep:
-            # block._backoff_strategy.request_failed(Exception())
             if block._backoff_strategy.should_retry(retry_num):
                 block._backoff_strategy.wait_for_retry(retry_num)
             sleep.assert_called_once_with(num_seconds)
@@ -135,6 +134,5 @@ class TestLinearBackoff(NIOBlockTestCase):
         retry_num += 1
         # Last retry should return false and not sleep
         with patch('nio.block.mixins.retry.strategies.linear.sleep') as sleep:
-            # block._backoff_strategy.request_failed(Exception())
             self.assertFalse(block._backoff_strategy.should_retry(retry_num))
             sleep.assert_not_called()
