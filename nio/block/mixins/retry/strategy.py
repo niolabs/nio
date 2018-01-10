@@ -23,17 +23,8 @@ class BackoffStrategy(object):
         self.max_retry = max_retry
         self.multiplier = multiplier
         self.indefinite = indefinite
-        self.retry_num = 0
 
-    def request_failed(self, exc):
-        """ Called when a retryable request fails """
-        self.retry_num += 1
-
-    def request_succeeded(self):
-        """ Called when a retryable request succeeds """
-        self.retry_num = 0
-
-    def should_retry(self):
+    def should_retry(self, retry_num):
         """ Determine whether or not we should retry this time.
 
         This function is responsible for determining whether or not a retry
@@ -51,8 +42,8 @@ class BackoffStrategy(object):
                 retrying
         """
         self.logger.info("Executing retry number {}, max retries is {}".format(
-            self.retry_num, self.max_retry))
-        if self.max_retry >= 0 and self.retry_num > self.max_retry:
+            retry_num, self.max_retry))
+        if self.max_retry >= 0 and retry_num > self.max_retry:
             # There is a configured max number of retries and we are
             # officially past it, see if we continue or not
             if not self.indefinite:

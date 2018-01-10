@@ -11,7 +11,7 @@ from nio.block.mixins.retry.strategy import BackoffStrategy
 class SimpleBackoffStrategy(BackoffStrategy):
     """ A backoff strategy that always retries immediately """
 
-    def should_retry(self):
+    def should_retry(self, retry_num):
         return True
 
 class EventDrivenBackoffStrategy(BackoffStrategy):
