@@ -20,7 +20,7 @@ class EventDrivenBackoffStrategy(BackoffStrategy):
         super().__init__(*args, **kwargs)
         self._retry_event = retry_event
 
-    def wait_for_retry(self):
+    def wait_for_retry(self, retry_num):
         result = self._retry_event.wait(2)
         if not result:
             raise AssertionError('retry event not set')

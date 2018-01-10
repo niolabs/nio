@@ -55,7 +55,7 @@ class BackoffStrategy(object):
         # our max yet, let's retry
         return True
 
-    def wait_for_retry(self):
+    def wait_for_retry(self, retry_num):
         """ Do any waiting before the next retry is actually executed.
 
         The strategy implementation will want to override this method to

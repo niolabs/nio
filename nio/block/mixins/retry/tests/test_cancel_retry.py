@@ -18,7 +18,7 @@ class SleepBackoffStrategy(BackoffStrategy):
     def should_retry(self, retry_num):
         return True
 
-    def wait_for_retry(self):
+    def wait_for_retry(self, retry_num):
         sleep(self._sleep_time)
 
 
