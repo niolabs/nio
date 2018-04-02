@@ -1,0 +1,564 @@
+{
+	"info": {
+		"_postman_id": "836823de-aa18-45da-bf34-2dd7575d67d1",
+		"name": "nio core API",
+		"description": "https://docs.n.io/api/",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "core",
+			"description": "",
+			"item": [
+				{
+					"name": "Get Core configuration",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/nio",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"nio"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Shutdown",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/config/refresh",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"config",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "services",
+			"description": "",
+			"item": [
+				{
+					"name": "Get Services",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/services",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"services"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "blocks",
+			"description": "",
+			"item": [
+				{
+					"name": "Get Blocks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/blocks",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"blocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Block by Name or ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/blocks/logger1",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"blocks",
+								"logger1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new Block",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/javascript"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"type\": \"Logger\"\n}"
+						},
+						"url": {
+							"raw": "{{nio_url}}/blocks",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"blocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new Block (w/ name)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/javascript"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"type\": \"Logger\",\n\t\"id\": \"3973c59b-6aa4-4f72-aa55-51e761a1b282\",\n\t\"name\": \"My Sweet Logger Block Name\"\n}"
+						},
+						"url": {
+							"raw": "{{nio_url}}/blocks",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"blocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Block",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/javascript"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"logger--RENAMED\"\n}"
+						},
+						"url": {
+							"raw": "localhost:8181/blocks/logger1",
+							"host": [
+								"localhost"
+							],
+							"port": "8181",
+							"path": [
+								"blocks",
+								"logger1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Block",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/javascript"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{nio_url}}/blocks/{id}",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"blocks",
+								"{id}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "blocks_types",
+			"description": "",
+			"item": [
+				{
+					"name": "Get Block Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/blocks_types",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"blocks_types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Block by Type",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/blocks_types/Logger",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"blocks_types",
+								"Logger"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "services_types",
+			"description": "",
+			"item": [
+				{
+					"name": "Get Service Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/services_types",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"services_types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Service by Type",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/services_types/Service",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"services_types",
+								"Service"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "config",
+			"description": "",
+			"item": [
+				{
+					"name": "Refresh Config",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/config/refresh",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"config",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "logs",
+			"description": "",
+			"item": [
+				{
+					"name": "Get Loggers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/log",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"log"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Loggers (w/ levels)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/log?level",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"log"
+							],
+							"query": [
+								{
+									"key": "level",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Logger Level",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"log_level\": \"DEBUG\",\n\t\"logger_name\": \"pubkeeper.protocol\"\n}"
+						},
+						"url": {
+							"raw": "{{nio_url}}/log",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"log"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Last 100 Logs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/log/entries",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"log",
+								"entries"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Last 200 Logs from Service with ERROR",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/log/entries?name=servicev3&level=ERROR&count=200",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"log",
+								"entries"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "servicev3"
+								},
+								{
+									"key": "level",
+									"value": "ERROR"
+								},
+								{
+									"key": "count",
+									"value": "200"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Service Loggers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{nio_url}}/log/service/servicev3?level",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"log",
+								"service",
+								"servicev3"
+							],
+							"query": [
+								{
+									"key": "level",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Service Logger Level",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"log_level\": \"DEBUG\",\n\t\"logger_name\": \"servicev3.Brew v1 protocol\"\n}"
+						},
+						"url": {
+							"raw": "{{nio_url}}/log/service/servicev3",
+							"host": [
+								"{{nio_url}}"
+							],
+							"path": [
+								"log",
+								"service",
+								"servicev3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "Admin",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "Admin",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "3bcdd3a8-2315-4ab4-8518-9d95556687b7",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "8d93030c-0c99-4588-bf18-878c92ded59d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "0bd5e303-1973-417a-aacb-cdc2a7cb0e04",
+			"key": "nio_url",
+			"value": "http://localhost:8181",
+			"type": "string",
+			"description": ""
+		}
+	]
+}
