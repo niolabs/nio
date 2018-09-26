@@ -41,7 +41,6 @@ class PropertyHolder(object):
             ignore_none (bool): if True, properties that have a value equal to
                 None are ignored (useful when wanting to validate errors on
                 properties for which a value other than None has been assigned)
-
         Raises:
             AllowNoneViolation: Property value does not allow none, available
                 when ignore_none is False
@@ -52,7 +51,8 @@ class PropertyHolder(object):
         for (property_name, prop) in class_properties.items():
             # Deserialize the raw value of the PropertyValue
             value = getattr(self, property_name).value
-            if value is None and ignore_none:
+            if value is None and (ignore_none or \
+                                  getattr(prop, 'allow_none', False)):
                 continue
             # Deserialize to check for AllowNoneViolation and TypeError
             prop.deserialize(value)
