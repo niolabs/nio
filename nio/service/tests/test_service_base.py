@@ -241,17 +241,31 @@ class TestBaseService(NIOTestCase):
 
     def test_failed_start(self):
         """Test service start failure"""
-        context = ServiceContext({"id": "TestFailedStart"},
-                                 [],
-                                 BlockRouter)
-
         service = Service()
-        service.configure(context)
 
-        service.start = Mock(side_effect=Exception())
+        class Block1(Block):
+            pass
+
+        class Block2(Block):
+            pass
+
+        Block1.start = Mock()
+        Block2.start = Mock(side_effect=Exception)
+        blocks = [{"type": Block1,
+                   "properties": {'id': 'block1'}},
+                  {"type": Block2,
+                   "properties": {'id': 'block2'}}]
+
+        service.do_configure(ServiceContext(
+            properties={"id": "ServiceId"},
+            blocks=blocks,
+            block_router_type=BlockRouter,
+            blocks_async_start=False,
+            blocks_async_stop=False
+        ))
         with self.assertRaises(Exception):
             service.do_start()
 
-        service.start.assert_called_once_with()
-        self.assertIn('error', str(service.status).split(', '))
-        service.stop()
+        Block1.start.assert_called_once_with()
+        Block2.start.assert_called_once_with()
+        self.assertEqual(str(service.status), 'starting, error')

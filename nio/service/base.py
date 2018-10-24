@@ -12,6 +12,15 @@ from nio.util.runner import Runner, RunnerStatus
 from nio.util.threading import spawn
 
 
+class BlockException(Exception):
+
+    """ Raised when a block fails to start, includes the block id.
+    """
+    def __init__(self, id=None, label=None):
+        super().__init__()
+        self.id = id
+        self.label = label
+
 class BlockExecution(PropertyHolder):
 
     """ An object containing a block and its receivers
@@ -110,9 +119,15 @@ class Service(PropertyHolder, CommandHolder, Runner):
 
         if self._blocks_async_start:
             self._execute_on_blocks_async("do_start")
+            # TODO: Make sure block exceptions work with async block start
         else:
             for block in self._blocks.values():
-                block.do_start()
+                try:
+                    block.do_start()
+                except Exception as e:
+                    raise BlockException(
+                        id=block.id(),
+                        label=block.label()).with_traceback(e.__traceback__)
 
     def stop(self):
         """Overrideable method to be called when the service stops.
