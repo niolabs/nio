@@ -16,8 +16,8 @@ class BlockException(Exception):
 
     """ Raised when a block fails to start, includes the block id.
     """
-    def __init__(self, id=None, label=None):
-        super().__init__()
+    def __init__(self, *args, id=None, label=None):
+        super().__init__(*args)
         self.id = id
         self.label = label
 
@@ -125,9 +125,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
                 try:
                     block.do_start()
                 except Exception as e:
-                    raise BlockException(
-                        id=block.id(),
-                        label=block.label()).with_traceback(e.__traceback__)
+                    raise BlockException(e, id=block.id(), label=block.label())
 
     def stop(self):
         """Overrideable method to be called when the service stops.
