@@ -14,7 +14,7 @@ from nio.util.threading import spawn
 
 class BlockException(Exception):
 
-    """ Raised when a block fails to start, includes the block id.
+    """ Raised when a block fails to start, includes the block id and label.
     """
     def __init__(self, *args, id=None, label=None):
         super().__init__(*args)
@@ -125,7 +125,12 @@ class Service(PropertyHolder, CommandHolder, Runner):
                 try:
                     block.do_start()
                 except Exception as e:
-                    raise BlockException(e, id=block.id(), label=block.label())
+                    block_label = getattr(block, "label", None)
+                    if block_label is not None:
+                        block_label = block_label()
+                    raise BlockException(e,
+                                         id=block.id(),
+                                         label=block_label)
 
     def stop(self):
         """Overrideable method to be called when the service stops.
