@@ -270,5 +270,5 @@ class TestBaseService(NIOTestCase):
             service.do_start()
         except BlockException as e:
             self.assertEqual(e.label, "block2")
-        # status is set when a Runner raises during do_start()
-        self.assertEqual(str(service.status), "starting, error")
+        service.do_stop()
+        self.assertEqual(str(service.status), "stopped, starting, error")
