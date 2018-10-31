@@ -271,4 +271,4 @@ class TestBaseService(NIOTestCase):
         except BlockException as e:
             self.assertEqual(e.label, "block2")
         service.do_stop()
-        self.assertEqual(str(service.status), "stopped, starting, error")
+        self.assertIn("error", str(service.status).split(", "))
