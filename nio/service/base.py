@@ -124,13 +124,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
                 try:
                     block.do_start()
                 except Exception as e:
-                    block_label = getattr(block, "label", None)
-                    if block_label is not None:
-                        block_label = block_label()
-                    else:
-                        # backwards compatability
-                        block_label = block.id()
-                    raise BlockException(e, label=block_label)
+                    raise BlockException(e, label=block.label())
 
     def stop(self):
         """Overrideable method to be called when the service stops.
