@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 from nio import Block
 from nio.properties.exceptions import AllowNoneViolation
 from nio.router.base import BlockRouter
-from nio.service.base import Service
+from nio.service.base import BlockException, Service
 from nio.service.context import ServiceContext
 from nio.signal.base import Signal
 from nio.testing.test_case import NIOTestCase
@@ -241,31 +241,32 @@ class TestBaseService(NIOTestCase):
 
     def test_failed_start(self):
         """Test service start failure"""
-        service = Service()
-
         class Block1(Block):
             pass
+
 
         class Block2(Block):
             pass
 
+
+        class TestException(Exception):
+            def __init__(self):
+                super().__init__("bad things")
+
+        service = Service()
         Block1.start = Mock()
-        Block2.start = Mock(side_effect=Exception)
+        Block2.start = Mock(side_effect=TestException)
         blocks = [{"type": Block1,
-                   "properties": {'id': 'block1'}},
+                   "properties": {"id": "block1"}},
                   {"type": Block2,
-                   "properties": {'id': 'block2'}}]
+                   "properties": {"id": "block2"}}]
 
         service.do_configure(ServiceContext(
             properties={"id": "ServiceId"},
             blocks=blocks,
             block_router_type=BlockRouter,
-            blocks_async_start=False,
-            blocks_async_stop=False
         ))
-        with self.assertRaises(Exception):
+        try:
             service.do_start()
-
-        Block1.start.assert_called_once_with()
-        Block2.start.assert_called_once_with()
-        self.assertEqual(str(service.status), 'starting, error')
+        except BlockException as e:
+            self.assertEqual(e.label, "block2")
