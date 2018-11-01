@@ -118,7 +118,6 @@ class Service(PropertyHolder, CommandHolder, Runner):
 
         if self._blocks_async_start:
             self._execute_on_blocks_async("do_start")
-            # TODO: Make sure block exceptions work with async block start
         else:
             for block in self._blocks.values():
                 try:
