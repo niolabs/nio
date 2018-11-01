@@ -210,13 +210,21 @@ class Service(PropertyHolder, CommandHolder, Runner):
                 configure_threads.append(
                     spawn(block.do_configure, block_context))
             else:
-                block.do_configure(block_context)
+                try:
+                    block.do_configure(block_context)
+                except Exception as e:
+                    raise BlockException(e, label=block.label())
             # register it
             self._blocks[block.id()] = block
         # if configuration was async, ensure they are all done
         if configure_threads:
             for thread in configure_threads:
-                thread.join()
+                try:
+                    thread.join()
+                except Exception as e:
+                    label = thread._args[0].properties["name"] or \
+                            thread._args[0].properties["id"]
+                    raise BlockException(e, label=label)
 
         # populate router context and configure block router
         router_context = RouterContext(self.execution(),
