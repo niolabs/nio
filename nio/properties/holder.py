@@ -41,6 +41,7 @@ class PropertyHolder(object):
             ignore_none (bool): if True, properties that have a value equal to
                 None are ignored (useful when wanting to validate errors on
                 properties for which a value other than None has been assigned)
+
         Raises:
             AllowNoneViolation: Property value does not allow none, available
                 when ignore_none is False
