@@ -5,4 +5,4 @@ from nio.signal.base import Signal
 from nio.modules.module import Module
 from nio.util.discovery import discoverable
 
-__version__ = '3.1.2'
+__version__ = '3.2.1'

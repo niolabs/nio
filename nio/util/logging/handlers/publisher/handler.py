@@ -52,11 +52,14 @@ class PublisherHandler(logging.Handler):
 
         """
         try:
+            msg = record.msg
+            if hasattr(record, "exc_text") and record.exc_text:
+                msg += record.exc_text
             # publishing it as a signal
             signal = LogSignal(self._get_time_as_str(record.created),
                                record.context,
                                record.levelname,
-                               record.msg,
+                               msg,
                                record.filename,
                                record.funcName,
                                record.lineno)
