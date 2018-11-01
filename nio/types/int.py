@@ -14,4 +14,8 @@ class IntType(Type):
         try:
             return int(value)
         except:
+            if value is None:
+                # allow_none has already been checked and None 
+                # is a valid value for an IntType
+                return None
             raise TypeError("Unable to cast value to an int: {}".format(value))

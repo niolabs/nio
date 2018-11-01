@@ -14,4 +14,8 @@ class FloatType(Type):
         try:
             return float(value)
         except:
+            if value is None:
+                # allow_none has already been checked and None 
+                # is a valid value for a FloatType
+                return None
             raise TypeError("Unable to cast value to float: {}".format(value))

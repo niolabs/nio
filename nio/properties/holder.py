@@ -51,8 +51,7 @@ class PropertyHolder(object):
         for (property_name, prop) in class_properties.items():
             # Deserialize the raw value of the PropertyValue
             value = getattr(self, property_name).value
-            if value is None and (ignore_none or \
-                                  getattr(prop, 'allow_none', False)):
+            if value is None and ignore_none:
                 continue
             # Deserialize to check for AllowNoneViolation and TypeError
             prop.deserialize(value)

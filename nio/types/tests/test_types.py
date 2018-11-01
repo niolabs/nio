@@ -72,6 +72,11 @@ class TestTypes(NIOTestCase):
                 with self.assertRaises(TypeError):
                     type_.deserialize(value)
 
+    def test_allowed_none_values(self):
+        """Int and Float Properties are able to evaluate to None if allowed"""
+        none_int = IntType.deserialize(None)
+        none_float = FloatType.deserialize(None)
+
     def test_serialize_deserialize_enum_type(self):
         """serialize then deserialize returns input value for enum type."""
         type_ = SelectType
