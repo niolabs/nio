@@ -13,7 +13,7 @@ class IntType(Type):
         """ Convert value to int """
         try:
             return int(value)
-        except:
+        except TypeError:
             if value is None:
                 # allow_none has already been checked and None 
                 # is a valid value for an IntType
