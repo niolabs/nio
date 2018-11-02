@@ -13,7 +13,7 @@ class FloatType(Type):
         """ Convert value to float """
         try:
             return float(value)
-        except TypeError:
+        except (TypeError, ValueError):
             if value is None:
                 # allow_none has already been checked and None 
                 # is a valid value for a FloatType
