@@ -161,7 +161,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
         for block in self._blocks.values():
             # no apparent way to retrieve block label from the thread object
             threads.append({
-                "block": block.name() or block.id(),
+                "block": block,
                 "thread": spawn(getattr(block, method)),
             })
 
@@ -169,7 +169,7 @@ class Service(PropertyHolder, CommandHolder, Runner):
             try:
                 thread["thread"].join()
             except Exception as e:
-                raise BlockException(e, label=thread["block"])
+                raise BlockException(e, label=thread["block"].label())
 
     def configure(self, context):
         """Configure the service based on the context
