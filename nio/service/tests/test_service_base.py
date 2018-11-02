@@ -240,9 +240,7 @@ class TestBaseService(NIOTestCase):
         service_mgmt_signal_handler.assert_called_once_with(my_sig)
 
     def test_failed_start(self):
-        """Test BlockException is raised if do_start fails, including the
-        original block object.
-        """
+        """Test service start failure"""
         class Block1(Block):
             pass
 
@@ -268,8 +266,9 @@ class TestBaseService(NIOTestCase):
             blocks=blocks,
             block_router_type=BlockRouter,
         ))
-        with self.assertRaises(BlockException) as context:
+        try:
             service.do_start()
-        self.assertEqual(context.exception.block, service.blocks["block2"])
-        self.assertIn("error", str(service.status).split(", "))
+        except BlockException as e:
+            self.assertEqual(e.label, "block2")
         service.do_stop()
+        self.assertIn("error", str(service.status).split(", "))
