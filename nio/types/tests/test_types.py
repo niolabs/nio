@@ -73,7 +73,7 @@ class TestTypes(NIOTestCase):
                     type_.deserialize(value)
 
     def test_allowed_none_values(self):
-        """Int and Float Properties are able to evaluate to None if allowed"""
+        """Int and Float Types are able to evaluate to None if allowed"""
         none_int = IntType.deserialize(None)
         none_float = FloatType.deserialize(None)
 
