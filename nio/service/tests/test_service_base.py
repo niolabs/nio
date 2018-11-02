@@ -266,9 +266,7 @@ class TestBaseService(NIOTestCase):
             blocks=blocks,
             block_router_type=BlockRouter,
         ))
-        try:
+        with self.assertRaises(BlockException) as context:
             service.do_start()
-        except BlockException as e:
-            self.assertEqual(e.label, "block2")
-        service.do_stop()
+        self.assertEqual(context.exception.label, "block2")
         self.assertIn("error", str(service.status).split(", "))
