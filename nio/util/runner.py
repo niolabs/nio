@@ -79,9 +79,11 @@ class Runner(object):
             self.configure(context)
             self.status.replace(RunnerStatus.configuring,
                                 RunnerStatus.configured)
-        except Exception:
+        except Exception as e:
             self.logger.exception("Failed to configure")
-            self.status.add(RunnerStatus.error)
+            self.status.add(RunnerStatus.error, value={
+                "exception": e
+            })
             raise
 
     def do_start(self):
@@ -116,6 +118,8 @@ class Runner(object):
         try:
             self.stop()
             self.status.replace(RunnerStatus.stopping, RunnerStatus.stopped)
-        except Exception:
+        except Exception as e:
             self.logger.exception("Failed to stop")
-            self.status.add(RunnerStatus.error)
+            self.status.add(RunnerStatus.error, value={
+                "exception": e
+            })

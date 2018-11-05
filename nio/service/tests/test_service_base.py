@@ -268,5 +268,5 @@ class TestBaseService(NIOTestCase):
         ))
         with self.assertRaises(BlockException) as context:
             service.do_start()
-        self.assertEqual(context.exception.label, "block2")
+        self.assertEqual(context.exception.block_label, "block2")
         self.assertIn("error", str(service.status).split(", "))
