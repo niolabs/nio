@@ -16,10 +16,12 @@ class BlockException(Exception):
 
     """ Raised when a block fails to start, includes the block label.
     """
-    def __init__(self, *args, block):
-        super().__init__(*args)
-        self.block_label = block.label()
-        self.block_id = block.id()
+    def __init__(
+            self, *args, block_label="Unknown block", block_id=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.block_label = block_label
+        self.block_id = block_id
+
 
 class BlockExecution(PropertyHolder):
 
@@ -124,7 +126,8 @@ class Service(PropertyHolder, CommandHolder, Runner):
                 try:
                     block.do_start()
                 except Exception as e:
-                    raise BlockException(e, block=block)
+                    raise BlockException(
+                        e, block_label=block.label(), block_id=block.id())
 
     def stop(self):
         """Overrideable method to be called when the service stops.
@@ -170,7 +173,9 @@ class Service(PropertyHolder, CommandHolder, Runner):
             try:
                 thread["thread"].join()
             except Exception as e:
-                raise BlockException(e, block=thread["block"])
+                block = thread["block"]
+                raise BlockException(
+                    e, block_label=block.label(), block_id=block.id())
 
     def configure(self, context):
         """Configure the service based on the context
@@ -222,7 +227,8 @@ class Service(PropertyHolder, CommandHolder, Runner):
                 try:
                     block.do_configure(block_context)
                 except Exception as e:
-                    raise BlockException(e, block=block)
+                    raise BlockException(
+                        e, block_label=block.label(), block_id=block.id())
             # register it
             self._blocks[block.id()] = block
         # if configuration was async, ensure they are all done
@@ -231,7 +237,9 @@ class Service(PropertyHolder, CommandHolder, Runner):
                 try:
                     thread["thread"].join()
                 except Exception as e:
-                    raise BlockException(e, block=thread["block"])
+                    block = thread["block"]
+                    raise BlockException(
+                        e, block_label=block.label(), block_id=block.id())
 
         # populate router context and configure block router
         router_context = RouterContext(self.execution(),
