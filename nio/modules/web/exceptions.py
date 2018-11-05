@@ -1,15 +1,17 @@
 class HTTPError(Exception):
 
-    def __init__(self, status=500, message=None):
+    def __init__(self, status=500, message=None, body=None):
         """ Create a new HTTPError instance.
 
         Args:
             status: http error status
             message: http optional error message
+            body (dict): An optional dictionary to include in the response
         """
         super().__init__()
         self.status = status
         self.message = message
+        self.body = body
 
 
 class HTTPNotImplemented(HTTPError):

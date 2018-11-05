@@ -47,7 +47,6 @@ class FlagsEnum(object):
         self._enum = enum
         self._status_change_callback = status_change_callback
         self._flags = {}
-        self.error_details = {}
 
         self.clear()
         if default_flag:
@@ -195,7 +194,7 @@ class FlagsEnum(object):
 
     def get_flag(self, flag):
         """ Returns the value of a flag """
-        return self._flags.get(flag.name, None)
+        return self._flags.get(flag.name, False)
 
     def clear(self):
         """ Resets all possible flag values
