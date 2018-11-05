@@ -94,6 +94,19 @@ class TestFlagsEnum(NIOTestCase):
         self.assertFalse(status.is_set(Status.stopping))
         self.assertFalse(status.is_set(Status.deliver_signal_error))
 
+    def test_custom_values(self):
+        """ Make sure we can set custom values on our flags """
+        status = FlagsEnum(Status, Status.created)
+        # Default to True for the value
+        self.assertTrue(status.is_set(Status.created))
+        self.assertTrue(status.get_flag(Status.created))
+        # Set a custom value to our flag
+        status.set(Status.started, value='started here!')
+        self.assertEqual(status.get_flag(Status.started), 'started here!')
+        # Flags that have been unset or never set should be False
+        self.assertFalse(status.get_flag(Status.created))
+        self.assertFalse(status.get_flag(Status.stopped))
+
     def test_callback(self):
         # assert that it can be initialized with a flag
         self._callback_called = False

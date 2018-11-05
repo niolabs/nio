@@ -94,9 +94,11 @@ class Runner(object):
         try:
             self.start()
             self.status.replace(RunnerStatus.starting, RunnerStatus.started)
-        except Exception:
+        except Exception as e:
             self.logger.exception("Failed to start")
-            self.status.add(RunnerStatus.error)
+            self.status.add(RunnerStatus.error, value={
+                "exception": e
+            })
             raise
 
     def do_stop(self):
