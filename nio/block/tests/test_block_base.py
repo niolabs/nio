@@ -124,6 +124,15 @@ class TestBaseBlock(NIOTestCaseNoModules):
         with self.assertRaises(TypeError):
             blk.notify_signals(dict_signal, "default")
 
+    def test_notify_empty_list(self):
+        """Make sure empty lists notified are ignored"""
+        blk = Block()
+        blk.do_configure(BlockContext(BlockRouter(), {"id": "BlockId"},))
+
+        with patch.object(blk, '_block_router') as router_patch:
+            blk.notify_signals([])
+            self.assertEqual(router_patch.notify_signals.call_count, 0)
+
     def test_add_to_status_with_helper(self):
         """ Test the block adds to its status with the helper method """
         mgmt_signal_handler = Mock()

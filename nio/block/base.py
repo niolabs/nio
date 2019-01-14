@@ -207,7 +207,8 @@ class Base(PropertyHolder, CommandHolder, Runner):
         """Notify signals to router.
 
         This is the method the block should call whenever it would like
-        to "output" signals for the router to send downstream.
+        to "output" signals for the router to send downstream. Empty signal
+        lists are safely/silently ignored.
 
         Args:
             signals (list): A list of signals to notify to the router
@@ -222,9 +223,12 @@ class Base(PropertyHolder, CommandHolder, Runner):
         Raises:
             TypeError: when signals are not instances of class Signal
         """
-
         if isinstance(signals, dict):
             raise TypeError("Signals cannot be a dictionary")
+
+        if not signals:
+            self.logger.debug("Ignoring empty signal list")
+            return
 
         # if a single Signal is being notified, make it a list
         if isinstance(signals, Signal):
