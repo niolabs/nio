@@ -171,4 +171,4 @@ class TestRetry(NIOBlockTestCase):
         # SimpleBackoffStrategy was ignored and no retries were executed
         with self.assertRaises(CustomException):
             block.execute_with_retry(target_func)
-        # self.assertEqual(target_func.call_count, 1)
+        self.assertEqual(target_func.call_count, 1)
