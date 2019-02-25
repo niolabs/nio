@@ -314,6 +314,15 @@ class Base(PropertyHolder, CommandHolder, Runner):
         """
         pass
 
+    def should_retry(self):
+        """ Overridable method indicating whether or not an implemented 
+        retry strategy should be allowed to retry.
+        
+        Returns:
+            boolean
+        """
+        return True
+
     @classmethod
     def get_description(cls):
         """ Get a dictionary description of this block.
