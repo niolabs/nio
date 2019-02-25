@@ -144,7 +144,8 @@ class Retry(object):
                     "Retryable execution on method {} failed".format(
                         execute_method_name), exc_info=True)
                 backoff_strategy.request_failed(exc)
-                should_retry = backoff_strategy.should_retry()
+                should_retry = self.should_retry() and \
+                               backoff_strategy.should_retry()
                 if not should_retry:
                     # Backoff strategy has said we're done retrying
                     self.logger.exception(

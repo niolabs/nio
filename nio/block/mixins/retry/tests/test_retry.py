@@ -29,6 +29,15 @@ class EventDrivenBackoffStrategy(BackoffStrategy):
             raise AssertionError('retry event not set')
 
 
+class NoRetryBlock(Retry, Block):
+
+    def setup_backoff_strategy(self):
+        self.use_backoff_strategy(SimpleBackoffStrategy)
+
+    def should_retry(self):
+        return False
+
+
 class RetryingBlock(Retry, Block):
 
     def setup_backoff_strategy(self):
@@ -146,3 +155,20 @@ class TestRetry(NIOBlockTestCase):
         # each execute_with_retry call should net 3 target_func calls
         self.assertEqual(target_func_1.call_count, 3)
         self.assertEqual(target_func_2.call_count, 3)
+
+    def test_should_retry_method(self):
+        """Block implements a `should_retry` method which takes precedence
+        over the backoff strategy's method by the same name."""
+        block = NoRetryBlock()
+        self.configure_block(block, {})
+
+        class CustomException(Exception):
+            pass
+
+        # target_func fails forever
+        target_func = MagicMock(side_effect=CustomException)
+
+        # SimpleBackoffStrategy was ignored and no retries were executed
+        with self.assertRaises(CustomException):
+            block.execute_with_retry(target_func)
+        # self.assertEqual(target_func.call_count, 1)
