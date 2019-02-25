@@ -94,6 +94,29 @@ class TestRetry(NIOBlockTestCase):
         block.execute_with_retry(target_func)
         self.assertEqual(block.before_retry.call_count, 2)
 
+    def test_max_retry_exhausted_called(self):
+        """Tests that the block's max_retry_exhausted function is called"""
+        block = VanillaBlock()
+        self.configure_block(block, {})
+        
+        class CustomException(Exception):
+            pass
+
+        this_exception = CustomException()
+        # target_func fails forever
+        target_func = MagicMock(side_effect=this_exception)
+        # max_retry_exhausted needs to be mocked for assertions while also
+        # raising the original exception
+        block.max_retry_exhausted = MagicMock(side_effect=this_exception)
+
+        target_func_call = spawn(block.execute_with_retry, target_func)
+        block._retry_event.set()  # don't wait for EventDrivenBackoffStrategy
+        with self.assertRaises(CustomException):
+            target_func_call.join()
+        # max_retry_exhausted was called with the original exception
+        self.assertEqual(block.max_retry_exhausted.call_count, 1)
+        block.max_retry_exhausted.assert_called_once_with(this_exception)
+
     def test_bad_strategy(self):
         """Test that an exception is raised with a non-BackoffStrategy """
         block = RetryingBlock()

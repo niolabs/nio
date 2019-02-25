@@ -146,12 +146,11 @@ class Retry(object):
                 backoff_strategy.request_failed(exc)
                 should_retry = backoff_strategy.should_retry()
                 if not should_retry:
-                    # Backoff strategy has said we're done retrying,
-                    # so re-raise the exception
+                    # Backoff strategy has said we're done retrying
                     self.logger.exception(
                         "Out of retries for method {}.".format(
                             execute_method_name))
-                    raise
+                    self.max_retry_exhausted(exc)
                 else:
                     # Backoff strategy has instructed us to retry again. First
                     # let the strategy do any waiting, then execute any
@@ -191,3 +190,14 @@ class Retry(object):
         any other behavior that may make the next retry attempt succeed.
         """
         pass  # pragma: no cover
+
+    def max_retry_exhausted(self, exc):
+        """ Called when the backoff strategy's `should_retry` returns False.
+        Override this in your block to define behavior when all retries have 
+        ben exhausted without success.
+
+        Args:
+            exc (Exception): The exception raised by the `execute_method` 
+                passed to `execute_with_retry()`
+        """
+        raise exc
